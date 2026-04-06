@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Mail, Lock, ShieldCheck } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -19,16 +19,13 @@ export default function AdminLogin() {
   const { profile, loading: profileLoading } = useProfile(session?.user ?? null);
 
   useEffect(() => {
-    console.log('AdminLogin State:', { authLoading, profileLoading, session: !!session, role: profile?.role });
     if (!authLoading && !profileLoading && session && profile?.role === 'admin') {
-      console.log('Auto-redirecting to admin dashboard');
       navigate('/admin/invoxa', { replace: true });
     }
   }, [session, profile, authLoading, profileLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt started');
     setLoading(true);
     setError(null);
 
@@ -42,8 +39,6 @@ export default function AdminLogin() {
       if (signInError) throw signInError;
       if (!data.user) throw new Error('Utilisateur introuvable');
 
-      console.log('Auth success, user id:', data.user.id);
-
       // Étape 2 : Vérifier le rôle immédiatement
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -51,30 +46,24 @@ export default function AdminLogin() {
         .eq('id', data.user.id)
         .single();
 
-      console.log('Profile fetch result:', { profileData, profileError });
-
       if (profileError) throw profileError;
       if (!profileData) throw new Error('Profil introuvable');
 
       // Étape 3 : Vérifications
       if (profileData.is_suspended) {
-        console.log('Account suspended');
         await supabase.auth.signOut();
         throw new Error('Ce compte est suspendu.');
       }
 
       if (profileData.role !== 'admin') {
-        console.log('Not an admin');
         await supabase.auth.signOut();
         throw new Error("Accès refusé. Ce compte n'a pas les droits administrateur.");
       }
 
       // Étape 4 : Redirection
-      console.log('All checks passed, navigating to /admin/invoxa');
       navigate('/admin/invoxa', { replace: true });
 
     } catch (err: unknown) {
-      console.error('Login error:', err);
       if (err instanceof Error) {
         const msg = err.message;
         if (msg.includes('Invalid login credentials')) {
@@ -88,7 +77,6 @@ export default function AdminLogin() {
         setError('Une erreur est survenue. Réessayez.');
       }
     } finally {
-      console.log('Login attempt finished');
       setLoading(false);
     }
   };

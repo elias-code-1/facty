@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 interface AdminStatCardProps {
   title: string;

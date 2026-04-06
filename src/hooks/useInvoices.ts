@@ -44,8 +44,6 @@ export function useInvoices(user: User | null) {
   const createInvoice = async (data: InvoiceFormData, items: InvoiceItemFormData[]): Promise<string> => {
     if (!user) throw new Error('Utilisateur non connecté');
 
-    console.log('Tentative de création de facture:', { data, itemsCount: items.length });
-
     try {
       // 0. Vérifier l'unicité du numéro
       const isUnique = await checkInvoiceNumberUnique(data.invoice_number);
@@ -237,8 +235,6 @@ export function useInvoices(user: User | null) {
     if (currentInvoice && (currentInvoice.status === 'paid' || currentInvoice.status === 'cancelled')) {
       throw new Error('Cette facture est verrouillée (payée ou annulée) et ne peut plus être modifiée.');
     }
-
-    console.log(`Changement de statut pour ${id} vers ${status}`);
     
     // Mise à jour optimiste locale
     const oldInvoices = [...invoices];

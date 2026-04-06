@@ -13,7 +13,7 @@ import InvoiceActions from '../components/invoice/InvoiceActions';
 import InvoiceStatusBadge from '../components/invoice/InvoiceStatusBadge';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 /**
  * Page de détail d'une facture

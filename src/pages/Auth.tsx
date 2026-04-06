@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import Modal from '../components/ui/Modal';

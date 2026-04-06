@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { User, Clock, FileText, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { InactiveUser } from '../../hooks/useAdminStats';
 

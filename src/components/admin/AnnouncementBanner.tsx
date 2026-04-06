@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Info, AlertTriangle, CheckCircle, XCircle, X } from 'lucide-react';
 import { Announcement } from '../../types/database';
 

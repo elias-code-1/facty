@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Save, Send, ChevronLeft, Layout, FileText, UserPlus, Loader2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useProfile } from '../hooks/useProfile';
@@ -112,11 +112,6 @@ export default function InvoiceNew() {
     try {
       // Filtrer les lignes vides pour les brouillons
       const filteredItems = items.filter(item => item.description.trim() !== '');
-      
-      console.log('Données envoyées pour création:', {
-        formData: { ...formData, status },
-        items: filteredItems
-      });
 
       const invoiceId = await createInvoice({ ...formData, status }, filteredItems);
       showToast(status === 'draft' ? 'Brouillon enregistré !' : 'Facture créée avec succès !', 'success');

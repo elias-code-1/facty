@@ -1,4 +1,4 @@
-/** Configuration Tailwind CSS v3 (adaptée pour v4 si nécessaire) */
+/** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
   content: [

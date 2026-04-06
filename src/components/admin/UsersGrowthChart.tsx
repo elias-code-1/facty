@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 interface UsersGrowthChartProps {
   data: {

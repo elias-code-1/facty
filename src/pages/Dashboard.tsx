@@ -23,7 +23,7 @@ import AnnouncementBanner from '../components/admin/AnnouncementBanner';
 import { formatCurrency, formatDate } from '../utils/invoice';
 import Spinner from '../components/ui/Spinner';
 
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const containerVariants = {
   animate: {

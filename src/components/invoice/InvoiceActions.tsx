@@ -13,7 +13,7 @@ import {
 import { Invoice } from '../../types/database';
 import { useToast } from '../../hooks/useToast';
 
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface InvoiceActionsProps {
   invoice: Invoice;

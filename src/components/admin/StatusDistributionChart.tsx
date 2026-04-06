@@ -6,7 +6,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 interface StatusDistributionChartProps {
   data: {

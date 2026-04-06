@@ -122,27 +122,21 @@ const AdminRoute = () => {
   const { session, user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile(user);
 
-  console.log('AdminRoute State:', { authLoading, profileLoading, session: !!session, role: profile?.role });
-
   // Attendre que LES DEUX soient chargés, et si on a une session, attendre d'avoir le profil
   if (authLoading || profileLoading || (session && !profile)) {
-    console.log('AdminRoute: Waiting for auth or profile...');
     return <FullPageSpinner />;
   }
 
   // Pas connecté → page login admin
   if (!session) {
-    console.log('AdminRoute: No session, redirecting to admin login');
     return <Navigate to="/admin/invoxa/login" replace />;
   }
 
   // Connecté mais pas admin → page login admin (pas de redirection vers /dashboard)
   if (profile?.role !== 'admin') {
-    console.log('AdminRoute: Not an admin, redirecting to admin login');
     return <Navigate to="/admin/invoxa/login" replace />;
   }
 
-  console.log('AdminRoute: Access granted');
   return <Outlet />;
 };
 
