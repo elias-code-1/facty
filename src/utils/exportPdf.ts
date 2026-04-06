@@ -1,0 +1,147 @@
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
+/**
+ * Exporte un élément HTML en PDF de haute qualité
+ * @param elementId L'ID de l'élément à capturer
+ * @param fileName Le nom du fichier de sortie
+ */
+export const exportInvoicePDF = async (
+  elementId: string,
+  fileName: string
+): Promise<void> => {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    throw new Error('Template introuvable');
+  }
+
+  // Masquer les éléments qui ne doivent pas apparaître dans le PDF
+  const noPrintElements = document.querySelectorAll('.no-print');
+  const originalVisibilities: string[] = [];
+  noPrintElements.forEach((el) => {
+    const htmlEl = el as HTMLElement;
+    originalVisibilities.push(htmlEl.style.visibility);
+    htmlEl.style.visibility = 'hidden';
+  });
+
+  try {
+    // Silence the oklab warning
+    const originalWarn = console.warn;
+    console.warn = (...args) => {
+      if (typeof args[0] === 'string' && args[0].includes('oklab')) return;
+      originalWarn(...args);
+    };
+
+    const canvas = await html2canvas(element, {
+      scale: 2, // Haute résolution
+      useCORS: true, // Pour les images externes (logo)
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight,
+      onclone: (clonedDoc) => {
+        // 1. Nettoyer toutes les balises <style> de manière agressive
+        const styleTags = clonedDoc.getElementsByTagName('style');
+        for (let i = 0; i < styleTags.length; i++) {
+          const tag = styleTags[i];
+          if (tag.innerHTML.includes('oklch') || tag.innerHTML.includes('oklab') || tag.innerHTML.includes('color(')) {
+            // Remplacement global de toutes les fonctions de couleur modernes par du noir
+            // On utilise une regex plus large pour capturer les espaces et les slashes
+            tag.innerHTML = tag.innerHTML.replace(/oklch\([\s\S]*?\)/g, '#000000');
+            tag.innerHTML = tag.innerHTML.replace(/oklab\([\s\S]*?\)/g, '#000000');
+            tag.innerHTML = tag.innerHTML.replace(/color\([\s\S]*?\)/g, '#000000');
+          }
+        }
+
+        // 2. Supprimer les balises <link> de styles externes qui pourraient contenir du oklab
+        // html2canvas essaie de les parser et plante. 
+        // On espère que les styles critiques sont dans <style> ou inline.
+        const links = clonedDoc.querySelectorAll('link[rel="stylesheet"]');
+        links.forEach(link => {
+          // Si c'est un lien local ou vers tailwind, on le supprime pour éviter le crash
+          // Les styles inline et les balises <style> déjà nettoyées suffiront
+          link.remove();
+        });
+
+        // 3. Forcer les styles calculés en RGB sur tous les éléments du clone
+        const allElements = clonedDoc.querySelectorAll('*');
+        allElements.forEach((el) => {
+          const htmlEl = el as HTMLElement;
+          const style = window.getComputedStyle(el);
+          
+          const problematicProps = [
+            'color',
+            'backgroundColor', 
+            'borderColor',
+            'outlineColor',
+            'boxShadow',
+            'fill',
+            'stroke'
+          ];
+          
+          problematicProps.forEach((prop) => {
+            try {
+              const value = (style as any)[prop];
+              if (value && (
+                value.includes('oklab') || 
+                value.includes('oklch') || 
+                value.includes('color(')
+              )) {
+                // Si le style calculé contient encore du oklab (rare car le navigateur convertit en rgb),
+                // on force une valeur sûre.
+                (htmlEl.style as any)[prop] = prop === 'boxShadow' ? 'none' : '#000000';
+              } else if (value) {
+                // On force la valeur calculée (qui est normalement en rgb/rgba)
+                // pour court-circuiter les feuilles de style qu'on a pu supprimer
+                (htmlEl.style as any)[prop] = value;
+              }
+            } catch (e) {
+              // Ignorer les erreurs de style
+            }
+          });
+        });
+      }
+    });
+
+    // Restore console.warn
+    console.warn = originalWarn;
+
+    const imgData = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pageHeight = 297; // Hauteur A4 en mm
+
+    if (pdfHeight > pageHeight) {
+      let heightLeft = pdfHeight;
+      let position = 0;
+
+      // Première page
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      // Pages suivantes
+      while (heightLeft > 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+    } else {
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    }
+
+    pdf.save(fileName);
+  } finally {
+    // Restaurer la visibilité des éléments masqués
+    noPrintElements.forEach((el, index) => {
+      (el as HTMLElement).style.visibility = originalVisibilities[index];
+    });
+  }
+};
