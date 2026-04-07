@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import Modal from '../components/ui/Modal';
+import { useToast } from '../hooks/useToast';
 
-type AuthMode = 'login' | 'register' | 'email-sent-register' | 'email-sent-reset' | 'email-verified';
+type AuthMode = 'login' | 'register' | 'email-sent-register' | 'email-sent-reset' | 'email-verified' | 'reset-password';
 
 /** Composant réutilisable pour les champs de saisie */
 interface InputFieldProps {
@@ -48,6 +49,7 @@ export default function Auth() {
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { showToast } = useToast();
 
   // Champs du formulaire
   const [email, setEmail] = useState('');
@@ -76,6 +78,43 @@ export default function Auth() {
   };
 
   const strength = getPasswordStrength();
+
+  // Gestion du hash Supabase (Reset Password / Confirmation Email)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const params = new URLSearchParams(hash.substring(1));
+    const type = params.get('type');
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+
+    if (!accessToken) return;
+
+    // Établir la session depuis le token
+    supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken ?? ''
+    }).then(({ error }) => {
+      if (error) {
+        setError('Lien invalide ou expiré.');
+        return;
+      }
+
+      if (type === 'recovery') {
+        // Afficher le formulaire reset password
+        setMode('reset-password');
+      }
+
+      if (type === 'signup') {
+        // Email confirmé
+        setMode('email-verified');
+      }
+
+      // Nettoyer le hash de l'URL
+      window.history.replaceState(null, '', '/auth');
+    });
+  }, []);
 
   // Gestion du cooldown
   useEffect(() => {
@@ -156,11 +195,23 @@ export default function Auth() {
           return;
         }
 
-        if (regData.user) {
-          const { error: profileErr } = await supabase.from('profiles').update({ full_name: fullName }).eq('id', regData.user.id);
-          if (profileErr) throw profileErr;
-          navigate('/dashboard');
+      } else if (mode === 'reset-password') {
+        if (password.length < 8) throw new Error('Minimum 8 caractères requis');
+        if (password !== confirmPassword) throw new Error('Les mots de passe ne correspondent pas');
+
+        const { error: updateErr } = await supabase.auth.updateUser({
+          password: password
+        });
+
+        if (updateErr) {
+          if (updateErr.message.includes('expired')) {
+            throw new Error('Ce lien a expiré. Demandez-en un nouveau.');
+          }
+          throw updateErr;
         }
+
+        showToast('Mot de passe mis à jour ✓', 'success');
+        setTimeout(() => navigate('/dashboard'), 2000);
       }
     } catch (err: any) {
       setError(mapError(err));
@@ -287,25 +338,47 @@ export default function Auth() {
               <InputField label="Nom complet" type="text" value={fullName} onChange={setFullName} required placeholder="Jean Dupont" />
             )}
             
-            <InputField label="Email" type="email" value={email} onChange={setEmail} required placeholder="jean@exemple.com" />
+            {mode === 'reset-password' ? (
+              <InputField label="Nouveau mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
+                {password && (
+                  <div className="mt-2">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs text-slate-500">Force du mot de passe</span>
+                      <span className={`text-xs font-medium ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
+                    </div>
+                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: strength.width }}
+                        className={`h-full ${strength.color} transition-all`}
+                      />
+                    </div>
+                  </div>
+                )}
+              </InputField>
+            ) : (
+              <InputField label="Email" type="email" value={email} onChange={setEmail} required placeholder="jean@exemple.com" />
+            )}
             
-            <InputField label="Mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
-              {mode === 'register' && password && (
-                <div className="mt-2">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-slate-500">Force du mot de passe</span>
-                    <span className={`text-xs font-medium ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
+            {mode !== 'reset-password' && (
+              <InputField label="Mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
+                {mode === 'register' && password && (
+                  <div className="mt-2">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs text-slate-500">Force du mot de passe</span>
+                      <span className={`text-xs font-medium ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
+                    </div>
+                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: strength.width }}
+                        className={`h-full ${strength.color} transition-all`}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: strength.width }}
-                      className={`h-full ${strength.color} transition-all`}
-                    />
-                  </div>
-                </div>
-              )}
-            </InputField>
+                )}
+              </InputField>
+            )}
 
             {mode === 'login' && (
               <div className="flex items-center justify-between mb-6">
@@ -328,7 +401,7 @@ export default function Auth() {
               </div>
             )}
 
-            {mode === 'register' && (
+            {(mode === 'register' || mode === 'reset-password') && (
               <InputField label="Confirmer le mot de passe" type="password" value={confirmPassword} onChange={setConfirmPassword} required />
             )}
 
@@ -343,19 +416,21 @@ export default function Auth() {
               disabled={loading}
               className="bg-indigo-600 text-white w-full rounded-xl py-3 font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Chargement...' : mode === 'login' ? 'Se connecter' : 'Créer un compte'}
+              {loading ? 'Chargement...' : mode === 'login' ? 'Se connecter' : mode === 'reset-password' ? 'Mettre à jour' : 'Créer un compte'}
             </button>
           </motion.form>
         </AnimatePresence>
 
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(null); }}
-            className="text-indigo-600 hover:underline text-sm font-medium"
-          >
-            {mode === 'login' ? "Pas encore de compte ? Créer un compte" : "Déjà un compte ? Se connecter"}
-          </button>
-        </div>
+        {mode !== 'reset-password' && (
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(null); }}
+              className="text-indigo-600 hover:underline text-sm font-medium"
+            >
+              {mode === 'login' ? "Pas encore de compte ? Créer un compte" : "Déjà un compte ? Se connecter"}
+            </button>
+          </div>
+        )}
       </motion.div>
 
       <Modal
