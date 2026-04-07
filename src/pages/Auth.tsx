@@ -67,7 +67,9 @@ export default function Auth() {
     if (msg.includes('Email not confirmed')) return 'Confirmez votre email avant de vous connecter';
     if (msg.includes('User already registered')) return 'Un compte existe déjà avec cet email';
     if (msg.includes('Password should be at least 6 characters')) return 'Le mot de passe doit contenir au moins 8 caractères';
-    return 'Une erreur est survenue. Réessayez.';
+    if (msg.includes('redirect_uri_not_allowed')) return 'Erreur de configuration : l\'URL de redirection n\'est pas autorisée dans Supabase.';
+    if (msg.includes('Email link is invalid or has expired')) return 'Le lien est invalide ou a expiré. Demandez-en un nouveau.';
+    return msg || 'Une erreur est survenue. Réessayez.';
   };
 
   // Force du mot de passe
@@ -357,46 +359,50 @@ export default function Auth() {
               <InputField label="Nom complet" type="text" value={fullName} onChange={setFullName} required placeholder="Jean Dupont" />
             )}
             
-            {mode === 'reset-password' ? (
-              <InputField label="Nouveau mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
-                {password && (
-                  <div className="mt-2">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs text-slate-500">Force du mot de passe</span>
-                      <span className={`text-xs font-medium ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
+            {mode === 'reset-password' && (
+              <>
+                <InputField label="Nouveau mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
+                  {password && (
+                    <div className="mt-2">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs text-slate-500">Force du mot de passe</span>
+                        <span className={`text-xs font-medium ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
+                      </div>
+                      <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: strength.width }}
+                          className={`h-full ${strength.color} transition-all`}
+                        />
+                      </div>
                     </div>
-                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: strength.width }}
-                        className={`h-full ${strength.color} transition-all`}
-                      />
-                    </div>
-                  </div>
-                )}
-              </InputField>
-            ) : (
-              <InputField label="Email" type="email" value={email} onChange={setEmail} required placeholder="jean@exemple.com" />
+                  )}
+                </InputField>
+                <InputField label="Confirmer le mot de passe" type="password" value={confirmPassword} onChange={setConfirmPassword} required minLength={8} />
+              </>
             )}
             
             {mode !== 'reset-password' && (
-              <InputField label="Mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
-                {mode === 'register' && password && (
-                  <div className="mt-2">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs text-slate-500">Force du mot de passe</span>
-                      <span className={`text-xs font-medium ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
+              <>
+                <InputField label="Email" type="email" value={email} onChange={setEmail} required placeholder="jean@exemple.com" />
+                <InputField label="Mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
+                  {mode === 'register' && password && (
+                    <div className="mt-2">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs text-slate-500">Force du mot de passe</span>
+                        <span className={`text-xs font-medium ${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
+                      </div>
+                      <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: strength.width }}
+                          className={`h-full ${strength.color} transition-all`}
+                        />
+                      </div>
                     </div>
-                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: strength.width }}
-                        className={`h-full ${strength.color} transition-all`}
-                      />
-                    </div>
-                  </div>
-                )}
-              </InputField>
+                  )}
+                </InputField>
+              </>
             )}
 
             {mode === 'login' && (

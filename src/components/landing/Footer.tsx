@@ -15,9 +15,9 @@ export default function Footer({ content }: { content: Record<string, any> }) {
           
           <div className="flex flex-col items-start">
             {content.nav_logo_url ? (
-              <img src={content.nav_logo_url} alt="Logo" className="h-8 mb-4 brightness-0 invert" referrerPolicy="no-referrer" />
+              <img src={content.nav_logo_url} alt="Logo" className="h-10 mb-4 brightness-0 invert" referrerPolicy="no-referrer" />
             ) : (
-              <span className="text-2xl font-bold text-white mb-4">Facty</span>
+              <span className="text-3xl font-bold text-white mb-4">Facty</span>
             )}
             <p className="text-slate-400 mb-6">
               {content.footer_tagline || 'La facturation simple pour les indépendants.'}

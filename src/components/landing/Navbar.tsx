@@ -26,9 +26,9 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           {content.nav_logo_url ? (
-            <img src={content.nav_logo_url} alt="Logo" className="h-8" referrerPolicy="no-referrer" />
+            <img src={content.nav_logo_url} alt="Logo" className="h-12 md:h-16" referrerPolicy="no-referrer" />
           ) : (
-            <span className="text-2xl font-bold text-indigo-600">Facty</span>
+            <span className="text-3xl md:text-4xl font-bold text-indigo-600">Facty</span>
           )}
         </div>
 

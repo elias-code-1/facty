@@ -185,7 +185,10 @@ export function useProfile(user: User | null) {
         return;
       }
 
-      if (isMounted) setLoading(true);
+      // On ne met loading à true que si on n'a pas encore de profil ou si l'ID utilisateur a changé
+      if (isMounted && (!profile || profile.id !== user.id)) {
+        setLoading(true);
+      }
       
       try {
         const { data, error } = await supabase
@@ -214,7 +217,7 @@ export function useProfile(user: User | null) {
 
     load();
     return () => { isMounted = false; };
-  }, [user]);
+  }, [user?.id]); // On dépend de l'ID plutôt que de l'objet utilisateur complet
 
   return { profile, loading, updateProfile, uploadLogo, deleteLogo, refetch: fetchProfile };
 }
