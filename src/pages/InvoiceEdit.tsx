@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Save, Send, ChevronLeft, Layout, FileText, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useProfile } from '../hooks/useProfile';
@@ -253,7 +253,7 @@ export default function InvoiceEdit() {
             Formulaire
           </div>
           {activeTab === 'form' && (
-            <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
+            <motion.div layout className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
           )}
         </button>
         <button
@@ -267,7 +267,7 @@ export default function InvoiceEdit() {
             Aperçu
           </div>
           {activeTab === 'preview' && (
-            <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
+            <motion.div layout className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
           )}
         </button>
       </div>
@@ -275,24 +275,28 @@ export default function InvoiceEdit() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 pb-24 md:pb-0">
         <div className={`${activeTab === 'form' ? 'block' : 'hidden'} lg:block lg:col-span-7`}>
-          <InvoiceForm
-            formData={formData}
-            items={items}
-            onChange={(data) => setFormData(prev => ({ ...prev, ...data }))}
-            onItemsChange={setItems}
-            clients={clients}
-            profile={profile}
-            onNewClient={() => setIsNewClientModalOpen(true)}
-          />
+          {profile && (
+            <InvoiceForm
+              formData={formData}
+              items={items}
+              onChange={(data) => setFormData(prev => ({ ...prev, ...data }))}
+              onItemsChange={setItems}
+              clients={clients}
+              profile={profile}
+              onNewClient={() => setIsNewClientModalOpen(true)}
+            />
+          )}
         </div>
 
         <div className={`${activeTab === 'preview' ? 'block' : 'hidden'} lg:block lg:col-span-5 sticky top-24 h-fit`}>
-          <InvoicePreview
-            formData={formData}
-            items={items}
-            client={selectedClient}
-            profile={profile}
-          />
+          {profile && (
+            <InvoicePreview
+              formData={formData}
+              items={items}
+              client={selectedClient}
+              profile={profile}
+            />
+          )}
         </div>
       </div>
 

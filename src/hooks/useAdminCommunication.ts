@@ -37,7 +37,7 @@ export function useAdminCommunication() {
       if (profilesError) throw profilesError;
 
       setAnnouncements(announcementsData || []);
-      setProfiles(profilesData || []);
+      setProfiles((profilesData as any) || []);
     } catch (error) {
       console.error('Erreur fetchAdminCommunication:', error);
     } finally {

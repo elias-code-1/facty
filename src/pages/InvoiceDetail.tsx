@@ -13,8 +13,6 @@ import InvoiceActions from '../components/invoice/InvoiceActions';
 import InvoiceStatusBadge from '../components/invoice/InvoiceStatusBadge';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 
-import { motion } from 'framer-motion';
-
 /**
  * Page de détail d'une facture
  * Affiche le template final et permet les actions de gestion
@@ -265,19 +263,13 @@ export default function InvoiceDetail() {
 
       {/* ZONE D'IMPRESSION / TEMPLATE */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
-        <motion.div 
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-        >
-          <div id="invoice-print-wrapper">
-            <InvoiceTemplate 
-              ref={invoiceRef}
-              invoice={invoice}
-              profile={profile}
-            />
-          </div>
-        </motion.div>
+        <div id="invoice-print-wrapper" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <InvoiceTemplate 
+            ref={invoiceRef}
+            invoice={invoice}
+            profile={profile}
+          />
+        </div>
       </div>
 
       {/* DIALOGUE DE CONFIRMATION DE SUPPRESSION */}

@@ -71,7 +71,7 @@ export function useAdminStats() {
         setData({
           profiles: profiles || [],
           invoices: invoices || [],
-          logs: logs || []
+          logs: (logs as any) || []
         });
       } catch (error) {
         console.error('Erreur fetchAdminStats:', error);

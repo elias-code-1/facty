@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { InvoiceStatus } from '../../types/database';
 
 interface InvoiceStatusBadgeProps {
@@ -52,12 +51,8 @@ export default function InvoiceStatusBadge({ status, size = 'md' }: InvoiceStatu
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs';
 
   return (
-    <motion.span 
-      key={status}
-      initial={{ scale: 1 }}
-      animate={{ scale: [1, 1.15, 1] }}
-      transition={{ duration: 0.3 }}
-      className={`inline-flex items-center gap-1.5 rounded-full font-bold uppercase tracking-wider ${bg} ${text} ${sizeClasses}`}
+    <span 
+      className={`inline-flex items-center gap-1.5 rounded-full font-bold uppercase tracking-wider ${bg} ${text} ${sizeClasses} transition-all duration-300`}
       style={{ backgroundColor: bgHex, color: textHex }}
     >
       <span 
@@ -65,6 +60,6 @@ export default function InvoiceStatusBadge({ status, size = 'md' }: InvoiceStatu
         style={{ backgroundColor: dotHex }}
       />
       {label}
-    </motion.span>
+    </span>
   );
 }

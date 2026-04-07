@@ -14,7 +14,7 @@ export interface InvoiceWithItems extends Invoice {
 
 /** Hook CRUD pour la gestion des factures */
 export function useInvoices(user: User | null) {
-  const [invoices, setInvoices] = useState<(Invoice & { clients: any })[]>([]);
+  const [invoices, setInvoices] = useState<(Invoice & { clients: Client | null })[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchInvoices = useCallback(async () => {

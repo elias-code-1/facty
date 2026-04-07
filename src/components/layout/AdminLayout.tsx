@@ -58,19 +58,16 @@ export default function AdminLayout() {
         
         <main className="flex-1 p-4 md:p-6 lg:p-8 3xl:p-10 overflow-x-hidden">
           <div className="max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-screen-3xl mx-auto">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={location.pathname}
-                variants={pageVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={pageTransition}
-                className="flex-1"
-              >
-                <Outlet />
-              </motion.div>
-            </AnimatePresence>
+            <motion.div
+              key={location.pathname}
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              transition={pageTransition}
+              className="flex-1"
+            >
+              <Outlet />
+            </motion.div>
           </div>
         </main>
       </div>

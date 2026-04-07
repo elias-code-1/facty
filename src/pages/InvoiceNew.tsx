@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Save, Send, ChevronLeft, Layout, FileText, UserPlus, Loader2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useProfile } from '../hooks/useProfile';
@@ -229,7 +229,7 @@ export default function InvoiceNew() {
             Formulaire
           </div>
           {activeTab === 'form' && (
-            <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
+            <motion.div layout className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
           )}
         </button>
         <button
@@ -243,7 +243,7 @@ export default function InvoiceNew() {
             Aperçu
           </div>
           {activeTab === 'preview' && (
-            <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
+            <motion.div layout className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
           )}
         </button>
       </div>

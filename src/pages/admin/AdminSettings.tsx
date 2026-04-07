@@ -17,7 +17,7 @@ import { supabase } from '../../lib/supabase';
 
 export default function AdminSettings() {
   const { settings, loading, updateSetting } = useAdminPlatform();
-  const { toast } = useToast();
+  const { showToast } = useToast();
   
   // Local state for text inputs to avoid saving on every keystroke
   const [maintenanceTitle, setMaintenanceTitle] = useState('');
@@ -41,13 +41,9 @@ export default function AdminSettings() {
     try {
       await updateSetting(key, value);
       const label = key.replace('feature_', '').replace(/_/g, ' ');
-      toast({ 
-        title: 'Succès', 
-        description: `Fonctionnalité ${label} ${value === 'true' ? 'activée' : 'désactivée'} ✓`, 
-        type: 'success' 
-      });
+      showToast(`Fonctionnalité ${label} ${value === 'true' ? 'activée' : 'désactivée'} ✓`, 'success');
     } catch (error) {
-      toast({ title: 'Erreur', description: 'Impossible de modifier le paramètre.', type: 'error' });
+      showToast('Impossible de modifier le paramètre.', 'error');
     }
   };
 
@@ -55,24 +51,24 @@ export default function AdminSettings() {
     try {
       await updateSetting('maintenance_title', maintenanceTitle);
       await updateSetting('maintenance_message', maintenanceMessage);
-      toast({ title: 'Succès', description: 'Message de maintenance sauvegardé.', type: 'success' });
+      showToast('Message de maintenance sauvegardé.', 'success');
     } catch (error) {
-      toast({ title: 'Erreur', description: 'Impossible de sauvegarder le message.', type: 'error' });
+      showToast('Impossible de sauvegarder le message.', 'error');
     }
   };
 
   const handleSaveFreePlanLimit = async () => {
     try {
       await updateSetting('free_plan_invoice_limit', freePlanLimit);
-      toast({ title: 'Succès', description: 'Limite du plan gratuit sauvegardée.', type: 'success' });
+      showToast('Limite du plan gratuit sauvegardée.', 'success');
     } catch (error) {
-      toast({ title: 'Erreur', description: 'Impossible de sauvegarder la limite.', type: 'error' });
+      showToast('Impossible de sauvegarder la limite.', 'error');
     }
   };
 
   const exportCSV = (data: any[], filename: string) => {
     if (data.length === 0) {
-      toast({ title: 'Info', description: 'Aucune donnée à exporter.', type: 'info' });
+      showToast('Aucune donnée à exporter.', 'info');
       return;
     }
     const headers = Object.keys(data[0]);
@@ -116,10 +112,10 @@ export default function AdminSettings() {
         exportCSV(data || [], `invoxa-backup-logs-${date}.csv`);
       }
       
-      toast({ title: 'Succès', description: 'Export terminé ✓', type: 'success' });
+      showToast('Export terminé ✓', 'success');
     } catch (error) {
       console.error('Erreur export:', error);
-      toast({ title: 'Erreur', description: 'L\'export a échoué.', type: 'error' });
+      showToast('L\'export a échoué.', 'error');
     } finally {
       setIsExporting(null);
     }

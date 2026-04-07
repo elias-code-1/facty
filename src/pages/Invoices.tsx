@@ -110,7 +110,6 @@ export default function Invoices() {
 
   // Actions
   const handleStatusChange = async (id: string, newStatus: InvoiceStatus) => {
-    console.log(`handleStatusChange called for ${id} with ${newStatus}`);
     setActionLoading(true);
     try {
       await updateStatus(id, newStatus);

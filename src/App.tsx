@@ -1,5 +1,10 @@
 import { AppRouter } from './router/index'
+import { ToastProvider } from './hooks/useToast'
 
 export default function App() {
-  return <AppRouter />
+  return (
+    <ToastProvider>
+      <AppRouter />
+    </ToastProvider>
+  )
 }

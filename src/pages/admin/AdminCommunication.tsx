@@ -22,7 +22,7 @@ type FilterType = 'all' | 'active' | 'inactive' | 'expired';
 
 export default function AdminCommunication() {
   const { announcements, profiles, loading, createAnnouncement, toggleActive, deleteAnnouncement } = useAdminCommunication();
-  const { toast } = useToast();
+  const { showToast } = useToast();
 
   // Form state
   const [form, setForm] = useState<AnnouncementForm>({
@@ -61,14 +61,14 @@ export default function AdminCommunication() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.target === 'specific' && !form.target_user_id) {
-      toast({ title: 'Erreur', description: 'Veuillez sélectionner un utilisateur cible.', type: 'error' });
+      showToast('Veuillez sélectionner un utilisateur cible.', 'error');
       return;
     }
     
     try {
       setIsSubmitting(true);
       await createAnnouncement(form);
-      toast({ title: 'Succès', description: 'Annonce publiée avec succès.', type: 'success' });
+      showToast('Annonce publiée avec succès.', 'success');
       setForm({
         title: '',
         message: '',
@@ -78,7 +78,7 @@ export default function AdminCommunication() {
         expires_at: undefined
       });
     } catch (error) {
-      toast({ title: 'Erreur', description: 'Impossible de publier l\'annonce.', type: 'error' });
+      showToast('Impossible de publier l\'annonce.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -87,9 +87,9 @@ export default function AdminCommunication() {
   const handleToggle = async (id: string, current: boolean) => {
     try {
       await toggleActive(id, current);
-      toast({ title: 'Succès', description: `Annonce ${current ? 'désactivée' : 'activée'}.`, type: 'success' });
+      showToast(`Annonce ${current ? 'désactivée' : 'activée'}.`, 'success');
     } catch (error) {
-      toast({ title: 'Erreur', description: 'Impossible de modifier le statut.', type: 'error' });
+      showToast('Impossible de modifier le statut.', 'error');
     }
   };
 
@@ -97,9 +97,9 @@ export default function AdminCommunication() {
     if (!deleteId) return;
     try {
       await deleteAnnouncement(deleteId);
-      toast({ title: 'Succès', description: 'Annonce supprimée.', type: 'success' });
+      showToast('Annonce supprimée.', 'success');
     } catch (error) {
-      toast({ title: 'Erreur', description: 'Impossible de supprimer l\'annonce.', type: 'error' });
+      showToast('Impossible de supprimer l\'annonce.', 'error');
     } finally {
       setDeleteId(null);
     }
@@ -303,7 +303,7 @@ export default function AdminCommunication() {
         <div className="space-y-4">
           <AnimatePresence mode="popLayout">
             {filteredAnnouncements.map(ann => {
-              const isExpired = ann.expires_at && new Date(ann.expires_at) < new Date();
+              const isExpired = !!(ann.expires_at && new Date(ann.expires_at) < new Date());
               
               let badgeBg, badgeText, badgeLabel;
               switch(ann.type) {
@@ -341,7 +341,7 @@ export default function AdminCommunication() {
                     {/* Toggle Switch */}
                     <button
                       onClick={() => handleToggle(ann.id, ann.is_active)}
-                      disabled={isExpired}
+                      disabled={isExpired || false}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
                         ann.is_active ? 'bg-indigo-600' : 'bg-slate-200'
                       } ${isExpired ? 'opacity-50 cursor-not-allowed' : ''}`}
