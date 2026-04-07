@@ -51,6 +51,9 @@ export default function Auth() {
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
 
+  // États de chargement et initialisation
+  const [isInitializing, setIsInitializing] = useState(true);
+
   // Champs du formulaire
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -79,45 +82,68 @@ export default function Auth() {
 
   const strength = getPasswordStrength();
 
-  // Gestion du hash Supabase (Reset Password / Confirmation Email)
+  // Initialisation et gestion des jetons (Reset Password / Confirmation Email)
   useEffect(() => {
-    const hash = window.location.hash;
-    if (!hash) return;
+    const handleAuthFlow = async () => {
+      const hash = window.location.hash;
+      const hashParams = new URLSearchParams(hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      const type = hashParams.get('type') || searchParams.get('type');
 
-    const hashParams = new URLSearchParams(hash.substring(1));
-    const type = hashParams.get('type') || searchParams.get('type');
-    const accessToken = hashParams.get('access_token');
-    const refreshToken = hashParams.get('refresh_token');
+      // 1. Si on a un jeton d'accès, on établit la session
+      if (accessToken) {
+        try {
+          const { data, error: sessionErr } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken ?? ''
+          });
 
-    if (!accessToken) return;
+          if (sessionErr) throw sessionErr;
 
-    // Établir la session depuis le token
-    supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken ?? ''
-    }).then(({ error }) => {
-      if (error) {
-        console.error('Erreur setSession Auth:', error.message);
-        setError('Lien invalide ou expiré.');
-        return;
+          console.log('Session établie avec succès, type:', type);
+
+          if (type === 'recovery') {
+            setMode('reset-password');
+          } else if (type === 'signup') {
+            setMode('email-verified');
+          } else if (data.session) {
+            navigate('/dashboard');
+          }
+
+          // Nettoyer l'URL
+          window.history.replaceState(null, '', '/auth');
+          setIsInitializing(false);
+          return;
+        } catch (err: any) {
+          console.error('Erreur setSession Auth:', err.message);
+          setError('Le lien est invalide ou a expiré. Veuillez en demander un nouveau.');
+          setIsInitializing(false);
+          return;
+        }
       }
 
-      console.log('Session établie avec succès, type:', type);
-
-      if (type === 'recovery') {
-        // Afficher le formulaire reset password
-        setMode('reset-password');
-      } else if (type === 'signup') {
-        // Email confirmé
-        setMode('email-verified');
-      } else {
-        // Par défaut si session établie mais type inconnu
-        navigate('/dashboard');
+      // 2. Sinon, on vérifie si une session existe déjà
+      try {
+        const { data: { session }, error: getSessionErr } = await supabase.auth.getSession();
+        
+        if (getSessionErr) {
+          if (getSessionErr.message.includes('Refresh Token Not Found') || getSessionErr.message.includes('invalid_refresh_token')) {
+            await supabase.auth.signOut().catch(() => {});
+          }
+        } else if (session) {
+          // On ne redirige pas si on est déjà dans un mode spécial (peu probable ici car accessToken est absent)
+          navigate('/dashboard');
+          return;
+        }
+      } catch (err) {
+        console.error('Erreur getSession initialisation:', err);
       }
 
-      // Nettoyer le hash de l'URL
-      window.history.replaceState(null, '', '/auth');
-    });
+      setIsInitializing(false);
+    };
+
+    handleAuthFlow();
   }, [navigate, searchParams]);
 
   // Gestion du cooldown
@@ -127,33 +153,6 @@ export default function Auth() {
       return () => clearTimeout(timer);
     }
   }, [cooldown]);
-
-  // Vérifier si une session existe déjà ou si l'email est vérifié
-  useEffect(() => {
-    const type = searchParams.get('type');
-    if (type === 'signup') {
-      setMode('email-verified');
-      return;
-    }
-
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error('Erreur getSession Auth:', error.message);
-        if (error.message.includes('Refresh Token Not Found') || error.message.includes('invalid_refresh_token')) {
-          supabase.auth.signOut().catch(() => {});
-        }
-      }
-      
-      // Ne pas rediriger si on est en train de gérer un lien de récupération ou de confirmation
-      const hash = window.location.hash;
-      const isRecovery = hash.includes('type=recovery') || searchParams.get('type') === 'recovery' || mode === 'reset-password';
-      const isSignup = hash.includes('type=signup') || searchParams.get('type') === 'signup' || mode === 'email-verified';
-      
-      if (session && !isRecovery && !isSignup) {
-        navigate('/dashboard');
-      }
-    });
-  }, [navigate, searchParams, mode]);
 
   // Countdown pour email-verified
   useEffect(() => {
@@ -263,6 +262,14 @@ export default function Auth() {
   };
 
   // Rendu des écrans de feedback
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
   if (mode === 'email-sent-register' || mode === 'email-sent-reset') {
     const isRegister = mode === 'email-sent-register';
     return (
