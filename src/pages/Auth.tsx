@@ -84,10 +84,10 @@ export default function Auth() {
     const hash = window.location.hash;
     if (!hash) return;
 
-    const params = new URLSearchParams(hash.substring(1));
-    const type = params.get('type');
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
+    const hashParams = new URLSearchParams(hash.substring(1));
+    const type = hashParams.get('type') || searchParams.get('type');
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
 
     if (!accessToken) return;
 
@@ -97,24 +97,28 @@ export default function Auth() {
       refresh_token: refreshToken ?? ''
     }).then(({ error }) => {
       if (error) {
+        console.error('Erreur setSession Auth:', error.message);
         setError('Lien invalide ou expiré.');
         return;
       }
 
+      console.log('Session établie avec succès, type:', type);
+
       if (type === 'recovery') {
         // Afficher le formulaire reset password
         setMode('reset-password');
-      }
-
-      if (type === 'signup') {
+      } else if (type === 'signup') {
         // Email confirmé
         setMode('email-verified');
+      } else {
+        // Par défaut si session établie mais type inconnu
+        navigate('/dashboard');
       }
 
       // Nettoyer le hash de l'URL
       window.history.replaceState(null, '', '/auth');
     });
-  }, []);
+  }, [navigate, searchParams]);
 
   // Gestion du cooldown
   useEffect(() => {
@@ -139,9 +143,17 @@ export default function Auth() {
           supabase.auth.signOut().catch(() => {});
         }
       }
-      if (session) navigate('/dashboard');
+      
+      // Ne pas rediriger si on est en train de gérer un lien de récupération ou de confirmation
+      const hash = window.location.hash;
+      const isRecovery = hash.includes('type=recovery') || searchParams.get('type') === 'recovery' || mode === 'reset-password';
+      const isSignup = hash.includes('type=signup') || searchParams.get('type') === 'signup' || mode === 'email-verified';
+      
+      if (session && !isRecovery && !isSignup) {
+        navigate('/dashboard');
+      }
     });
-  }, [navigate, searchParams]);
+  }, [navigate, searchParams, mode]);
 
   // Countdown pour email-verified
   useEffect(() => {
