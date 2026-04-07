@@ -35,8 +35,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
     if (path.startsWith('/invoices/')) return 'Détails de la facture';
     if (path === '/clients') return 'Clients';
     if (path === '/settings') return 'Paramètres';
-    if (path.startsWith('/admin/invoxa')) return 'Administration';
-    return 'Invoxa';
+    if (path.startsWith('/admin/facty')) return 'Administration';
+    return 'Facty';
   };
 
   const handleLogout = async () => {

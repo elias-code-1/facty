@@ -19,8 +19,12 @@ export function useAuth() {
         if (error) {
           if (error.message.includes('Refresh Token Not Found') || error.message.includes('invalid_refresh_token')) {
             // Si le refresh token est invalide, on nettoie tout
-            await supabase.auth.signOut();
-            localStorage.removeItem('supabase.auth.token'); // Nettoyage manuel au cas où
+            await supabase.auth.signOut().catch(() => {});
+            if (mounted) {
+              setSession(null);
+              setUser(null);
+            }
+            return;
           }
           throw error;
         }

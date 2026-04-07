@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /invoices
+Disallow: /clients
+Disallow: /settings
+Disallow: /admin
+
+Sitemap: https://facty.logonova.site/sitemap.xml

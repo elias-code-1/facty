@@ -10,7 +10,8 @@ import {
   ArrowLeft,
   X,
   LogOut,
-  Megaphone
+  Megaphone,
+  LayoutTemplate
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
@@ -21,13 +22,14 @@ interface AdminSidebarProps {
 }
 
 const navLinks = [
-  { to: '/admin/invoxa', label: 'Vue globale', icon: <LayoutDashboard size={20} />, end: true },
-  { to: '/admin/invoxa/users', label: 'Utilisateurs', icon: <Users size={20} /> },
-  { to: '/admin/invoxa/invoices', label: 'Factures', icon: <FileText size={20} /> },
-  { to: '/admin/invoxa/logs', label: 'Logs', icon: <Activity size={20} /> },
-  { to: '/admin/invoxa/stats', label: 'Statistiques', icon: <BarChart3 size={20} /> },
-  { to: '/admin/invoxa/communication', label: 'Communication', icon: <Megaphone size={20} /> },
-  { to: '/admin/invoxa/settings', label: 'Paramètres', icon: <Settings size={20} /> },
+  { to: '/admin/facty', label: 'Vue globale', icon: <LayoutDashboard size={20} />, end: true },
+  { to: '/admin/facty/users', label: 'Utilisateurs', icon: <Users size={20} /> },
+  { to: '/admin/facty/invoices', label: 'Factures', icon: <FileText size={20} /> },
+  { to: '/admin/facty/logs', label: 'Logs', icon: <Activity size={20} /> },
+  { to: '/admin/facty/stats', label: 'Statistiques', icon: <BarChart3 size={20} /> },
+  { to: '/admin/facty/communication', label: 'Communication', icon: <Megaphone size={20} /> },
+  { to: '/admin/facty/landing', label: 'Landing Page', icon: <LayoutTemplate size={20} /> },
+  { to: '/admin/facty/settings', label: 'Paramètres', icon: <Settings size={20} /> },
 ];
 
 export default function AdminSidebar({ onClose }: AdminSidebarProps) {
@@ -37,7 +39,7 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate('/admin/invoxa/login');
+    navigate('/admin/facty/login');
   };
 
   return (
@@ -45,7 +47,7 @@ export default function AdminSidebar({ onClose }: AdminSidebarProps) {
       {/* Header Sidebar */}
       <div className="p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-2xl font-bold tracking-tight">Invoxa</span>
+          <span className="text-2xl font-bold tracking-tight">Facty</span>
           <span className="bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5">
             Admin
           </span>

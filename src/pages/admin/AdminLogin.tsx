@@ -20,7 +20,7 @@ export default function AdminLogin() {
 
   useEffect(() => {
     if (!authLoading && !profileLoading && session && profile?.role === 'admin') {
-      navigate('/admin/invoxa', { replace: true });
+      navigate('/admin/facty', { replace: true });
     }
   }, [session, profile, authLoading, profileLoading, navigate]);
 
@@ -61,7 +61,7 @@ export default function AdminLogin() {
       }
 
       // Étape 4 : Redirection
-      navigate('/admin/invoxa', { replace: true });
+      navigate('/admin/facty', { replace: true });
 
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -91,7 +91,7 @@ export default function AdminLogin() {
       >
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <h1 className="text-4xl font-bold text-white">Invoxa</h1>
+            <h1 className="text-4xl font-bold text-white">Facty</h1>
             <span className="bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5">
               Administration
             </span>
@@ -109,7 +109,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="admin@invoxa.com"
+                placeholder="admin@facty.com"
                 className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
               />
             </div>

@@ -18,7 +18,7 @@ export default function Maintenance({ title, message }: MaintenanceProps) {
       />
       
       <div className="relative z-10 flex flex-col items-center text-center">
-        <h1 className="text-4xl font-bold text-white mb-12 tracking-tight">Invoxa</h1>
+        <h1 className="text-4xl font-bold text-white mb-12 tracking-tight">Facty</h1>
         
         <motion.div
           animate={{ rotate: 360 }}

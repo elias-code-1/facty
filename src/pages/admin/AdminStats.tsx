@@ -33,7 +33,7 @@ export default function AdminStats() {
         </div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Pas encore assez de données</h2>
         <p className="text-slate-500 max-w-md">
-          Invoxa a besoin de plus d'utilisateurs et d'activité pour générer des analyses de Business Intelligence pertinentes.
+          Facty a besoin de plus d'utilisateurs et d'activité pour générer des analyses de Business Intelligence pertinentes.
         </p>
       </div>
     );
@@ -59,7 +59,7 @@ export default function AdminStats() {
       {/* En-tête */}
       <div>
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Statistiques avancées</h1>
-        <p className="text-slate-500 mt-1">Business Intelligence — Invoxa</p>
+        <p className="text-slate-500 mt-1">Business Intelligence — Facty</p>
       </div>
 
       {/* Section 1 : Métriques clés */}

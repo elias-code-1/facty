@@ -22,7 +22,7 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar Desktop/Tablet */}
-      <aside className="hidden md:block fixed inset-y-0 left-0 z-20 no-print transition-all duration-300 w-16 lg:w-60 2xl:w-72">
+      <aside className="hidden md:block fixed inset-y-0 left-0 z-20 no-print transition-all duration-300 w-20 lg:w-64">
         <Sidebar />
       </aside>
 
@@ -51,7 +51,7 @@ export default function AppLayout() {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300 md:ml-16 lg:ml-60 2xl:ml-72">
+      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300 md:ml-20 lg:ml-64">
         <div className="no-print">
           <Header onMenuClick={() => setIsSidebarOpen(true)} />
         </div>

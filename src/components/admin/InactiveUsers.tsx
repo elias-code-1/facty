@@ -106,7 +106,7 @@ export default function InactiveUsers({ users }: InactiveUsersProps) {
                   </div>
 
                   <Link
-                    to={`/admin/invoxa/users/${user.id}`}
+                    to={`/admin/facty/users/${user.id}`}
                     className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
                   >
                     <ChevronRight size={20} />

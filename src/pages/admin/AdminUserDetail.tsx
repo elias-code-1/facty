@@ -120,7 +120,7 @@ export default function AdminUserDetail() {
     try {
       await deleteUser(profile.id);
       setToast({ message: "Utilisateur supprimé définitivement.", type: 'success' });
-      setTimeout(() => navigate('/admin/invoxa/users'), 1500);
+      setTimeout(() => navigate('/admin/facty/users'), 1500);
     } catch (err: any) {
       setToast({ message: err.message || "Erreur lors de la suppression.", type: 'error' });
     } finally {
@@ -140,7 +140,7 @@ export default function AdminUserDetail() {
       {/* En-tête */}
       <div className="flex flex-col gap-4">
         <Link 
-          to="/admin/invoxa/users" 
+          to="/admin/facty/users" 
           className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors w-fit"
         >
           <ArrowLeft className="w-4 h-4" />

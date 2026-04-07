@@ -97,19 +97,19 @@ export default function AdminSettings() {
           .from('profiles')
           .select('id, full_name, email, company_name, currency, created_at, last_seen_at, is_suspended');
         if (error) throw error;
-        exportCSV(data || [], `invoxa-backup-users-${date}.csv`);
+        exportCSV(data || [], `facty-backup-users-${date}.csv`);
       } else if (type === 'invoices') {
         const { data, error } = await supabase
           .from('invoices')
           .select('id, user_id, invoice_number, status, issue_date, due_date, subtotal, tax_rate, total, created_at');
         if (error) throw error;
-        exportCSV(data || [], `invoxa-backup-invoices-${date}.csv`);
+        exportCSV(data || [], `facty-backup-invoices-${date}.csv`);
       } else if (type === 'logs') {
         const { data, error } = await supabase
           .from('audit_logs')
           .select('id, user_id, action, entity_type, entity_id, created_at');
         if (error) throw error;
-        exportCSV(data || [], `invoxa-backup-logs-${date}.csv`);
+        exportCSV(data || [], `facty-backup-logs-${date}.csv`);
       }
       
       showToast('Export terminé ✓', 'success');
@@ -128,7 +128,7 @@ export default function AdminSettings() {
       {/* En-tête */}
       <div>
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Paramètres plateforme</h1>
-        <p className="text-slate-500 mt-1">Contrôlez le comportement global d'Invoxa</p>
+        <p className="text-slate-500 mt-1">Contrôlez le comportement global d'Facty</p>
       </div>
 
       {/* SECTION 1 : Mode Maintenance */}

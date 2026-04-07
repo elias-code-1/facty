@@ -80,7 +80,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
       {/* Header Sidebar */}
       <div className={`p-4 lg:p-6 2xl:p-8 flex flex-col ${isMobileOverlay ? 'items-start' : 'items-center lg:items-start'}`}>
         <div className="flex items-center gap-2 mb-1">
-          <span className={`text-2xl font-bold tracking-tight ${isMobileOverlay ? 'inline' : 'hidden lg:inline'}`}>Invoxa</span>
+          <span className={`text-2xl font-bold tracking-tight ${isMobileOverlay ? 'inline' : 'hidden lg:inline'}`}>Facty</span>
           {!isMobileOverlay && <span className="text-2xl font-bold tracking-tight lg:hidden">I</span>}
           <div className="w-2 h-2 bg-indigo-500 rounded-full mt-1"></div>
         </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
-const CACHE_KEY = 'invoxa_feature_flags';
+const CACHE_KEY = 'facty_feature_flags';
 const CACHE_TTL = 60 * 1000; // 60 secondes
 
 export function useFeatureFlags() {

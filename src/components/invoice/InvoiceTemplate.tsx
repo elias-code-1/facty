@@ -48,7 +48,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
                 className="w-12 h-12 md:w-16 md:h-16 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-lg md:text-xl font-bold"
                 style={{ backgroundColor: '#e0e7ff', color: '#4f46e5' }}
               >
-                {getInitials(profile.company_name || profile.full_name || 'Invoxa')}
+                {getInitials(profile.company_name || profile.full_name || 'Facty')}
               </div>
             )}
             <div className="space-y-1">
@@ -178,7 +178,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
         </div>
       </div>
 
-      {/* Branding Propulsé par Invoxa */}
+      {/* Branding Propulsé par Facty */}
       <div className="mt-6 text-center">
         <a
           href={window.location.origin}
@@ -186,7 +186,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
           rel="noopener noreferrer"
           className="text-xs text-slate-300 hover:text-indigo-400 transition-colors inline-flex items-center gap-1.5"
         >
-          Propulsé par <span className="font-bold text-slate-400 hover:text-indigo-500 transition-colors">Invoxa</span>
+          Propulsé par <span className="font-bold text-slate-400 hover:text-indigo-500 transition-colors">Facty</span>
         </a>
       </div>
     </div>

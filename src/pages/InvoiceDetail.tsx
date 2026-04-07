@@ -91,7 +91,7 @@ export default function InvoiceDetail() {
     try {
       await exportInvoicePDF(
         'invoice-template',
-        `Invoxa-${invoice.invoice_number}.pdf`
+        `Facty-${invoice.invoice_number}.pdf`
       );
       
       // Logger l'export

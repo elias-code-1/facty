@@ -198,7 +198,7 @@ export default function AdminUsers() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       className="group hover:bg-slate-50/50 transition-colors cursor-pointer"
-                      onClick={() => navigate(`/admin/invoxa/users/${u.id}`)}
+                      onClick={() => navigate(`/admin/facty/users/${u.id}`)}
                     >
                       <td className="py-4 pl-6">
                         <div className="flex items-center gap-3">
@@ -241,7 +241,7 @@ export default function AdminUsers() {
                           {dropdownOpen === u.id && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 z-50 py-1 overflow-hidden">
                               <Link 
-                                to={`/admin/invoxa/users/${u.id}`}
+                                to={`/admin/facty/users/${u.id}`}
                                 className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
                               >
                                 <Eye className="w-3.5 h-3.5" />

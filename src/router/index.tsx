@@ -17,6 +17,8 @@ import Clients from '../pages/Clients';
 import Settings from '../pages/Settings';
 import SuspendedPage from '../pages/Suspended';
 import Maintenance from '../pages/Maintenance';
+import Landing from '../pages/Landing';
+import ErrorPage from '../pages/ErrorPage';
 
 // Admin Pages
 import AdminLogin from '../pages/admin/AdminLogin';
@@ -28,6 +30,7 @@ import AdminLogs from '../pages/admin/AdminLogs';
 import AdminStats from '../pages/admin/AdminStats';
 import AdminCommunication from '../pages/admin/AdminCommunication';
 import AdminSettings from '../pages/admin/AdminSettings';
+import AdminLanding from '../pages/admin/AdminLanding';
 
 // Layouts
 import AppLayout from '../components/layout/AppLayout';
@@ -129,12 +132,12 @@ const AdminRoute = () => {
 
   // Pas connecté → page login admin
   if (!session) {
-    return <Navigate to="/admin/invoxa/login" replace />;
+    return <Navigate to="/admin/facty/login" replace />;
   }
 
   // Connecté mais pas admin → page login admin (pas de redirection vers /dashboard)
   if (profile?.role !== 'admin') {
-    return <Navigate to="/admin/invoxa/login" replace />;
+    return <Navigate to="/admin/facty/login" replace />;
   }
 
   return <Outlet />;
@@ -143,13 +146,14 @@ const AdminRoute = () => {
 /** Configuration du routeur principal */
 export const AppRouter = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         {/* Routes publiques */}
+        <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
         
         {/* Route publique admin */}
-        <Route path="/admin/invoxa/login" element={<AdminLogin />} />
+        <Route path="/admin/facty/login" element={<AdminLogin />} />
         
         {/* Routes protégées (Utilisateur standard) */}
         <Route element={
@@ -164,25 +168,29 @@ export const AppRouter = () => {
           <Route path="/invoices/:id/edit" element={<InvoiceEdit />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* <Route path="/" element={<Navigate to="/dashboard" replace />} /> */}
         </Route>
 
         {/* Routes Admin */}
         <Route element={<AdminRoute />}>
           <Route element={<AdminLayout />}>
-            <Route path="/admin/invoxa" element={<AdminDashboard />} />
-            <Route path="/admin/invoxa/users" element={<AdminUsers />} />
-            <Route path="/admin/invoxa/users/:id" element={<AdminUserDetail />} />
-            <Route path="/admin/invoxa/invoices" element={<AdminInvoices />} />
-            <Route path="/admin/invoxa/logs" element={<AdminLogs />} />
-            <Route path="/admin/invoxa/stats" element={<AdminStats />} />
-            <Route path="/admin/invoxa/communication" element={<AdminCommunication />} />
-            <Route path="/admin/invoxa/settings" element={<AdminSettings />} />
+            <Route path="/admin/facty" element={<AdminDashboard />} />
+            <Route path="/admin/facty/users" element={<AdminUsers />} />
+            <Route path="/admin/facty/users/:id" element={<AdminUserDetail />} />
+            <Route path="/admin/facty/invoices" element={<AdminInvoices />} />
+            <Route path="/admin/facty/logs" element={<AdminLogs />} />
+            <Route path="/admin/facty/stats" element={<AdminStats />} />
+            <Route path="/admin/facty/communication" element={<AdminCommunication />} />
+            <Route path="/admin/facty/settings" element={<AdminSettings />} />
+            <Route path="/admin/facty/landing" element={<AdminLanding />} />
           </Route>
         </Route>
 
+        {/* Routes d'erreurs */}
+        <Route path="/error/:code" element={<ErrorPage />} />
+
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<ErrorPage defaultCode="404" />} />
       </Routes>
     </BrowserRouter>
   );

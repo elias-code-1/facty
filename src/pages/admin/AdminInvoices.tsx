@@ -170,7 +170,7 @@ export default function AdminInvoices() {
     const date = new Date().toISOString().split('T')[0];
     
     link.setAttribute("href", url);
-    link.setAttribute("download", `invoxa-admin-factures-${date}.csv`);
+    link.setAttribute("download", `facty-admin-factures-${date}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -332,7 +332,7 @@ export default function AdminInvoices() {
                         className="flex flex-col min-w-0 hover:text-indigo-600 transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (inv.owner) navigate(`/admin/invoxa/users/${inv.owner.id}`);
+                          if (inv.owner) navigate(`/admin/facty/users/${inv.owner.id}`);
                         }}
                       >
                         <span className="text-sm font-bold text-slate-800 truncate">{inv.owner?.full_name || 'Inconnu'}</span>
@@ -378,7 +378,7 @@ export default function AdminInvoices() {
                             </Link>
                             {inv.owner && (
                               <Link 
-                                to={`/admin/invoxa/users/${inv.owner.id}`}
+                                to={`/admin/facty/users/${inv.owner.id}`}
                                 className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
                               >
                                 <User className="w-3.5 h-3.5" />

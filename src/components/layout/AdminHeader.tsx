@@ -26,13 +26,13 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   // Titre dynamique selon la route
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === '/admin/invoxa') return 'Vue globale';
-    if (path === '/admin/invoxa/users') return 'Utilisateurs';
-    if (path.includes('/admin/invoxa/users/')) return 'Détail utilisateur';
-    if (path === '/admin/invoxa/invoices') return 'Factures';
-    if (path === '/admin/invoxa/logs') return 'Logs';
-    if (path === '/admin/invoxa/stats') return 'Statistiques';
-    if (path === '/admin/invoxa/settings') return 'Paramètres';
+    if (path === '/admin/facty') return 'Vue globale';
+    if (path === '/admin/facty/users') return 'Utilisateurs';
+    if (path.includes('/admin/facty/users/')) return 'Détail utilisateur';
+    if (path === '/admin/facty/invoices') return 'Factures';
+    if (path === '/admin/facty/logs') return 'Logs';
+    if (path === '/admin/facty/stats') return 'Statistiques';
+    if (path === '/admin/facty/settings') return 'Paramètres';
     return 'Administration';
   };
 

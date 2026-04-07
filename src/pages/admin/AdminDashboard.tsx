@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, 
@@ -24,6 +24,7 @@ import StatusDistributionChart from '../../components/admin/StatusDistributionCh
 import { formatCurrency } from '../../utils/format';
 import { timeAgo } from '../../utils/date';
 import FullPageSpinner from '../../components/ui/FullPageSpinner';
+import { supabase } from '../../lib/supabase';
 
 const ACTION_LABELS: Record<string, string> = {
   'auth.login': "s'est connecté",
@@ -65,6 +66,22 @@ export default function AdminDashboard() {
     usersGrowthByMonth, invoicesByMonth, statusDistribution,
     recentLogs, unreadNotifications, topUsers, loading 
   } = useAdminDashboard();
+
+  useEffect(() => {
+    async function updateDb() {
+      const { data } = await supabase.from('landing_page_content').select('*');
+      if (data) {
+        for (const item of data) {
+          if (typeof item.value === 'string' && (item.value.includes('Invoxa') || item.value.includes('invoxa'))) {
+            const newValue = item.value.replace(/Invoxa/g, 'Facty').replace(/invoxa/g, 'facty');
+            await supabase.from('landing_page_content').update({ value: newValue }).eq('key', item.key);
+          }
+        }
+        localStorage.removeItem('facty_landing_content');
+      }
+    }
+    updateDb();
+  }, []);
 
   if (loading) return <FullPageSpinner />;
 
@@ -197,7 +214,7 @@ export default function AdminDashboard() {
         <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-slate-800">Activité récente</h3>
-            <Link to="/admin/invoxa/logs" className="text-xs font-semibold text-indigo-600 hover:translate-x-1 transition-transform flex items-center gap-1">
+            <Link to="/admin/facty/logs" className="text-xs font-semibold text-indigo-600 hover:translate-x-1 transition-transform flex items-center gap-1">
               Voir tous les logs <ArrowRight className="w-3 h-3" />
             </Link>
           </div>

@@ -35,7 +35,7 @@ const InputField = ({ label, type, value, onChange, required, placeholder, minLe
   </div>
 );
 
-/** Page d'authentification Invoxa */
+/** Page d'authentification Facty */
 export default function Auth() {
   const [mode, setMode] = useState<AuthMode>('login');
   const [loading, setLoading] = useState(false);
@@ -97,8 +97,7 @@ export default function Auth() {
       if (error) {
         console.error('Erreur getSession Auth:', error.message);
         if (error.message.includes('Refresh Token Not Found') || error.message.includes('invalid_refresh_token')) {
-          supabase.auth.signOut();
-          localStorage.removeItem('supabase.auth.token');
+          supabase.auth.signOut().catch(() => {});
         }
       }
       if (session) navigate('/dashboard');
@@ -271,7 +270,7 @@ export default function Auth() {
         className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8"
       >
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[#6366F1] mb-2">Invoxa</h1>
+          <h1 className="text-4xl font-bold text-[#6366F1] mb-2">Facty</h1>
           <p className="text-slate-500">Gérez vos factures simplement</p>
         </div>
 
