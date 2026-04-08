@@ -224,7 +224,7 @@ export default function AdminLanding() {
   const handleSaveText = async (key: string, value: string) => {
     setIsSaving(key);
     try {
-      await updateContent(key, value);
+      await updateContent(key, value, activeTab);
       showToast('Contenu mis à jour', 'success');
     } catch (error: any) {
       console.error('Update error:', error);
@@ -237,7 +237,7 @@ export default function AdminLanding() {
   const handleSaveJson = async (key: string, value: any) => {
     setIsSaving(key);
     try {
-      await updateContent(key, JSON.stringify(value));
+      await updateContent(key, JSON.stringify(value), activeTab);
       showToast('Liste mise à jour', 'success');
     } catch (error: any) {
       console.error('Update error:', error);
@@ -253,7 +253,7 @@ export default function AdminLanding() {
 
     setIsSaving(key);
     try {
-      const url = await uploadImage(key, file);
+      const url = await uploadImage(key, file, activeTab);
       if (url) {
         updateLocalValue(key, url);
       }

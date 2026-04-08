@@ -74,7 +74,10 @@ export default function AdminDashboard() {
         for (const item of data) {
           if (typeof item.value === 'string' && (item.value.includes('Invoxa') || item.value.includes('invoxa'))) {
             const newValue = item.value.replace(/Invoxa/g, 'Facty').replace(/invoxa/g, 'facty');
-            await supabase.from('landing_page_content').update({ value: newValue }).eq('key', item.key);
+            await supabase.from('landing_page_content').update({ 
+              value: newValue,
+              section: item.section || 'General'
+            }).eq('key', item.key);
           }
         }
         localStorage.removeItem('facty_landing_content');

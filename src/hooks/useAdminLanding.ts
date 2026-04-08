@@ -33,7 +33,7 @@ export function useAdminLanding() {
     fetchContent(true);
   }, [fetchContent]);
 
-  const updateContent = async (key: string, value: string) => {
+  const updateContent = async (key: string, value: string, section: string) => {
     try {
       // Check if key exists
       const { data: existing, error: fetchError } = await supabase
@@ -47,14 +47,14 @@ export function useAdminLanding() {
       if (existing) {
         const { error } = await supabase
           .from('landing_page_content')
-          .update({ value, updated_at: new Date().toISOString() })
+          .update({ value, section, updated_at: new Date().toISOString() })
           .eq('key', key);
         if (error) throw error;
       } else {
         const type = (value.startsWith('[') || value.startsWith('{')) ? 'json' : 'text';
         const { error } = await supabase
           .from('landing_page_content')
-          .insert({ key, value, type });
+          .insert({ key, value, type, section });
         if (error) throw error;
       }
 
@@ -76,7 +76,7 @@ export function useAdminLanding() {
     }
   };
 
-  const uploadImage = async (key: string, file: File) => {
+  const uploadImage = async (key: string, file: File, section: string) => {
     try {
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData.user?.id;
@@ -112,7 +112,7 @@ export function useAdminLanding() {
         .from('landing')
         .getPublicUrl(filePath);
 
-      await updateContent(key, publicUrl);
+      await updateContent(key, publicUrl, section);
       return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
