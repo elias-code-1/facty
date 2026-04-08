@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import DynamicIcon from '../ui/DynamicIcon';
 
 export default function HeroSection({ content }: { content: Record<string, any> }) {
   const navigate = useNavigate();
@@ -47,10 +48,19 @@ export default function HeroSection({ content }: { content: Record<string, any> 
               {content.hero_social_proof || 'Rejoignez des milliers d\'indépendants satisfaits.'}
             </p>
             
-            <div className="flex items-center gap-6 text-sm font-medium text-slate-500">
-              <div className="flex items-center gap-2"><span className="text-xl">⚡</span> 30s chrono</div>
-              <div className="flex items-center gap-2"><span className="text-xl">🆓</span> 100% Gratuit</div>
-              <div className="flex items-center gap-2"><span className="text-xl">📄</span> PDF Pro</div>
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium text-slate-500">
+              <div className="flex items-center gap-2">
+                <DynamicIcon name={content.hero_feature_1_icon || 'Zap'} size={20} className="text-indigo-500" />
+                {content.hero_feature_1 || '30s chrono'}
+              </div>
+              <div className="flex items-center gap-2">
+                <DynamicIcon name={content.hero_feature_2_icon || 'Gift'} size={20} className="text-indigo-500" />
+                {content.hero_feature_2 || '100% Gratuit'}
+              </div>
+              <div className="flex items-center gap-2">
+                <DynamicIcon name={content.hero_feature_3_icon || 'FileText'} size={20} className="text-indigo-500" />
+                {content.hero_feature_3 || 'PDF Pro'}
+              </div>
             </div>
           </motion.div>
 

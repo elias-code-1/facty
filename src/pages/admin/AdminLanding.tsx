@@ -374,6 +374,62 @@ export default function AdminLanding() {
                 onUpload={handleImageUpload}
                 isSaving={isSaving === 'hero_mockup_url'}
               />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-100 pt-6 mt-6">
+                <div className="space-y-4">
+                  <TextInput 
+                    label="Feature 1 - Texte" 
+                    dbKey="hero_feature_1" 
+                    val={localValues.hero_feature_1 || ''}
+                    setVal={(v) => updateLocalValue('hero_feature_1', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'hero_feature_1'}
+                  />
+                  <TextInput 
+                    label="Feature 1 - Icône (Lucide)" 
+                    dbKey="hero_feature_1_icon" 
+                    val={localValues.hero_feature_1_icon || ''}
+                    setVal={(v) => updateLocalValue('hero_feature_1_icon', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'hero_feature_1_icon'}
+                  />
+                </div>
+                <div className="space-y-4">
+                  <TextInput 
+                    label="Feature 2 - Texte" 
+                    dbKey="hero_feature_2" 
+                    val={localValues.hero_feature_2 || ''}
+                    setVal={(v) => updateLocalValue('hero_feature_2', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'hero_feature_2'}
+                  />
+                  <TextInput 
+                    label="Feature 2 - Icône (Lucide)" 
+                    dbKey="hero_feature_2_icon" 
+                    val={localValues.hero_feature_2_icon || ''}
+                    setVal={(v) => updateLocalValue('hero_feature_2_icon', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'hero_feature_2_icon'}
+                  />
+                </div>
+                <div className="space-y-4">
+                  <TextInput 
+                    label="Feature 3 - Texte" 
+                    dbKey="hero_feature_3" 
+                    val={localValues.hero_feature_3 || ''}
+                    setVal={(v) => updateLocalValue('hero_feature_3', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'hero_feature_3'}
+                  />
+                  <TextInput 
+                    label="Feature 3 - Icône (Lucide)" 
+                    dbKey="hero_feature_3_icon" 
+                    val={localValues.hero_feature_3_icon || ''}
+                    setVal={(v) => updateLocalValue('hero_feature_3_icon', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'hero_feature_3_icon'}
+                  />
+                </div>
+              </div>
             </motion.div>
           )}
 

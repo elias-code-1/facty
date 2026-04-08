@@ -6,9 +6,9 @@ export function useAdminLanding() {
   const [content, setContent] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
 
-  const fetchContent = useCallback(async () => {
+  const fetchContent = useCallback(async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) setLoading(true);
       const { data, error } = await supabase
         .from('landing_page_content')
         .select('key, value, type');
@@ -25,12 +25,12 @@ export function useAdminLanding() {
     } catch (error) {
       console.error('Error fetching admin landing content:', error);
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchContent();
+    fetchContent(true);
   }, [fetchContent]);
 
   const updateContent = async (key: string, value: string) => {
@@ -70,7 +70,7 @@ export function useAdminLanding() {
         metadata: { key }
       });
 
-      await fetchContent();
+      await fetchContent(false);
     } catch (error) {
       console.error('Error updating content:', error);
       throw error;
