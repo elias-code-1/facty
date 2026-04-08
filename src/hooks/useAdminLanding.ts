@@ -66,7 +66,6 @@ export function useAdminLanding() {
         user_id: userData.user?.id,
         action: 'landing.content_updated',
         entity_type: 'landing_content',
-        entity_id: key,
         metadata: { key }
       });
 

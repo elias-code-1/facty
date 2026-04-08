@@ -70,7 +70,6 @@ export function useAdminCommunication() {
         user_id: userData.user?.id,
         action: 'announcement.created',
         entity_type: 'announcement',
-        entity_id: 'new',
         metadata: { title: data.title }
       });
 

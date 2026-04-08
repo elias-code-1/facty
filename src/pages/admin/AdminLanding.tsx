@@ -225,8 +225,9 @@ export default function AdminLanding() {
     try {
       await updateContent(key, value);
       showToast('Contenu mis à jour', 'success');
-    } catch (error) {
-      showToast('Erreur lors de la mise à jour', 'error');
+    } catch (error: any) {
+      console.error('Update error:', error);
+      showToast(`Erreur : ${error.message || 'Mise à jour échouée'}`, 'error');
     } finally {
       setIsSaving(null);
     }
@@ -237,8 +238,9 @@ export default function AdminLanding() {
     try {
       await updateContent(key, JSON.stringify(value));
       showToast('Liste mise à jour', 'success');
-    } catch (error) {
-      showToast('Erreur lors de la mise à jour', 'error');
+    } catch (error: any) {
+      console.error('Update error:', error);
+      showToast(`Erreur : ${error.message || 'Mise à jour échouée'}`, 'error');
     } finally {
       setIsSaving(null);
     }
@@ -611,22 +613,99 @@ export default function AdminLanding() {
 
           {activeTab === 'Footer' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <TextInput 
-                label="Tagline" 
-                dbKey="footer_tagline" 
-                val={localValues.footer_tagline || ''}
-                setVal={(v) => updateLocalValue('footer_tagline', v)}
-                onSave={handleSaveText}
-                isSaving={isSaving === 'footer_tagline'}
-              />
-              <TextInput 
-                label="Copyright" 
-                dbKey="footer_copyright" 
-                val={localValues.footer_copyright || ''}
-                setVal={(v) => updateLocalValue('footer_copyright', v)}
-                onSave={handleSaveText}
-                isSaving={isSaving === 'footer_copyright'}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <TextInput 
+                  label="Email de contact" 
+                  dbKey="footer_contact_email" 
+                  val={localValues.footer_contact_email || ''}
+                  setVal={(v) => updateLocalValue('footer_contact_email', v)}
+                  onSave={handleSaveText}
+                  isSaving={isSaving === 'footer_contact_email'}
+                />
+                <TextInput 
+                  label="Numéro de téléphone (laisser vide pour désactiver)" 
+                  dbKey="footer_contact_phone" 
+                  val={localValues.footer_contact_phone || ''}
+                  setVal={(v) => updateLocalValue('footer_contact_phone', v)}
+                  onSave={handleSaveText}
+                  isSaving={isSaving === 'footer_contact_phone'}
+                />
+              </div>
+
+              <div className="border-t border-slate-100 pt-8 mb-8">
+                <h3 className="text-lg font-bold text-slate-800 mb-6">Réseaux Sociaux</h3>
+                <p className="text-sm text-slate-500 mb-6">Entrez les URLs complètes (ex: https://facebook.com/votrepage). Laissez vide pour masquer l'icône.</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                  <TextInput 
+                    label="Facebook" 
+                    dbKey="footer_social_facebook" 
+                    val={localValues.footer_social_facebook || ''}
+                    setVal={(v) => updateLocalValue('footer_social_facebook', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'footer_social_facebook'}
+                  />
+                  <TextInput 
+                    label="Twitter / X" 
+                    dbKey="footer_social_twitter" 
+                    val={localValues.footer_social_twitter || ''}
+                    setVal={(v) => updateLocalValue('footer_social_twitter', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'footer_social_twitter'}
+                  />
+                  <TextInput 
+                    label="Instagram" 
+                    dbKey="footer_social_instagram" 
+                    val={localValues.footer_social_instagram || ''}
+                    setVal={(v) => updateLocalValue('footer_social_instagram', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'footer_social_instagram'}
+                  />
+                  <TextInput 
+                    label="LinkedIn" 
+                    dbKey="footer_social_linkedin" 
+                    val={localValues.footer_social_linkedin || ''}
+                    setVal={(v) => updateLocalValue('footer_social_linkedin', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'footer_social_linkedin'}
+                  />
+                  <TextInput 
+                    label="YouTube" 
+                    dbKey="footer_social_youtube" 
+                    val={localValues.footer_social_youtube || ''}
+                    setVal={(v) => updateLocalValue('footer_social_youtube', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'footer_social_youtube'}
+                  />
+                  <TextInput 
+                    label="GitHub" 
+                    dbKey="footer_social_github" 
+                    val={localValues.footer_social_github || ''}
+                    setVal={(v) => updateLocalValue('footer_social_github', v)}
+                    onSave={handleSaveText}
+                    isSaving={isSaving === 'footer_social_github'}
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100 pt-8">
+                <TextInput 
+                  label="Tagline" 
+                  dbKey="footer_tagline" 
+                  val={localValues.footer_tagline || ''}
+                  setVal={(v) => updateLocalValue('footer_tagline', v)}
+                  onSave={handleSaveText}
+                  isSaving={isSaving === 'footer_tagline'}
+                />
+                <TextInput 
+                  label="Copyright" 
+                  dbKey="footer_copyright" 
+                  val={localValues.footer_copyright || ''}
+                  setVal={(v) => updateLocalValue('footer_copyright', v)}
+                  onSave={handleSaveText}
+                  isSaving={isSaving === 'footer_copyright'}
+                />
+              </div>
             </motion.div>
           )}
         </div>

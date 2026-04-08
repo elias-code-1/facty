@@ -50,7 +50,6 @@ export function useAdminPlatform() {
         user_id: user?.id,
         action: 'platform.setting_updated',
         entity_type: 'platform_setting',
-        entity_id: key,
         metadata: { key, old_value: oldValue, new_value: value }
       });
     } catch (err) {
