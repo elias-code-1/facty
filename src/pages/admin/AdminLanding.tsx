@@ -197,11 +197,11 @@ export default function AdminLanding() {
 
   const tabs = ['Navbar', 'Hero', 'Problème', 'Solution', 'Produit', 'Bénéfices', 'FAQ', 'CTA', 'Footer'];
 
-  // Local states for inputs to avoid re-renders losing focus
   const [localValues, setLocalValues] = useState<Record<string, any>>({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
   React.useEffect(() => {
-    if (!loading && content) {
+    if (!loading && content && !isInitialized) {
       const newLocalValues: Record<string, any> = {};
       Object.keys(content).forEach(key => {
         if (key.endsWith('_items') || key === 'solution_stats' || key === 'product_use_cases' || key === 'faq_items') {
@@ -215,10 +215,11 @@ export default function AdminLanding() {
         }
       });
       setLocalValues(newLocalValues);
+      setIsInitialized(true);
     }
-  }, [content, loading]);
+  }, [content, loading, isInitialized]);
 
-  if (loading) return <FullPageSpinner />;
+  if (loading && !isInitialized) return <FullPageSpinner />;
 
   const handleSaveText = async (key: string, value: string) => {
     setIsSaving(key);
@@ -252,7 +253,10 @@ export default function AdminLanding() {
 
     setIsSaving(key);
     try {
-      await uploadImage(key, file);
+      const url = await uploadImage(key, file);
+      if (url) {
+        updateLocalValue(key, url);
+      }
       showToast('Image mise à jour', 'success');
     } catch (error) {
       showToast('Erreur lors de l\'upload', 'error');

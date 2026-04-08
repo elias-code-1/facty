@@ -25,7 +25,7 @@ export function useAdminLanding() {
     } catch (error) {
       console.error('Error fetching admin landing content:', error);
     } finally {
-      if (isInitial) setLoading(false);
+      setLoading(false);
     }
   }, []);
 
@@ -113,6 +113,7 @@ export function useAdminLanding() {
         .getPublicUrl(filePath);
 
       await updateContent(key, publicUrl);
+      return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
       throw error;
