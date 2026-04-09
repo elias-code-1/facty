@@ -47,6 +47,7 @@ export function useAnnouncement() {
       setAnnouncements(validAnnouncements);
     } catch (error) {
       console.error('Erreur fetchAnnouncements:', error);
+      setAnnouncements([]);
     } finally {
       setLoading(false);
     }

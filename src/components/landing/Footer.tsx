@@ -1,12 +1,27 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Github, Mail, Phone } from 'lucide-react';
 
 export default function Footer({ content }: { content: Record<string, any> }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const scrollToSection = (id: string) => {
+    if (id === '') {
+      if (location.pathname !== '/') {
+        navigate('/#');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.history.pushState(null, '', '/#');
+      }
+      return;
+    }
+    if (location.pathname !== '/') {
+      navigate('/#' + id);
+      return;
+    }
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    window.history.pushState(null, '', '/#' + id);
   };
 
   const socialLinks = [
@@ -64,9 +79,9 @@ export default function Footer({ content }: { content: Record<string, any> }) {
 
           <div className="flex flex-col gap-4">
             <h4 className="font-bold text-white text-lg mb-2">Navigation</h4>
-            <button onClick={() => scrollToSection('features')} className="text-left text-slate-400 hover:text-white transition-colors">Fonctionnalités</button>
-            <button onClick={() => scrollToSection('pricing')} className="text-left text-slate-400 hover:text-white transition-colors">Tarifs</button>
-            <button onClick={() => scrollToSection('faq')} className="text-left text-slate-400 hover:text-white transition-colors">FAQ</button>
+            <button onClick={() => scrollToSection('')} className="text-left text-slate-400 hover:text-white transition-colors">Accueil</button>
+            <button onClick={() => scrollToSection('fonctionnalités')} className="text-left text-slate-400 hover:text-white transition-colors">Fonctionnalités</button>
+            <button onClick={() => navigate('/contact')} className="text-left text-slate-400 hover:text-white transition-colors">Contact</button>
             <button onClick={() => navigate('/auth')} className="text-left text-slate-400 hover:text-white transition-colors">Se connecter</button>
           </div>
 

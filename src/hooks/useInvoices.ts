@@ -45,7 +45,39 @@ export function useInvoices(user: User | null) {
     if (!user) throw new Error('Utilisateur non connecté');
 
     try {
-      // 0. Vérifier l'unicité du numéro
+      // 0. Vérifier la limite du plan gratuit
+      let limitStr = '999999';
+      try {
+        const response = await fetch('/api/settings/public');
+        if (response.ok) {
+          const settings = await response.json();
+          if (settings.free_plan_invoice_limit) {
+            limitStr = settings.free_plan_invoice_limit;
+          }
+        }
+      } catch (err) {
+        console.warn('Impossible de récupérer la limite du plan gratuit', err);
+      }
+      
+      const limit = parseInt(limitStr, 10);
+
+      if (!isNaN(limit) && limit < 999999) {
+        // Compter les factures du mois courant
+        const now = new Date();
+        const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        
+        const { count, error: countError } = await supabase
+          .from('invoices')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('created_at', firstDayOfMonth);
+
+        if (!countError && count !== null && count >= limit) {
+          throw new Error(`Limite atteinte : Vous ne pouvez pas créer plus de ${limit} factures par mois avec le plan gratuit.`);
+        }
+      }
+
+      // 0.5 Vérifier l'unicité du numéro
       const isUnique = await checkInvoiceNumberUnique(data.invoice_number);
       if (!isUnique) {
         throw new Error(`Le numéro de facture ${data.invoice_number} est déjà utilisé.`);
@@ -117,7 +149,7 @@ export function useInvoices(user: User | null) {
     }
   };
 
-  const checkInvoiceNumberUnique = async (invoiceNumber: string): Promise<boolean> => {
+  const checkInvoiceNumberUnique = useCallback(async (invoiceNumber: string): Promise<boolean> => {
     if (!user) return false;
     try {
       const { count, error } = await supabase
@@ -132,9 +164,9 @@ export function useInvoices(user: User | null) {
       console.error('Erreur lors de la vérification du numéro de facture:', err);
       return false;
     }
-  };
+  }, [user]);
 
-  const getNextInvoiceNumber = async (): Promise<string> => {
+  const getNextInvoiceNumber = useCallback(async (): Promise<string> => {
     if (!user) return 'INV-001';
     try {
       const { data, error } = await supabase
@@ -157,7 +189,7 @@ export function useInvoices(user: User | null) {
       console.error('Erreur lors de la génération du prochain numéro:', err);
       return 'INV-001';
     }
-  };
+  }, [user]);
 
   const updateInvoice = async (id: string, data: Partial<Invoice>, items: InvoiceItemFormData[]) => {
     if (!user) throw new Error('Utilisateur non connecté');

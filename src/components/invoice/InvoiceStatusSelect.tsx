@@ -46,7 +46,8 @@ export default function InvoiceStatusSelect({
     }
   };
 
-  const { bg, text, dot } = config[status];
+  const currentConfig = config[status] || config.draft;
+  const { bg, text, dot } = currentConfig;
   const sizeClasses = size === 'sm' ? 'pl-7 pr-7 py-1 text-[10px]' : 'pl-8 pr-8 py-1.5 text-xs';
   const dotSize = size === 'sm' ? 'w-1 h-1 left-2.5' : 'w-1.5 h-1.5 left-3';
   const iconSize = size === 'sm' ? 10 : 12;

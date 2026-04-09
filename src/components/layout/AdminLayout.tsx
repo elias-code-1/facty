@@ -1,76 +1,50 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
-
-const pageVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8 }
-};
-
-const pageTransition = {
-  duration: 0.25,
-  ease: 'easeOut'
-};
+import ErrorViewer from '../ui/ErrorViewer';
 
 export default function AdminLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
+  // Fermer le menu à chaque changement de route
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 flex overflow-x-hidden">
       {/* Sidebar Desktop/Tablet */}
-      <aside className="hidden md:block fixed inset-y-0 left-0 z-20 no-print transition-all duration-300 w-20 lg:w-64">
+      <aside className="hidden md:block fixed inset-y-0 left-0 z-40 no-print transition-all duration-300 w-20 lg:w-64">
         <AdminSidebar />
       </aside>
 
-      {/* Sidebar Mobile Overlay */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsSidebarOpen(false)}
-              className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 md:hidden"
-            />
-            <motion.aside
-              initial={{ x: -288 }}
-              animate={{ x: 0 }}
-              exit={{ x: -288 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed inset-y-0 left-0 w-72 z-40 md:hidden"
-            >
-              <AdminSidebar onClose={() => setIsSidebarOpen(false)} />
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Sidebar Mobile (Always rendered, handles its own visibility) */}
+      <AdminSidebar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300 md:ml-20 lg:ml-64">
-        <div className="no-print">
-          <AdminHeader onMenuClick={() => setIsSidebarOpen(true)} />
+      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300 md:ml-20 lg:ml-64 w-full">
+        <div className="no-print sticky top-0 z-30">
+          <AdminHeader onMenuClick={() => setIsMenuOpen(true)} />
         </div>
         
-        <main className="flex-1 p-4 md:p-6 lg:p-8 3xl:p-10 overflow-x-hidden">
-          <div className="max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-screen-3xl mx-auto">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden">
+          <div className="max-w-7xl 2xl:max-w-screen-2xl mx-auto">
             <motion.div
               key={location.pathname}
-              variants={pageVariants}
-              initial="initial"
-              animate="animate"
-              transition={pageTransition}
-              className="flex-1"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="w-full"
             >
               <Outlet />
             </motion.div>
           </div>
         </main>
       </div>
+      <ErrorViewer />
     </div>
   );
 }

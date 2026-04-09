@@ -53,8 +53,9 @@ export function useAdminLogs() {
     fetchLogs();
 
     // Temps réel
+    // On utilise un nom unique pour éviter les conflits si le hook est utilisé plusieurs fois
     const channel = supabase
-      .channel('audit_logs_changes')
+      .channel(`audit_logs_changes_${Math.random().toString(36).substring(7)}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',

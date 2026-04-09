@@ -41,23 +41,11 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { profile } = useProfile(user);
   const stats = useDashboard(user);
-  const { announcements, dismissAnnouncement } = useAnnouncement();
+  const { announcements, dismissAnnouncement, loading: announcementsLoading } = useAnnouncement();
   const { clients } = useFeatureFlags();
   const navigate = useNavigate();
 
-  const firstName = profile?.full_name?.split(' ')[0] || 'Utilisateur';
-  const currency = profile?.currency || 'FCFA';
-
-  // Salutation dynamique
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return "Bonne matinée";
-    if (hour >= 12 && hour < 18) return "Bon après-midi";
-    if (hour >= 18 && hour < 22) return "Bonne soirée";
-    return "Bonne nuit";
-  };
-
-  if (stats.loading) {
+  if (stats.loading || announcementsLoading || !profile) {
     return (
       <div className="flex items-center justify-center h-96">
         <Spinner size="lg" />
@@ -65,7 +53,10 @@ export default function Dashboard() {
     );
   }
 
-  const isEmpty = stats.totalInvoices === 0;
+  const firstName = profile?.full_name?.split(' ')[0] || 'Utilisateur';
+  const currency = profile?.currency || 'FCFA';
+
+  const isEmpty = (stats.totalInvoices ?? 0) === 0;
 
   return (
     <div className="max-w-7xl mx-auto pb-20">
@@ -74,18 +65,33 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold text-slate-800">
           Bonjour, {firstName} 👋
         </h1>
-        <p className="text-slate-500 mt-1">{getGreeting()}</p>
+        <p className="text-slate-500 mt-1">
+          {(() => {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 12) return "Bonne matinée";
+            if (hour >= 12 && hour < 18) return "Bon après-midi";
+            if (hour >= 18 && hour < 22) return "Bonne soirée";
+            return "Bonne nuit";
+          })()}
+        </p>
       </div>
 
       {/* SECTION ANNONCES */}
       <div className="mb-8 space-y-3">
         <AnimatePresence mode="popLayout">
-          {announcements.slice(0, 2).map(ann => (
-            <AnnouncementBanner
+          {(announcements ?? []).slice(0, 2).map(ann => (
+            <motion.div
               key={ann.id}
-              announcement={ann}
-              onDismiss={() => dismissAnnouncement(ann.id)}
-            />
+              initial={{ opacity: 0, y: -16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnnouncementBanner
+                announcement={ann}
+                onDismiss={() => dismissAnnouncement(ann.id)}
+              />
+            </motion.div>
           ))}
         </AnimatePresence>
       </div>
@@ -101,24 +107,24 @@ export default function Dashboard() {
         <StatCard
           index={0}
           title="Total factures"
-          value={stats.totalInvoices}
-          subtitle={`+${stats.invoicesThisMonth} ce mois`}
+          value={stats.totalInvoices ?? 0}
+          subtitle={`+${stats.invoicesThisMonth ?? 0} ce mois`}
           icon={<FileText size={20} />}
           accentColor="indigo"
         />
         <StatCard
           index={1}
           title="Revenus encaissés"
-          value={formatCurrency(stats.totalRevenue, currency)}
-          subtitle={`+${formatCurrency(stats.revenueThisMonth, currency)} ce mois`}
+          value={formatCurrency(stats.totalRevenue ?? 0, currency)}
+          subtitle={`+${formatCurrency(stats.revenueThisMonth ?? 0, currency)} ce mois`}
           icon={<TrendingUp size={20} />}
           accentColor="green"
         />
         <StatCard
           index={2}
           title="En attente"
-          value={formatCurrency(stats.pendingAmount, currency)}
-          subtitle={`${stats.statusBreakdown.sent} factures`}
+          value={formatCurrency(stats.pendingAmount ?? 0, currency)}
+          subtitle={`${stats.statusBreakdown?.sent ?? 0} factures`}
           icon={<Clock size={20} />}
           accentColor="orange"
         />
@@ -126,7 +132,7 @@ export default function Dashboard() {
           <StatCard
             index={3}
             title="Clients"
-            value={stats.totalClients}
+            value={stats.totalClients ?? 0}
             subtitle="clients actifs"
             icon={<Users size={20} />}
             accentColor="blue"
@@ -162,10 +168,10 @@ export default function Dashboard() {
             transition={{ delay: 0.3, duration: 0.4 }}
           >
             <div className="lg:col-span-2">
-              <RevenueChart data={stats.revenueByMonth} currency={currency} />
+              <RevenueChart data={stats.revenueByMonth ?? []} currency={currency} />
             </div>
             <div className="lg:col-span-1">
-              <StatusChart data={stats.statusBreakdown} />
+              <StatusChart data={stats.statusBreakdown ?? { draft: 0, sent: 0, paid: 0, cancelled: 0 }} />
             </div>
           </motion.div>
 
@@ -198,7 +204,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {stats.recentInvoices.map((inv) => (
+                  {(stats.recentInvoices ?? []).map((inv) => (
                     <tr 
                       key={inv.id}
                       onClick={() => navigate(`/invoices/${inv.id}`)}
@@ -224,7 +230,7 @@ export default function Dashboard() {
 
             {/* Card View (Mobile) */}
             <div className="md:hidden divide-y divide-slate-50">
-              {stats.recentInvoices.map((inv) => (
+              {(stats.recentInvoices ?? []).map((inv) => (
                 <div 
                   key={inv.id}
                   onClick={() => navigate(`/invoices/${inv.id}`)}

@@ -5,6 +5,7 @@ import { useProfile } from '../hooks/useProfile';
 import { supabase } from '../lib/supabase';
 import Spinner from '../components/ui/Spinner';
 import FullPageSpinner from '../components/ui/FullPageSpinner';
+import ErrorBoundary from '../components/ui/ErrorBoundary';
 
 // Pages
 import Auth from '../pages/Auth';
@@ -31,6 +32,8 @@ import AdminStats from '../pages/admin/AdminStats';
 import AdminCommunication from '../pages/admin/AdminCommunication';
 import AdminSettings from '../pages/admin/AdminSettings';
 import AdminLanding from '../pages/admin/AdminLanding';
+import AdminSupport from '../pages/admin/AdminSupport';
+import Contact from '../pages/Contact';
 
 // Layouts
 import AppLayout from '../components/layout/AppLayout';
@@ -146,10 +149,11 @@ const AdminRoute = () => {
 /** Configuration du routeur principal */
 export const AppRouter = () => {
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter>
       <Routes>
         {/* Routes publiques */}
         <Route path="/" element={<Landing />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/auth" element={<Auth />} />
         
         {/* Route publique admin */}
@@ -158,7 +162,9 @@ export const AppRouter = () => {
         {/* Routes protégées (Utilisateur standard) */}
         <Route element={
           <PrivateRoute>
-            <AppLayout />
+            <ErrorBoundary>
+              <AppLayout />
+            </ErrorBoundary>
           </PrivateRoute>
         }>
           <Route path="/dashboard" element={<Dashboard />} />
@@ -183,6 +189,7 @@ export const AppRouter = () => {
             <Route path="/admin/facty/communication" element={<AdminCommunication />} />
             <Route path="/admin/facty/settings" element={<AdminSettings />} />
             <Route path="/admin/facty/landing" element={<AdminLanding />} />
+            <Route path="/admin/facty/support" element={<AdminSupport />} />
           </Route>
         </Route>
 

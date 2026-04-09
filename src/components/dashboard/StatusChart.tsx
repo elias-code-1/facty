@@ -32,14 +32,27 @@ const LABELS = {
 
 /** Graphe Donut pour la répartition des statuts */
 export default function StatusChart({ data }: StatusChartProps) {
+  const safeData = data ?? { draft: 0, sent: 0, paid: 0, cancelled: 0 };
+  
   const chartData = [
-    { name: LABELS.draft, value: data.draft, color: COLORS.draft },
-    { name: LABELS.sent, value: data.sent, color: COLORS.sent },
-    { name: LABELS.paid, value: data.paid, color: COLORS.paid },
-    { name: LABELS.cancelled, value: data.cancelled, color: COLORS.cancelled },
+    { name: LABELS.draft, value: safeData.draft, color: COLORS.draft },
+    { name: LABELS.sent, value: safeData.sent, color: COLORS.sent },
+    { name: LABELS.paid, value: safeData.paid, color: COLORS.paid },
+    { name: LABELS.cancelled, value: safeData.cancelled, color: COLORS.cancelled },
   ].filter(d => d.value > 0);
 
-  const total = Object.values(data).reduce((acc, val) => acc + val, 0);
+  const total = Object.values(safeData).reduce((acc, val) => acc + val, 0);
+
+  if (total === 0) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 flex flex-col h-[400px]">
+        <h3 className="text-base font-semibold text-slate-800 mb-4">Répartition des statuts</h3>
+        <div className="flex-1 flex items-center justify-center text-slate-400 text-sm italic">
+          Aucune donnée disponible
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 flex flex-col h-[400px]">

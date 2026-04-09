@@ -14,8 +14,17 @@ export default function ProductSection({ content }: { content: Record<string, an
 
   const useCases = content.product_use_cases || defaultUseCases;
 
+  const defaultFeatures = [
+    { title: 'Gestion des clients', description: 'Enregistrez vos clients pour les réutiliser facilement.' },
+    { title: 'Articles illimités', description: 'Créez votre catalogue de services ou produits.' },
+    { title: 'Export PDF pro', description: 'Générez des PDF propres et conformes.' },
+    { title: 'Suivi des paiements', description: 'Marquez vos factures comme payées en un clic.' }
+  ];
+
+  const userFeatures = content.user_features_items || defaultFeatures;
+
   return (
-    <section id="features" className="bg-slate-50 py-24">
+    <section id="fonctionnalités" className="bg-slate-50 py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           ref={ref}
@@ -87,7 +96,7 @@ export default function ProductSection({ content }: { content: Record<string, an
         </div>
 
         {/* Use Cases */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           {useCases.map((item: any, index: number) => (
             <motion.div
               key={index}
@@ -103,6 +112,34 @@ export default function ProductSection({ content }: { content: Record<string, an
               <p className="text-slate-500">{item.description}</p>
             </motion.div>
           ))}
+        </div>
+
+        {/* User Features List */}
+        <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-100">
+          <div className="text-center mb-12">
+            <h3 className="text-2xl font-bold text-slate-800">
+              {content.user_features_title || 'Fonctionnalités incluses'}
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {userFeatures.map((feature: any, index: number) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                className="flex gap-4"
+              >
+                <div className="flex-shrink-0 w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mt-1">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-800 mb-1">{feature.title}</h4>
+                  <p className="text-sm text-slate-500 leading-relaxed">{feature.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

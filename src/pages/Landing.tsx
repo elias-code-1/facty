@@ -8,6 +8,9 @@ import SolutionSection from '../components/landing/SolutionSection';
 import ProductSection from '../components/landing/ProductSection';
 import BenefitsSection from '../components/landing/BenefitsSection';
 import FaqSection from '../components/landing/FaqSection';
+import StepsSection from '../components/landing/StepsSection';
+import SecuritySection from '../components/landing/SecuritySection';
+import TestimonialsSection from '../components/landing/TestimonialsSection';
 import CtaSection from '../components/landing/CtaSection';
 import Footer from '../components/landing/Footer';
 import { updateSEO } from '../utils/seo';
@@ -49,7 +52,12 @@ export default function Landing() {
       <ProblemSection content={content} />
       <SolutionSection content={content} />
       <ProductSection content={content} />
+      <StepsSection content={content} />
       <BenefitsSection content={content} />
+      <SecuritySection content={content} />
+      {(content.testimonials_visible === 'true' || content.testimonials_visible === true || content.testimonials_visible === undefined) && (
+        <TestimonialsSection content={content} />
+      )}
       <FaqSection content={content} />
       <CtaSection content={content} />
       <Footer content={content} />

@@ -189,22 +189,81 @@ const JsonListEditor = ({ label, dbKey, items, setItems, onSave, isSaving, templ
   );
 };
 
+const ToggleInput = ({ label, dbKey, val, onSave, isSaving }: { 
+  label: string, 
+  dbKey: string, 
+  val: boolean, 
+  onSave: (key: string, value: string) => void, 
+  isSaving: boolean 
+}) => {
+  return (
+    <div className="mb-6 flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+      <div>
+        <label className="block text-sm font-bold text-slate-700">{label}</label>
+        <p className="text-xs text-slate-500">Activer ou désactiver l'affichage de cette section</p>
+      </div>
+      <button
+        onClick={() => onSave(dbKey, (!val).toString())}
+        disabled={isSaving}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+          val ? 'bg-indigo-600' : 'bg-slate-300'
+        }`}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            val ? 'translate-x-6' : 'translate-x-1'
+          }`}
+        />
+      </button>
+    </div>
+  );
+};
+
 export default function AdminLanding() {
   const { content, loading, updateContent, uploadImage } = useAdminLanding();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('Navbar');
   const [isSaving, setIsSaving] = useState<string | null>(null);
 
-  const tabs = ['Navbar', 'Hero', 'Problème', 'Solution', 'Produit', 'Bénéfices', 'FAQ', 'CTA', 'Footer'];
+  const tabs = ['Navbar', 'Hero', 'Problème', 'Solution', 'Produit', 'Étapes', 'Bénéfices', 'Sécurité', 'Témoignages', 'FAQ', 'CTA', 'Footer'];
 
-  const [localValues, setLocalValues] = useState<Record<string, any>>({});
+  const [localValues, setLocalValues] = useState<Record<string, any>>({
+    steps_title: 'Comment ça marche ?',
+    steps_subtitle: 'Trois étapes simples pour commencer à facturer dès aujourd\'hui.',
+    steps_items: [
+      { icon: 'UserPlus', title: 'Créez votre compte', description: 'Inscrivez-vous gratuitement en quelques secondes.' },
+      { icon: 'FilePlus', title: 'Générez votre facture', description: 'Remplissez les détails de votre prestation.' },
+      { icon: 'Send', title: 'Envoyez à votre client', description: 'Téléchargez le PDF ou envoyez-le par email.' }
+    ],
+    security_title: 'Votre sécurité est notre priorité',
+    security_description: 'Nous utilisons les standards les plus élevés pour protéger vos données financières.',
+    security_items: [
+      { icon: 'Lock', title: 'Cryptage SSL', description: 'Toutes les données sont cryptées lors du transfert.' },
+      { icon: 'Database', title: 'Sauvegardes quotidiennes', description: 'Vos factures sont en sécurité sur nos serveurs.' },
+      { icon: 'ShieldCheck', title: 'Conformité RGPD', description: 'Nous respectons strictement votre vie privée.' }
+    ],
+    testimonials_title: 'Ils nous font confiance',
+    testimonials_subtitle: 'Découvrez pourquoi des centaines de professionnels choisissent Facty.',
+    testimonials_items: [
+      { name: 'Thomas Martin', role: 'Freelance Designer', content: 'Facty a totalement changé ma façon de facturer.', avatar: 'https://i.pravatar.cc/150?u=thomas' },
+      { name: 'Sarah Benali', role: 'Consultante Marketing', content: 'L\'interface est incroyablement intuitive.', avatar: 'https://i.pravatar.cc/150?u=sarah' }
+    ],
+    user_features_title: 'Fonctionnalités incluses',
+    user_features_items: [
+      { title: 'Gestion des clients', description: 'Enregistrez vos clients pour les réutiliser facilement.' },
+      { title: 'Articles illimités', description: 'Créez votre catalogue de services ou produits.' },
+      { title: 'Export PDF pro', description: 'Générez des PDF propres et conformes.' },
+      { title: 'Suivi des paiements', description: 'Marquez vos factures comme payées en un clic.' }
+    ],
+    testimonials_visible: 'true'
+  });
   const [isInitialized, setIsInitialized] = useState(false);
 
   React.useEffect(() => {
     if (!loading && content && !isInitialized) {
       const newLocalValues: Record<string, any> = {};
       Object.keys(content).forEach(key => {
-        if (key.endsWith('_items') || key === 'solution_stats' || key === 'product_use_cases' || key === 'faq_items') {
+        if (key.endsWith('_items') || key === 'solution_stats' || key === 'product_use_cases' || key === 'faq_items' || key === 'steps_items' || key === 'security_items' || key === 'testimonials_items' || key === 'user_features_items') {
           try {
             newLocalValues[key] = typeof content[key] === 'string' ? JSON.parse(content[key]) : content[key];
           } catch {
@@ -539,6 +598,54 @@ export default function AdminLanding() {
                 isSaving={isSaving === 'product_use_cases'}
                 template={{ icon: 'Lightbulb', title: '', description: '' }} 
               />
+              <div className="my-8 border-t border-slate-100" />
+              <TextInput 
+                label="Titre de la liste des fonctionnalités" 
+                dbKey="user_features_title" 
+                val={localValues.user_features_title || ''}
+                setVal={(v) => updateLocalValue('user_features_title', v)}
+                onSave={handleSaveText}
+                isSaving={isSaving === 'user_features_title'}
+              />
+              <JsonListEditor 
+                label="Liste des fonctionnalités utilisateurs" 
+                dbKey="user_features_items" 
+                items={localValues.user_features_items || []}
+                setItems={(items) => updateLocalValue('user_features_items', items)}
+                onSave={handleSaveJson}
+                isSaving={isSaving === 'user_features_items'}
+                template={{ title: '', description: '' }} 
+              />
+            </motion.div>
+          )}
+
+          {activeTab === 'Étapes' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <TextInput 
+                label="Titre de la section" 
+                dbKey="steps_title" 
+                val={localValues.steps_title || ''}
+                setVal={(v) => updateLocalValue('steps_title', v)}
+                onSave={handleSaveText}
+                isSaving={isSaving === 'steps_title'}
+              />
+              <TextInput 
+                label="Sous-titre" 
+                dbKey="steps_subtitle" 
+                val={localValues.steps_subtitle || ''}
+                setVal={(v) => updateLocalValue('steps_subtitle', v)}
+                onSave={handleSaveText}
+                isSaving={isSaving === 'steps_subtitle'}
+              />
+              <JsonListEditor 
+                label="Étapes" 
+                dbKey="steps_items" 
+                items={localValues.steps_items || []}
+                setItems={(items) => updateLocalValue('steps_items', items)}
+                onSave={handleSaveJson}
+                isSaving={isSaving === 'steps_items'}
+                template={{ icon: 'UserPlus', title: '', description: '' }} 
+              />
             </motion.div>
           )}
 
@@ -560,6 +667,74 @@ export default function AdminLanding() {
                 onSave={handleSaveJson}
                 isSaving={isSaving === 'benefits_items'}
                 template={{ icon: 'Sparkles', title: '', description: '' }} 
+              />
+            </motion.div>
+          )}
+
+          {activeTab === 'Sécurité' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <TextInput 
+                label="Titre de la section" 
+                dbKey="security_title" 
+                val={localValues.security_title || ''}
+                setVal={(v) => updateLocalValue('security_title', v)}
+                onSave={handleSaveText}
+                isSaving={isSaving === 'security_title'}
+              />
+              <TextInput 
+                label="Description" 
+                dbKey="security_description" 
+                val={localValues.security_description || ''}
+                setVal={(v) => updateLocalValue('security_description', v)}
+                onSave={handleSaveText}
+                isSaving={isSaving === 'security_description'}
+                isTextarea
+              />
+              <JsonListEditor 
+                label="Points de sécurité" 
+                dbKey="security_items" 
+                items={localValues.security_items || []}
+                setItems={(items) => updateLocalValue('security_items', items)}
+                onSave={handleSaveJson}
+                isSaving={isSaving === 'security_items'}
+                template={{ icon: 'ShieldCheck', title: '', description: '' }} 
+              />
+            </motion.div>
+          )}
+
+          {activeTab === 'Témoignages' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <ToggleInput 
+                label="Afficher la section Témoignages" 
+                dbKey="testimonials_visible" 
+                val={localValues.testimonials_visible === 'true' || localValues.testimonials_visible === true}
+                onSave={handleSaveText}
+                isSaving={isSaving === 'testimonials_visible'}
+              />
+              <TextInput 
+                label="Titre de la section" 
+                dbKey="testimonials_title" 
+                val={localValues.testimonials_title || ''}
+                setVal={(v) => updateLocalValue('testimonials_title', v)}
+                onSave={handleSaveText}
+                isSaving={isSaving === 'testimonials_title'}
+              />
+              <TextInput 
+                label="Sous-titre" 
+                dbKey="testimonials_subtitle" 
+                val={localValues.testimonials_subtitle || ''}
+                setVal={(v) => updateLocalValue('testimonials_subtitle', v)}
+                onSave={handleSaveText}
+                isSaving={isSaving === 'testimonials_subtitle'}
+              />
+              <JsonListEditor 
+                label="Témoignages" 
+                dbKey="testimonials_items" 
+                items={localValues.testimonials_items || []}
+                setItems={(items) => updateLocalValue('testimonials_items', items)}
+                onSave={handleSaveJson}
+                isSaving={isSaving === 'testimonials_items'}
+                template={{ name: '', role: '', content: '', avatar: '' }} 
               />
             </motion.div>
           )}

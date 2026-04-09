@@ -131,16 +131,42 @@ export function useAdminUsers() {
 
   const deleteUser = async (id: string) => {
     try {
-      // Appel de l'Edge Function pour la suppression Supabase Auth
-      const { data, error } = await supabase.functions.invoke('delete-user', {
-        body: { userId: id }
+      // On force la récupération de la session la plus fraîche
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error("Session expirée ou invalide. Veuillez vous reconnecter.");
+      }
+      
+      // Appel de notre API locale (Express)
+      const response = await fetch('/api/admin/delete-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ userId: id })
       });
 
-      if (error) {
-        // Fallback si l'Edge Function n'est pas déployée ou échoue
-        console.warn('Edge Function delete-user failed, falling back to suspension:', error);
-        await suspendUser(id, 'unknown');
-        throw new Error("La suppression réelle nécessite le déploiement de l'Edge Function. L'utilisateur a été suspendu par sécurité.");
+      const text = await response.text();
+      let data: any = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        console.error("Erreur de parsing JSON:", text);
+        throw new Error(`Réponse serveur invalide (${response.status})`);
+      }
+
+      if (!response.ok) {
+        // Fallback si la clé n'est pas configurée
+        if (data.error?.includes('SUPABASE_SERVICE_ROLE_KEY')) {
+          console.warn('Service Role Key non configurée, suspension de secours.');
+          await suspendUser(id, 'unknown');
+          throw new Error("La suppression réelle nécessite la configuration de la 'SUPABASE_SERVICE_ROLE_KEY' dans les paramètres de l'application. L'utilisateur a été suspendu par sécurité.");
+        }
+        
+        const errorMessage = data.error || data.message || `Erreur serveur (${response.status})`;
+        throw new Error(errorMessage);
       }
 
       setUsers(prev => prev.filter(u => u.id !== id));

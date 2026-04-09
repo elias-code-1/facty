@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -7,6 +7,7 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,7 +19,21 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
 
   const scrollToSection = (id: string) => {
     setIsMobileMenuOpen(false);
+    if (id === '') {
+      if (location.pathname !== '/') {
+        navigate('/#');
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.history.pushState(null, '', '/#');
+      }
+      return;
+    }
+    if (location.pathname !== '/') {
+      navigate('/#' + id);
+      return;
+    }
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    window.history.pushState(null, '', '/#' + id);
   };
 
   return (
@@ -34,9 +49,9 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8">
-          <button onClick={() => scrollToSection('features')} className="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Fonctionnalités</button>
-          <button onClick={() => scrollToSection('pricing')} className="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Tarifs</button>
-          <button onClick={() => scrollToSection('faq')} className="text-slate-600 hover:text-indigo-600 font-medium transition-colors">FAQ</button>
+          <button onClick={() => scrollToSection('')} className="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Accueil</button>
+          <button onClick={() => scrollToSection('fonctionnalités')} className="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Fonctionnalités</button>
+          <button onClick={() => navigate('/contact')} className="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Contact</button>
         </div>
 
         <div className="hidden md:flex items-center gap-4">
@@ -79,9 +94,9 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
               </div>
               
               <div className="flex flex-col gap-6 text-lg font-medium text-slate-700">
-                <button onClick={() => scrollToSection('features')} className="text-left hover:text-indigo-600">Fonctionnalités</button>
-                <button onClick={() => scrollToSection('pricing')} className="text-left hover:text-indigo-600">Tarifs</button>
-                <button onClick={() => scrollToSection('faq')} className="text-left hover:text-indigo-600">FAQ</button>
+                <button onClick={() => scrollToSection('')} className="text-left hover:text-indigo-600">Accueil</button>
+                <button onClick={() => scrollToSection('fonctionnalités')} className="text-left hover:text-indigo-600">Fonctionnalités</button>
+                <button onClick={() => { setIsMobileMenuOpen(false); navigate('/contact'); }} className="text-left hover:text-indigo-600">Contact</button>
               </div>
 
               <div className="mt-auto flex flex-col gap-3">

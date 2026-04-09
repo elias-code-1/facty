@@ -47,7 +47,8 @@ export default function InvoiceStatusBadge({ status, size = 'md' }: InvoiceStatu
     }
   };
 
-  const { label, bg, text, dot, bgHex, textHex, dotHex } = config[status];
+  const currentConfig = config[status] || config.draft;
+  const { label, bg, text, dot, bgHex, textHex, dotHex } = currentConfig;
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs';
 
   return (

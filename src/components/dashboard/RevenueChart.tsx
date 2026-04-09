@@ -20,7 +20,8 @@ interface RevenueChartProps {
 /** Graphe des revenus et factures sur 6 mois */
 export default function RevenueChart({ data, currency }: RevenueChartProps) {
   // Si pas assez de données
-  const hasData = data.some(d => d.revenue > 0 || d.invoices > 0);
+  const safeData = data ?? [];
+  const hasData = safeData.length > 0 && safeData.some(d => d.revenue > 0 || d.invoices > 0);
 
   if (!hasData) {
     return (

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { Copy, Check, X, Trash2, EyeOff } from 'lucide-react';
 
 export default function ErrorViewer() {
   const [errors, setErrors] = useState<string[]>([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (import.meta.env.PROD) return;
-
     const handleError = (event: ErrorEvent) => {
       setErrors(prev => [...prev, event.message]);
       setIsVisible(true);
@@ -26,20 +26,53 @@ export default function ErrorViewer() {
     };
   }, []);
 
+  const copyAllErrors = async () => {
+    try {
+      await navigator.clipboard.writeText(errors.join('\n---\n'));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy errors:', err);
+    }
+  };
+
   if (!isVisible || errors.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] max-w-sm w-full bg-red-50 border border-red-200 rounded-xl shadow-2xl overflow-hidden">
-      <div className="bg-red-600 text-white px-4 py-2 flex justify-between items-center">
-        <span className="font-bold text-sm">Erreurs ({errors.length})</span>
-        <div className="flex gap-2">
-          <button onClick={() => setErrors([])} className="text-xs hover:underline">Clear</button>
-          <button onClick={() => setIsVisible(false)} className="text-xs hover:underline">Hide</button>
+    <div className="fixed bottom-4 right-4 z-[9999] max-w-sm w-full bg-red-50 border border-red-200 rounded-xl shadow-2xl overflow-hidden no-print">
+      <div className="bg-red-600 text-white px-4 py-2.5 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+          <span className="font-bold text-sm">Console Admin ({errors.length})</span>
+        </div>
+        <div className="flex gap-3">
+          <button 
+            onClick={copyAllErrors} 
+            title="Copier toutes les erreurs"
+            className="hover:scale-110 transition-transform"
+          >
+            {copied ? <Check size={14} /> : <Copy size={14} />}
+          </button>
+          <button 
+            onClick={() => setErrors([])} 
+            title="Vider la console"
+            className="hover:scale-110 transition-transform"
+          >
+            <Trash2 size={14} />
+          </button>
+          <button 
+            onClick={() => setIsVisible(false)} 
+            title="Masquer"
+            className="hover:scale-110 transition-transform"
+          >
+            <EyeOff size={14} />
+          </button>
         </div>
       </div>
-      <div className="p-4 max-h-60 overflow-y-auto">
+      <div className="p-4 max-h-60 overflow-y-auto bg-slate-900">
         {errors.map((err, i) => (
-          <div key={i} className="text-xs text-red-800 mb-2 pb-2 border-b border-red-100 last:mb-0 last:pb-0 last:border-0 font-mono break-words">
+          <div key={i} className="text-[10px] text-red-400 mb-3 pb-3 border-b border-slate-800 last:mb-0 last:pb-0 last:border-0 font-mono break-words leading-relaxed">
+            <span className="text-slate-500 mr-2">[{new Date().toLocaleTimeString()}]</span>
             {err}
           </div>
         ))}

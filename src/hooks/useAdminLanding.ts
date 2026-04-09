@@ -54,7 +54,13 @@ export function useAdminLanding() {
         const type = (value.startsWith('[') || value.startsWith('{')) ? 'json' : 'text';
         const { error } = await supabase
           .from('landing_page_content')
-          .insert({ key, value, type, section });
+          .insert({ 
+            key, 
+            value, 
+            type, 
+            section,
+            label: key // Ajout du label pour éviter la contrainte NOT NULL
+          });
         if (error) throw error;
       }
 

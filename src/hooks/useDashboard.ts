@@ -50,11 +50,14 @@ export function useDashboard(user: User | null) {
       ]);
 
       if (invoicesRes.error) throw invoicesRes.error;
+      if (clientsRes.error) throw clientsRes.error;
       
       setInvoices(invoicesRes.data || []);
       setTotalClients(clientsRes.count || 0);
     } catch (err) {
       console.error('Erreur dashboard:', err);
+      setInvoices([]);
+      setTotalClients(0);
     } finally {
       setLoading(false);
     }

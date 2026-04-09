@@ -4,17 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
-const pageVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8 }
-};
-
-const pageTransition = {
-  duration: 0.25,
-  ease: 'easeOut'
-};
-
 export default function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
@@ -29,24 +18,26 @@ export default function AppLayout() {
       {/* Sidebar Mobile Overlay */}
       <AnimatePresence>
         {isSidebarOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsSidebarOpen(false)}
-              className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 md:hidden"
-            />
-            <motion.aside
-              initial={{ x: -288 }}
-              animate={{ x: 0 }}
-              exit={{ x: -288 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed inset-y-0 left-0 w-72 z-40 md:hidden"
-            >
-              <Sidebar onClose={() => setIsSidebarOpen(false)} />
-            </motion.aside>
-          </>
+          <motion.div
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 md:hidden"
+          />
+        )}
+        {isSidebarOpen && (
+          <motion.aside
+            key="sidebar"
+            initial={{ x: -288 }}
+            animate={{ x: 0 }}
+            exit={{ x: -288 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed inset-y-0 left-0 w-72 z-40 md:hidden"
+          >
+            <Sidebar onClose={() => setIsSidebarOpen(false)} />
+          </motion.aside>
         )}
       </AnimatePresence>
 
@@ -60,10 +51,9 @@ export default function AppLayout() {
           <div className="max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-screen-3xl mx-auto">
             <motion.div
               key={location.pathname}
-              variants={pageVariants}
-              initial="initial"
-              animate="animate"
-              transition={pageTransition}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
               className="flex-1"
             >
               <Outlet />

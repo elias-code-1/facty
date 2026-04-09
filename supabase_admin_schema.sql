@@ -89,6 +89,18 @@ CREATE TABLE IF NOT EXISTS public.admin_notifications (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- Table: support_tickets
+CREATE TABLE IF NOT EXISTS public.support_tickets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  email text NOT NULL,
+  subject text NOT NULL,
+  message text NOT NULL,
+  status text NOT NULL DEFAULT 'open'
+    CHECK (status IN ('open', 'read', 'resolved')),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
 -- Default values for platform_settings
 INSERT INTO public.platform_settings (key, value, description) 
 VALUES
@@ -128,6 +140,7 @@ ALTER TABLE public.invoice_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.platform_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admin_notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.support_tickets ENABLE ROW LEVEL SECURITY;
 
 -- ===============================================================
 -- 4. FONCTIONS (Helper)
@@ -307,6 +320,22 @@ ON public.admin_notifications FOR UPDATE USING (public.is_admin());
 DROP POLICY IF EXISTS "Admin can update settings" ON public.platform_settings;
 CREATE POLICY "Admin can update settings"
 ON public.platform_settings FOR UPDATE USING (public.is_admin());
+
+-- support_tickets
+DROP POLICY IF EXISTS "Anyone can insert support tickets" ON public.support_tickets;
+CREATE POLICY "Anyone can insert support tickets"
+ON public.support_tickets FOR INSERT
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Admin can view all support tickets" ON public.support_tickets;
+CREATE POLICY "Admin can view all support tickets"
+ON public.support_tickets FOR SELECT
+USING (public.is_admin());
+
+DROP POLICY IF EXISTS "Admin can update support tickets" ON public.support_tickets;
+CREATE POLICY "Admin can update support tickets"
+ON public.support_tickets FOR UPDATE
+USING (public.is_admin());
 
 -- ===============================================================
 -- 7. TRIGGERS & FONCTIONS (Business Logic)
