@@ -20,34 +20,92 @@ export default function Legal() {
         
         <div className="prose prose-slate max-w-none space-y-8 text-slate-600 leading-relaxed">
           <section>
-            <h2 className="text-xl font-bold text-slate-800 mb-4">1. Présentation du site</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">1. Éditeur du site</h2>
             <p>
-              Le site <strong>Facty</strong> est une plateforme de gestion de facturation éditée par <strong>Logonova Agency</strong>.
+              Le site et l’application <strong>Facty</strong> sont édités par :
             </p>
             <p>
-              <strong>Directeur de la publication :</strong> Logonova Agency<br />
-              <strong>Contact :</strong> logonovaagency@gmail.com
+              <strong>Logonova Agency</strong><br />
+              <strong>Email :</strong> logonovaagency@gmail.com
+            </p>
+            <p className="italic text-sm">
+              (ci-après « l’Éditeur »)
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4">2. Hébergement</h2>
             <p>
-              Le site est hébergé par <strong>Google Cloud Platform (Cloud Run)</strong>.
+              L’application est hébergée par des prestataires techniques tiers garantissant la disponibilité et la sécurité des services.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-slate-800 mb-4">3. Propriété intellectuelle</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">3. Objet du service</h2>
             <p>
-              L'ensemble de ce site relève de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. Tous les droits de reproduction sont réservés, y compris pour les documents téléchargeables et les représentations iconographiques et photographiques.
+              <strong>Facty</strong> est une application SaaS permettant :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>La création de factures</li>
+              <li>La gestion de clients</li>
+              <li>L’automatisation de l’envoi de documents</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">4. Accès au service</h2>
+            <p>
+              Le service est accessible 24h/24 et 7j/7, sauf interruption pour maintenance ou cas de force majeure.
+            </p>
+            <p>
+              L’Éditeur ne saurait être tenu responsable en cas :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>D’interruption temporaire</li>
+              <li>De bug technique ou d’indisponibilité du service</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">5. Responsabilité</h2>
+            <p>
+              L’utilisateur est seul responsable :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Des données qu’il saisit</li>
+              <li>Des factures générées</li>
+              <li>De l’usage qu’il fait du service</li>
+            </ul>
+            <p className="mt-4">
+              L’Éditeur ne garantit pas :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>La conformité légale des factures selon chaque pays</li>
+              <li>L’absence totale d’erreurs</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">6. Propriété intellectuelle</h2>
+            <p>
+              Tous les éléments du site (design, logo, code, textes) sont la propriété exclusive de <strong>Logonova Agency</strong>.
+            </p>
+            <p>
+              Toute reproduction est interdite sans autorisation.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-slate-800 mb-4">4. Limitation de responsabilité</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">7. Données personnelles</h2>
             <p>
-              Facty s'efforce d'assurer au mieux de ses possibilités, l'exactitude et la mise à jour des informations diffusées sur ce site. Facty se réserve le droit de corriger, à tout moment et sans préavis, le contenu.
+              Les données personnelles sont collectées et traitées conformément à la Politique de Confidentialité disponible sur le site.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">8. Droit applicable</h2>
+            <p>
+              Le présent site est soumis au droit applicable selon la juridiction de l’Éditeur.
             </p>
           </section>
         </div>

@@ -22,33 +22,99 @@ export default function Privacy() {
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4">1. Collecte des données</h2>
             <p>
-              Nous collectons les informations que vous nous fournissez directement lors de la création de votre compte : nom, adresse email, et informations de facturation.
+              Nous collectons les données suivantes :
             </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Adresse email</li>
+              <li>Nom et informations de profil</li>
+              <li>Données clients saisies dans l’application</li>
+              <li>Données de facturation</li>
+              <li>Données techniques (adresse IP, navigateur)</li>
+            </ul>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-slate-800 mb-4">2. Utilisation des données</h2>
             <p>
-              Vos données sont utilisées exclusivement pour :
+              Les données sont utilisées pour :
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Gérer votre compte et vos factures.</li>
-              <li>Vous envoyer des notifications liées à votre activité.</li>
-              <li>Améliorer nos services.</li>
+              <li>Fournir le service</li>
+              <li>Gérer les comptes utilisateurs</li>
+              <li>Améliorer l’application</li>
+              <li>Assurer la sécurité</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-slate-800 mb-4">3. Protection des données</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">3. Conservation des données</h2>
             <p>
-              Nous mettons en œuvre des mesures de sécurité robustes pour protéger vos informations personnelles contre tout accès non autorisé. Vos données sont stockées de manière sécurisée via Supabase (PostgreSQL).
+              Les données sont conservées :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Pendant la durée d’utilisation du service</li>
+              <li>Ou jusqu’à suppression du compte</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">4. Partage des données</h2>
+            <p>
+              Les données peuvent être partagées avec :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Des services techniques (hébergement, email) uniquement dans le cadre du fonctionnement du service</li>
+            </ul>
+            <p className="mt-4 font-semibold">
+              Aucune donnée n’est vendue à des tiers.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-bold text-slate-800 mb-4">4. Vos droits</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">5. Sécurité</h2>
             <p>
-              Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles. Vous pouvez exercer ces droits en nous contactant à logonovaagency@gmail.com.
+              Nous mettons en place des mesures techniques pour protéger les données :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Chiffrement</li>
+              <li>Accès sécurisé</li>
+              <li>Contrôle d’accès</li>
+            </ul>
+            <p className="mt-4 italic">
+              Cependant, aucun système n’est totalement inviolable.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">6. Droits des utilisateurs</h2>
+            <p>
+              L’utilisateur peut :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Accéder à ses données</li>
+              <li>Modifier ses données</li>
+              <li>Demander la suppression de ses données</li>
+            </ul>
+            <p className="mt-4">
+              Toute demande peut être faite à : <strong>logonovaagency@gmail.com</strong>
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">7. Cookies</h2>
+            <p>
+              Le site peut utiliser des cookies pour :
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Améliorer l’expérience utilisateur</li>
+              <li>Analyser l’utilisation du service</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">8. Modifications</h2>
+            <p>
+              Cette politique peut être modifiée à tout moment. Les utilisateurs seront informés en cas de changement majeur.
             </p>
           </section>
         </div>
