@@ -172,17 +172,6 @@ export default function AdminTeam() {
       </div>
 
       {/* Liste membres */}
-      {loading && (
-        <p className="text-slate-400 text-sm mb-4">
-          Chargement...
-        </p>
-      )}
-      {!loading && members.length === 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-700 mb-6">
-          Aucun membre trouvé. Vérifiez la RLS Supabase.
-        </div>
-      )}
-
       {loading ? (
         <div className="text-center text-slate-400 py-12">
           Chargement...
