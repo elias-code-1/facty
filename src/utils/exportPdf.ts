@@ -37,9 +37,17 @@ export const exportInvoicePDF = async (
       useCORS: true, // Pour les images externes (logo)
       backgroundColor: '#ffffff',
       logging: false,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
+      windowWidth: 1200, // Force desktop layout for consistent PDF rendering
       onclone: (clonedDoc) => {
+        // Force the cloned element to have a fixed width to match windowWidth
+        const clonedElement = clonedDoc.getElementById(elementId);
+        if (clonedElement) {
+          clonedElement.style.width = '1200px';
+          clonedElement.style.maxWidth = '1200px';
+          clonedElement.style.margin = '0';
+          clonedElement.style.padding = '40px'; // Add some padding for the PDF
+        }
+
         // 1. Nettoyer toutes les balises <style> de manière agressive
         const styleTags = clonedDoc.getElementsByTagName('style');
         for (let i = 0; i < styleTags.length; i++) {

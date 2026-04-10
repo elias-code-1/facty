@@ -16,8 +16,13 @@ export function useAuth() {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
+        const isRefreshError = (err: any) => {
+          const msg = typeof err === 'string' ? err : err?.message || '';
+          return msg.includes('Refresh Token Not Found') || msg.includes('invalid_refresh_token') || msg.includes('Invalid Refresh Token');
+        };
+
         if (error) {
-          if (error.message.includes('Refresh Token Not Found') || error.message.includes('invalid_refresh_token')) {
+          if (isRefreshError(error)) {
             // Si le refresh token est invalide, on nettoie tout
             await supabase.auth.signOut().catch(() => {});
             if (mounted) {
@@ -34,7 +39,16 @@ export function useAuth() {
           setUser(session?.user ?? null);
         }
       } catch (err: any) {
-        console.error('Erreur session initiale:', err.message);
+        const isRefreshError = (e: any) => {
+          const msg = typeof e === 'string' ? e : e?.message || '';
+          return msg.includes('Refresh Token Not Found') || msg.includes('invalid_refresh_token') || msg.includes('Invalid Refresh Token');
+        };
+
+        if (isRefreshError(err)) {
+          await supabase.auth.signOut().catch(() => {});
+        } else {
+          console.error('Erreur session initiale:', err?.message || err);
+        }
         if (mounted) {
           setSession(null);
           setUser(null);

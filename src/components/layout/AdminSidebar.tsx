@@ -12,7 +12,8 @@ import {
   LogOut,
   Megaphone,
   LayoutTemplate,
-  Headphones
+  Headphones,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
@@ -33,14 +34,17 @@ const navLinks = [
   { to: '/admin/facty/communication', label: 'Communication', icon: <Megaphone size={20} /> },
   { to: '/admin/facty/landing', label: 'Landing Page', icon: <LayoutTemplate size={20} /> },
   { to: '/admin/facty/support', label: 'Support', icon: <Headphones size={20} /> },
+  { to: '/admin/facty/chat', label: 'Chat', icon: <MessageSquare size={20} /> },
   { to: '/admin/facty/settings', label: 'Paramètres', icon: <Settings size={20} /> },
 ];
 
 export default function AdminSidebar({ isMenuOpen, setIsMenuOpen, onClose }: AdminSidebarProps) {
   const { user } = useAuth();
   const { profile } = useProfile(user);
+  const isOwner = profile?.role === 'admin';
   const navigate = useNavigate();
   const [openTicketsCount, setOpenTicketsCount] = React.useState(0);
+  const [unreadChatCount, setUnreadChatCount] = React.useState(0);
 
   const isMobile = isMenuOpen !== undefined;
   const handleClose = () => {
@@ -60,6 +64,18 @@ export default function AdminSidebar({ isMenuOpen, setIsMenuOpen, onClose }: Adm
 
     fetchOpenTickets();
 
+    const fetchUnreadChat = async () => {
+      const { count } = await supabase
+        .from('chat_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('sender_type', 'user')
+        .eq('is_read', false);
+      
+      if (count !== null) setUnreadChatCount(count);
+    };
+
+    fetchUnreadChat();
+
     // Abonnement temps réel pour le badge
     // On utilise un nom unique pour éviter les conflits si le composant est rendu deux fois (mobile/desktop)
     const channel = supabase
@@ -70,6 +86,13 @@ export default function AdminSidebar({ isMenuOpen, setIsMenuOpen, onClose }: Adm
         table: 'support_tickets'
       }, () => {
         fetchOpenTickets();
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'chat_messages'
+      }, () => {
+        fetchUnreadChat();
       })
       .subscribe();
 
@@ -154,8 +177,41 @@ export default function AdminSidebar({ isMenuOpen, setIsMenuOpen, onClose }: Adm
               {link.to === '/admin/facty/support' && openTicketsCount > 0 && (
                 <div className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-slate-900 hidden md:block lg:hidden" />
               )}
+
+              {link.to === '/admin/facty/chat' && unreadChatCount > 0 && (
+                <span className="bg-indigo-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-indigo-900/20 md:hidden lg:flex">
+                  {unreadChatCount}
+                </span>
+              )}
+              {link.to === '/admin/facty/chat' && unreadChatCount > 0 && (
+                <div className="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full border border-slate-900 hidden md:block lg:hidden" />
+              )}
             </NavLink>
           ))}
+
+          {isOwner && (
+            <NavLink
+              to="/admin/facty/team"
+              onClick={handleClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                }`
+              }
+            >
+              <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                👥
+              </div>
+              <span className="md:hidden lg:block flex-1 truncate">Équipe</span>
+              
+              {/* Tooltip for compact mode */}
+              <div className="hidden md:group-hover:block lg:group-hover:hidden absolute left-full ml-4 px-3 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg whitespace-nowrap z-50 shadow-xl border border-slate-700 pointer-events-none">
+                Équipe
+              </div>
+            </NavLink>
+          )}
 
           <div className="my-6 border-t border-slate-800/50 mx-2" />
 

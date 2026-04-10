@@ -137,6 +137,69 @@ async function startServer() {
     }
   });
 
+  // API: Invitation d'utilisateur (nécessite SUPABASE_SERVICE_ROLE_KEY)
+  app.post("/api/admin/invite-user", async (req, res) => {
+    const { email, full_name, team_role } = req.body;
+    const authHeader = req.headers.authorization;
+
+    if (!email) {
+      return res.status(400).json({ error: "L'email est requis" });
+    }
+
+    try {
+      const supabaseUrl = process.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+      if (!supabaseUrl || !supabaseServiceKey) {
+        return res.status(500).json({ error: "Configuration serveur incomplète" });
+      }
+
+      const clientSupabase = createClient(supabaseUrl, supabaseAnonKey!);
+      const token = authHeader?.replace("Bearer ", "");
+      
+      if (!token) {
+        return res.status(401).json({ error: "Non authentifié" });
+      }
+
+      const { data: { user }, error: authError } = await clientSupabase.auth.getUser(token);
+
+      if (authError || !user) {
+        return res.status(401).json({ error: "Non authentifié" });
+      }
+
+      const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: { autoRefreshToken: false, persistSession: false }
+      });
+
+      const { data: profile, error: profileError } = await adminSupabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError || profile?.role !== "admin") {
+        return res.status(403).json({ error: "Accès refusé : Vous devez être administrateur." });
+      }
+
+      const { data: inviteData, error: inviteError } = await adminSupabase.auth.admin.inviteUserByEmail(email, {
+        data: {
+          full_name,
+          team_role
+        },
+        redirectTo: 'https://facty.netlify.app/auth'
+      });
+
+      if (inviteError) {
+        return res.status(400).json({ error: inviteError.message });
+      }
+
+      res.json({ success: true, user: inviteData.user });
+    } catch (err: any) {
+      res.status(500).json({ error: `Erreur interne serveur: ${err.message}` });
+    }
+  });
+
   // Vite middleware pour le développement
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

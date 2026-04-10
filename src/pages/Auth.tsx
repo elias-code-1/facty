@@ -105,12 +105,23 @@ export default function Auth() {
 
           console.log('Session établie avec succès, type:', type);
 
-          if (type === 'recovery') {
+          if (type === 'recovery' || type === 'invite') {
             setMode('reset-password');
           } else if (type === 'signup') {
             setMode('email-verified');
           } else if (data.session) {
-            navigate('/dashboard');
+            // Check if user is admin or team member to redirect correctly
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role, team_role')
+              .eq('id', data.session.user.id)
+              .single();
+              
+            if (profile?.role === 'admin' || profile?.team_role) {
+              navigate('/admin/facty');
+            } else {
+              navigate('/dashboard');
+            }
           }
 
           // Nettoyer l'URL
@@ -129,8 +140,13 @@ export default function Auth() {
       try {
         const { data: { session }, error: getSessionErr } = await supabase.auth.getSession();
         
+        const isRefreshError = (err: any) => {
+          const msg = typeof err === 'string' ? err : err?.message || '';
+          return msg.includes('Refresh Token Not Found') || msg.includes('invalid_refresh_token') || msg.includes('Invalid Refresh Token');
+        };
+
         if (getSessionErr) {
-          if (getSessionErr.message.includes('Refresh Token Not Found') || getSessionErr.message.includes('invalid_refresh_token')) {
+          if (isRefreshError(getSessionErr)) {
             await supabase.auth.signOut().catch(() => {});
           }
         } else if (session) {
@@ -138,8 +154,17 @@ export default function Auth() {
           navigate('/dashboard');
           return;
         }
-      } catch (err) {
-        console.error('Erreur getSession initialisation:', err);
+      } catch (err: any) {
+        const isRefreshError = (e: any) => {
+          const msg = typeof e === 'string' ? e : e?.message || '';
+          return msg.includes('Refresh Token Not Found') || msg.includes('invalid_refresh_token') || msg.includes('Invalid Refresh Token');
+        };
+
+        if (isRefreshError(err)) {
+          await supabase.auth.signOut().catch(() => {});
+        } else {
+          console.error('Erreur getSession initialisation:', err);
+        }
       }
 
       setIsInitializing(false);
@@ -194,7 +219,18 @@ export default function Auth() {
             entity_id: data.session.user.id,
             metadata: { email }
           });
-          navigate('/dashboard');
+          
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role, team_role')
+            .eq('id', data.session.user.id)
+            .single();
+            
+          if (profile?.role === 'admin' || profile?.team_role) {
+            navigate('/admin/facty');
+          } else {
+            navigate('/dashboard');
+          }
         }
       } else if (mode === 'register') {
         if (password !== confirmPassword) throw new Error('Les mots de passe ne correspondent pas.');
@@ -202,6 +238,32 @@ export default function Auth() {
         const { data: regData, error: regErr } = await supabase.auth.signUp({ email, password });
         if (regErr) throw regErr;
         
+        if (regData.user) {
+          // Vérifier si email est dans team_members
+          const { data: teamMember } = await supabase
+            .from('team_members')
+            .select('role, invited_by')
+            .eq('email', email)
+            .single();
+
+          if (teamMember) {
+            // Mettre à jour le profil avec team_role
+            await supabase
+              .from('profiles')
+              .update({
+                team_role: teamMember.role,
+                invited_by: teamMember.invited_by
+              })
+              .eq('id', regData.user.id);
+
+            // Activer le membre
+            await supabase
+              .from('team_members')
+              .update({ status: 'active' })
+              .eq('email', email);
+          }
+        }
+
         if (regData.user && !regData.session) {
           // Email confirmation required
           setMode('email-sent-register');
@@ -212,7 +274,7 @@ export default function Auth() {
         if (password.length < 8) throw new Error('Minimum 8 caractères requis');
         if (password !== confirmPassword) throw new Error('Les mots de passe ne correspondent pas');
 
-        const { error: updateErr } = await supabase.auth.updateUser({
+        const { data: updateData, error: updateErr } = await supabase.auth.updateUser({
           password: password
         });
 
@@ -223,8 +285,52 @@ export default function Auth() {
           throw updateErr;
         }
 
+        let redirectTo = '/dashboard';
+
+        if (updateData.user) {
+          const email = updateData.user.email;
+          if (email) {
+            // Vérifier si email est dans team_members
+            const { data: teamMember } = await supabase
+              .from('team_members')
+              .select('role, invited_by')
+              .eq('email', email)
+              .single();
+
+            if (teamMember) {
+              // Mettre à jour le profil avec team_role
+              await supabase
+                .from('profiles')
+                .update({
+                  team_role: teamMember.role,
+                  invited_by: teamMember.invited_by
+                })
+                .eq('id', updateData.user.id);
+
+              // Activer le membre
+              await supabase
+                .from('team_members')
+                .update({ status: 'active' })
+                .eq('email', email);
+                
+              redirectTo = '/admin/facty';
+            } else {
+              // Vérifier si c'est un admin existant
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', updateData.user.id)
+                .single();
+                
+              if (profile?.role === 'admin') {
+                redirectTo = '/admin/facty';
+              }
+            }
+          }
+        }
+
         showToast('Mot de passe mis à jour ✓', 'success');
-        setTimeout(() => navigate('/dashboard'), 2000);
+        setTimeout(() => navigate(redirectTo), 2000);
       }
     } catch (err: any) {
       setError(mapError(err));

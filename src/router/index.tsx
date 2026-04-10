@@ -33,6 +33,8 @@ import AdminCommunication from '../pages/admin/AdminCommunication';
 import AdminSettings from '../pages/admin/AdminSettings';
 import AdminLanding from '../pages/admin/AdminLanding';
 import AdminSupport from '../pages/admin/AdminSupport';
+import AdminChat from '../pages/admin/AdminChat';
+import AdminTeam from '../pages/admin/AdminTeam';
 import Contact from '../pages/Contact';
 
 // Layouts
@@ -139,7 +141,8 @@ const AdminRoute = () => {
   }
 
   // Connecté mais pas admin → page login admin (pas de redirection vers /dashboard)
-  if (profile?.role !== 'admin') {
+  const hasAccess = profile?.role === 'admin' || !!profile?.team_role;
+  if (!hasAccess) {
     return <Navigate to="/admin/facty/login" replace />;
   }
 
@@ -190,6 +193,8 @@ export const AppRouter = () => {
             <Route path="/admin/facty/settings" element={<AdminSettings />} />
             <Route path="/admin/facty/landing" element={<AdminLanding />} />
             <Route path="/admin/facty/support" element={<AdminSupport />} />
+            <Route path="/admin/facty/chat" element={<AdminChat />} />
+            <Route path="/admin/facty/team" element={<AdminTeam />} />
           </Route>
         </Route>
 

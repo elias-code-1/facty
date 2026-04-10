@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import ChatWidget from '../ui/ChatWidget';
 
 export default function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -61,6 +62,8 @@ export default function AppLayout() {
           </div>
         </main>
       </div>
+
+      <ChatWidget />
     </div>
   );
 }

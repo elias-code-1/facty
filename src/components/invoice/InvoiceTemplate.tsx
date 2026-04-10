@@ -30,105 +30,102 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       <div 
         ref={ref}
         id="invoice-template"
-        className="w-full bg-white rounded-2xl shadow-md p-6 md:p-10 font-sans text-slate-800"
-        style={{ backgroundColor: '#ffffff', color: '#1e293b' }}
+        className="w-full bg-white p-8 md:p-12 font-sans text-slate-800"
+        style={{ backgroundColor: '#ffffff', color: '#1e293b', minHeight: '1120px' }}
       >
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-6 mb-8 md:mb-10">
-          <div className="space-y-4">
+        <div className="flex justify-between items-start mb-10">
+          <div>
             {profile.logo_url ? (
               <img 
                 src={profile.logo_url} 
                 alt={profile.company_name} 
-                className="max-h-12 md:max-h-16 max-w-[100px] md:max-w-[128px] object-contain"
+                className="max-h-20 max-w-[180px] object-contain"
                 referrerPolicy="no-referrer"
               />
             ) : (
               <div 
-                className="w-12 h-12 md:w-16 md:h-16 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-lg md:text-xl font-bold"
-                style={{ backgroundColor: '#e0e7ff', color: '#4f46e5' }}
+                className="w-16 h-16 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-2xl font-bold"
+                style={{ backgroundColor: '#4f46e5', color: '#ffffff' }}
               >
                 {getInitials(profile.company_name || profile.full_name || 'Facty')}
               </div>
             )}
-            <div className="space-y-1">
-              <h2 className="font-bold text-base md:text-lg text-slate-900" style={{ color: '#0f172a' }}>{profile.company_name || profile.full_name}</h2>
-              <p className="text-xs md:text-sm text-slate-500 whitespace-pre-line" style={{ color: '#64748b' }}>{profile.address}</p>
-              <p className="text-xs md:text-sm text-slate-500" style={{ color: '#64748b' }}>{profile.phone}</p>
-              <p className="text-xs md:text-sm text-slate-500" style={{ color: '#64748b' }}>{profile.email}</p>
+            <div className="mt-4 space-y-1">
+              <h2 className="font-bold text-xl text-slate-900" style={{ color: '#0f172a' }}>{profile.company_name || profile.full_name}</h2>
+              <p className="text-sm text-slate-500 whitespace-pre-line" style={{ color: '#64748b' }}>{profile.address}</p>
+              <p className="text-sm text-slate-500" style={{ color: '#64748b' }}>{profile.phone}</p>
+              <p className="text-sm text-slate-500" style={{ color: '#64748b' }}>{profile.email}</p>
             </div>
           </div>
 
-          <div className="sm:text-right space-y-2 w-full sm:w-auto">
-            <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase" style={{ color: '#1e293b' }}>Facture</h1>
-            <div className="space-y-1">
-              <p className="text-slate-500 font-medium text-sm md:text-base" style={{ color: '#64748b' }}>N° {invoice.invoice_number}</p>
-              <div className="flex sm:justify-end">
-                <InvoiceStatusBadge status={invoice.status} size="md" />
-              </div>
+          <div className="text-right">
+            <h1 className="text-4xl font-black text-slate-800 tracking-tight uppercase mb-2" style={{ color: '#1e293b' }}>Facture</h1>
+            <p className="text-slate-500 font-bold text-lg" style={{ color: '#64748b' }}>N° {invoice.invoice_number}</p>
+            <div className="flex justify-end mt-2">
+              <InvoiceStatusBadge status={invoice.status} size="md" />
             </div>
           </div>
         </div>
 
         {/* Ligne accent indigo */}
-        <div className="w-full h-0.5 bg-indigo-600 my-6 md:my-8" style={{ backgroundColor: '#4f46e5' }} />
+        <div className="w-full h-1 bg-indigo-600 mb-10" style={{ backgroundColor: '#4f46e5' }} />
 
         {/* DE / POUR */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 mb-8 md:mb-10">
+        <div className="grid grid-cols-2 gap-12 mb-12">
           <div>
-            <span className="block text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 md:mb-3" style={{ color: '#94a3b8' }}>De :</span>
+            <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" style={{ color: '#94a3b8' }}>De :</span>
             <div className="space-y-1">
-              <p className="font-bold text-slate-800 text-sm md:text-base" style={{ color: '#1e293b' }}>{profile.full_name}</p>
-              <p className="text-xs md:text-sm text-slate-500 whitespace-pre-line" style={{ color: '#64748b' }}>{profile.address}</p>
-              <p className="text-xs md:text-sm text-slate-500" style={{ color: '#64748b' }}>{profile.phone}</p>
-              <p className="text-xs md:text-sm text-slate-500" style={{ color: '#64748b' }}>{profile.email}</p>
+              <p className="font-bold text-slate-800 text-lg" style={{ color: '#1e293b' }}>{profile.full_name}</p>
+              <p className="text-sm text-slate-500 whitespace-pre-line" style={{ color: '#64748b' }}>{profile.address}</p>
+              <p className="text-sm text-slate-500" style={{ color: '#64748b' }}>{profile.phone}</p>
+              <p className="text-sm text-slate-500" style={{ color: '#64748b' }}>{profile.email}</p>
             </div>
           </div>
 
           <div>
-            <span className="block text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 md:mb-3" style={{ color: '#94a3b8' }}>Pour :</span>
+            <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" style={{ color: '#94a3b8' }}>Pour :</span>
             <div className="space-y-1">
-              <p className="font-bold text-slate-800 text-sm md:text-base" style={{ color: '#1e293b' }}>{invoice.clients.name}</p>
-              <p className="text-xs md:text-sm text-slate-500" style={{ color: '#64748b' }}>{invoice.clients.email}</p>
-              <p className="text-xs md:text-sm text-slate-500" style={{ color: '#64748b' }}>{invoice.clients.phone}</p>
-              <p className="text-xs md:text-sm text-slate-500 whitespace-pre-line" style={{ color: '#64748b' }}>{invoice.clients.address}</p>
+              <p className="font-bold text-slate-800 text-lg" style={{ color: '#1e293b' }}>{invoice.clients.name}</p>
+              <p className="text-sm text-slate-500" style={{ color: '#64748b' }}>{invoice.clients.email}</p>
+              <p className="text-sm text-slate-500" style={{ color: '#64748b' }}>{invoice.clients.phone}</p>
+              <p className="text-sm text-slate-500 whitespace-pre-line" style={{ color: '#64748b' }}>{invoice.clients.address}</p>
             </div>
           </div>
         </div>
 
         {/* DATES */}
-        <div className="flex flex-wrap gap-6 md:gap-12 py-4 md:py-5 border-y border-slate-100 mb-8" style={{ borderColor: '#f1f5f9' }}>
+        <div className="grid grid-cols-2 gap-12 py-6 border-y border-slate-100 mb-10" style={{ borderColor: '#f1f5f9' }}>
           <div>
-            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1" style={{ color: '#94a3b8' }}>Date d'émission</span>
-            <p className="text-xs md:text-sm font-semibold text-slate-700" style={{ color: '#334155' }}>{formatDate(invoice.issue_date)}</p>
+            <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1" style={{ color: '#94a3b8' }}>Date d'émission</span>
+            <p className="text-base font-bold text-slate-700" style={{ color: '#334155' }}>{formatDate(invoice.issue_date)}</p>
           </div>
           <div>
-            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1" style={{ color: '#94a3b8' }}>Date d'échéance</span>
-            <p className={`text-xs md:text-sm font-semibold ${isOverdue ? 'text-red-500' : 'text-slate-700'}`} style={{ color: isOverdue ? '#ef4444' : '#334155' }}>
+            <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1" style={{ color: '#94a3b8' }}>Date d'échéance</span>
+            <p className={`text-base font-bold ${isOverdue ? 'text-red-500' : 'text-slate-700'}`} style={{ color: isOverdue ? '#ef4444' : '#334155' }}>
               {formatDate(invoice.due_date)}
-              {isOverdue && <span className="ml-2 text-[10px] md:text-xs font-bold" style={{ color: '#ef4444' }}>⚠️ ÉCHÉANCE DÉPASSÉE</span>}
             </p>
           </div>
         </div>
 
         {/* TABLEAU DES PRESTATIONS */}
-        <div className="mb-8 overflow-x-auto rounded-2xl border border-slate-100" style={{ borderColor: '#f1f5f9' }}>
-          <table className="w-full border-collapse min-w-[600px] md:min-w-0">
+        <div className="mb-10 overflow-hidden rounded-2xl border border-slate-200" style={{ borderColor: '#e2e8f0' }}>
+          <table className="w-full border-collapse">
             <thead>
               <tr className="bg-slate-800 text-white" style={{ backgroundColor: '#1e293b', color: '#ffffff' }}>
-                <th className="text-left px-4 md:px-6 py-3 md:py-4 text-[10px] font-bold uppercase tracking-widest">Description</th>
-                <th className="text-right px-4 md:px-6 py-3 md:py-4 text-[10px] font-bold uppercase tracking-widest w-20">Qté</th>
-                <th className="text-right px-4 md:px-6 py-3 md:py-4 text-[10px] font-bold uppercase tracking-widest w-32">Prix unit.</th>
-                <th className="text-right px-4 md:px-6 py-3 md:py-4 text-[10px] font-bold uppercase tracking-widest w-32">Total</th>
+                <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-widest">Description</th>
+                <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-widest w-24">Qté</th>
+                <th className="text-right px-6 py-4 text-xs font-bold uppercase tracking-widest w-40">Prix unit.</th>
+                <th className="text-right px-6 py-4 text-xs font-bold uppercase tracking-widest w-40">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100" style={{ borderColor: '#f1f5f9' }}>
               {invoice.items.map((item, index) => (
-                <tr key={item.id} className={index % 2 === 1 ? 'bg-slate-50/50' : 'bg-white'} style={{ backgroundColor: index % 2 === 1 ? '#f8fafc' : '#ffffff' }}>
-                  <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-slate-700 font-medium" style={{ color: '#334155' }}>{item.description}</td>
-                  <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-slate-500 text-right" style={{ color: '#64748b' }}>{item.quantity}</td>
-                  <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-slate-500 text-right" style={{ color: '#64748b' }}>{formatCurrency(item.unit_price, invoice.currency)}</td>
-                  <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-slate-900 font-bold text-right" style={{ color: '#0f172a' }}>{formatCurrency(item.total, invoice.currency)}</td>
+                <tr key={item.id} className={index % 2 === 1 ? 'bg-slate-50/30' : 'bg-white'} style={{ backgroundColor: index % 2 === 1 ? '#f8fafc' : '#ffffff' }}>
+                  <td className="px-6 py-5 text-sm text-slate-700 font-medium" style={{ color: '#334155' }}>{item.description}</td>
+                  <td className="px-6 py-5 text-sm text-slate-500 text-center" style={{ color: '#64748b' }}>{item.quantity}</td>
+                  <td className="px-6 py-5 text-sm text-slate-500 text-right" style={{ color: '#64748b' }}>{formatCurrency(item.unit_price, invoice.currency)}</td>
+                  <td className="px-6 py-5 text-sm text-slate-900 font-bold text-right" style={{ color: '#0f172a' }}>{formatCurrency(item.total, invoice.currency)}</td>
                 </tr>
               ))}
             </tbody>
@@ -136,45 +133,45 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
         </div>
 
         {/* SECTION TOTAUX */}
-        <div className="flex justify-end mb-10">
-          <div className="w-full sm:max-w-[280px] space-y-3">
-            <div className="flex justify-between text-xs md:text-sm text-slate-500 px-2" style={{ color: '#64748b' }}>
+        <div className="flex justify-end mb-12">
+          <div className="w-full max-w-[320px] space-y-4">
+            <div className="flex justify-between text-sm text-slate-500 px-2" style={{ color: '#64748b' }}>
               <span>Sous-total</span>
-              <span className="font-medium text-slate-700" style={{ color: '#334155' }}>{formatCurrency(invoice.subtotal, invoice.currency)}</span>
+              <span className="font-bold text-slate-700" style={{ color: '#334155' }}>{formatCurrency(invoice.subtotal, invoice.currency)}</span>
             </div>
-            <div className="flex justify-between text-xs md:text-sm text-slate-500 px-2" style={{ color: '#64748b' }}>
+            <div className="flex justify-between text-sm text-slate-500 px-2" style={{ color: '#64748b' }}>
               <span>TVA ({invoice.tax_rate}%)</span>
-              <span className="font-medium text-slate-700" style={{ color: '#334155' }}>{formatCurrency(invoice.tax_amount, invoice.currency)}</span>
+              <span className="font-bold text-slate-700" style={{ color: '#334155' }}>{formatCurrency(invoice.tax_amount, invoice.currency)}</span>
             </div>
             <div 
-              className="flex justify-between items-center bg-indigo-600 text-white rounded-2xl px-4 md:px-5 py-3 md:py-4 shadow-lg shadow-indigo-100"
+              className="flex justify-between items-center bg-indigo-600 text-white rounded-2xl px-6 py-5 shadow-xl shadow-indigo-100"
               style={{ backgroundColor: '#4f46e5', color: '#ffffff' }}
             >
-              <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider opacity-80">Total</span>
-              <span className="text-lg md:text-xl font-black">{formatCurrency(invoice.total, invoice.currency)}</span>
+              <span className="text-xs font-bold uppercase tracking-widest opacity-90">Total</span>
+              <span className="text-2xl font-black">{formatCurrency(invoice.total, invoice.currency)}</span>
             </div>
           </div>
         </div>
 
         {/* NOTES */}
         {invoice.notes && (
-          <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-10" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9' }}>
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2" style={{ color: '#94a3b8' }}>Notes :</h3>
+          <div className="bg-slate-50 rounded-2xl p-8 border border-slate-100 mb-12" style={{ backgroundColor: '#f8fafc', borderColor: '#f1f5f9' }}>
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" style={{ color: '#94a3b8' }}>Notes :</h3>
             <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line" style={{ color: '#475569' }}>{invoice.notes}</p>
           </div>
         )}
 
         {/* PIED DE PAGE */}
-        <div className="border-t border-slate-100 pt-8 text-center space-y-2" style={{ borderColor: '#f1f5f9' }}>
-          <p className="text-xs font-bold text-slate-800 uppercase tracking-widest" style={{ color: '#1e293b' }}>
+        <div className="mt-auto border-t border-slate-100 pt-10 text-center space-y-3" style={{ borderColor: '#f1f5f9' }}>
+          <p className="text-sm font-bold text-slate-800 uppercase tracking-widest" style={{ color: '#1e293b' }}>
             {profile.company_name || profile.full_name}
           </p>
-          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[10px] text-slate-400 font-medium" style={{ color: '#94a3b8' }}>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-400 font-medium" style={{ color: '#94a3b8' }}>
             {profile.address && <span>{profile.address.replace(/\n/g, ' ')}</span>}
             {profile.phone && <span>• {profile.phone}</span>}
             {profile.email && <span>• {profile.email}</span>}
           </div>
-          <p className="text-[10px] text-slate-300 pt-2 italic" style={{ color: '#cbd5e1' }}>Merci pour votre confiance ! 🙏</p>
+          <p className="text-xs text-slate-300 pt-4 italic" style={{ color: '#cbd5e1' }}>Merci pour votre confiance ! 🙏</p>
         </div>
       </div>
 

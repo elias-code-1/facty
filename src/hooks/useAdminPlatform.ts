@@ -37,10 +37,14 @@ export function useAdminPlatform() {
     try {
       const oldValue = settings[key];
       
+      // Utiliser upsert pour créer le paramètre s'il n'existe pas encore
       const { error } = await supabase
         .from('platform_settings')
-        .update({ value, updated_at: new Date().toISOString() })
-        .eq('key', key);
+        .upsert({ 
+          key, 
+          value, 
+          updated_at: new Date().toISOString() 
+        }, { onConflict: 'key' });
 
       if (error) throw error;
 
