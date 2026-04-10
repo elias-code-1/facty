@@ -76,7 +76,8 @@ export function useAdminDashboard() {
       ] = await Promise.all([
         supabase.from('profiles')
           .select('id, created_at, is_suspended, role, full_name, email')
-          .neq('role', 'admin'),
+          .neq('role', 'admin')
+          .is('team_role', null),
 
         supabase.from('invoices')
           .select('id, total, status, created_at, user_id'),

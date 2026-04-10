@@ -152,13 +152,32 @@ export function useAdminTeam() {
     await fetchMembers()
   }
 
-  const removeMember = async (id: string) => {
-    await supabase
-      .from('team_members')
-      .delete()
-      .eq('id', id)
+  const removeMember = async (id: string, email: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
 
-    await fetchMembers()
+      if (!token) throw new Error("Non authentifié")
+
+      const response = await fetch('/api/delete-team-member', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ memberId: id, email })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Erreur lors de la suppression")
+      }
+
+      await fetchMembers()
+    } catch (err: any) {
+      console.error('Error removeMember:', err)
+      throw err
+    }
   }
 
   return {

@@ -202,7 +202,7 @@ export default function AdminTeam() {
                     setConfirmAction({
                       title: 'Retirer ?',
                       message: `Retirer ${member.full_name} de l'équipe ?`,
-                      onConfirm: () => removeMember(member.id)
+                      onConfirm: () => removeMember(member.id, member.email)
                     })
                   }
                   className="text-xs text-red-400 hover:text-red-600"

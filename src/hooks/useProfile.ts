@@ -203,6 +203,26 @@ export function useProfile(user: User | null) {
             setProfile(null);
           } else {
             setProfile(data);
+            
+            // Si c'est un membre d'équipe en attente, on active son statut
+            if (data.team_role) {
+              try {
+                const { data: teamMember } = await supabase
+                  .from('team_members')
+                  .select('status')
+                  .eq('email', data.email)
+                  .maybeSingle();
+                
+                if (teamMember?.status === 'pending') {
+                  await supabase
+                    .from('team_members')
+                    .update({ status: 'active' })
+                    .eq('email', data.email);
+                }
+              } catch (e) {
+                console.warn('Erreur lors de la mise à jour du statut équipe:', e);
+              }
+            }
           }
         }
       } catch (err) {

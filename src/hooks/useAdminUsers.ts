@@ -19,11 +19,12 @@ export function useAdminUsers() {
     try {
       setLoading(true);
 
-      // Requête 1 : tous les profils non-admin
+      // Requête 1 : tous les profils non-admin et qui ne sont pas des membres d'équipe
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .neq('role', 'admin')
+        .is('team_role', null)
         .order('created_at', { ascending: false });
 
       if (profilesError) throw profilesError;
