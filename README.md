@@ -1,20 +1,68 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Facty 🧾
 
-# Run and deploy your AI Studio app
+Facty est une application moderne de gestion de facturation et d'administration d'équipe, conçue pour simplifier la création, le suivi et la gestion de vos factures.
 
-This contains everything you need to run your app locally.
+## 🚀 Fonctionnalités
 
-View your app in AI Studio: https://ai.studio/apps/82b53827-8dda-4052-9e83-f07fcbe44a78
+- **Gestion des factures** : Créez, éditez, téléchargez (PDF) et suivez le statut de vos factures (brouillon, envoyée, payée, en retard).
+- **Espace Client & Admin** : Tableaux de bord distincts pour les utilisateurs standards et les administrateurs.
+- **Gestion d'équipe** : Invitez des collaborateurs avec des rôles spécifiques (admin, éditeur, lecteur) via des invitations par email sécurisées.
+- **Authentification sécurisée** : Propulsé par Supabase Auth (Inscription, connexion, récupération de mot de passe).
+- **Interface Moderne** : Interface utilisateur élégante, responsive et accessible, construite avec Tailwind CSS.
 
-## Run Locally
+## 🛠️ Technologies utilisées
 
-**Prerequisites:**  Node.js
+- **Frontend** : React 18, Vite, TypeScript, Tailwind CSS, Lucide React (icônes)
+- **Backend & Base de données** : Supabase (PostgreSQL, Auth, Row Level Security)
+- **Serverless** : Netlify Functions (pour les actions d'administration sécurisées comme l'invitation d'utilisateurs)
+- **Déploiement** : Netlify
 
+## ⚙️ Prérequis
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- Node.js (v18 ou supérieur)
+- Un projet [Supabase](https://supabase.com/) actif
+- Un compte [Netlify](https://www.netlify.com/) (pour le déploiement et les fonctions serverless)
+
+## 📦 Installation locale
+
+1. **Cloner le dépôt**
+   ```bash
+   git clone <votre-repo-url>
+   cd facty
+   ```
+
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
+
+3. **Configuration des variables d'environnement**
+   Créez un fichier `.env` à la racine du projet et ajoutez vos clés Supabase :
+   ```env
+   VITE_SUPABASE_URL=votre_url_supabase
+   VITE_SUPABASE_ANON_KEY=votre_cle_anon_supabase
+   SUPABASE_SERVICE_ROLE_KEY=votre_cle_service_role_supabase
+   ```
+   *Note : La `SUPABASE_SERVICE_ROLE_KEY` est requise pour les fonctions d'administration (Netlify Functions) comme l'invitation de membres d'équipe.*
+
+4. **Lancer le serveur de développement**
+   ```bash
+   npm run dev
+   ```
+   L'application sera accessible sur `http://localhost:3000`.
+
+## 🚀 Déploiement sur Netlify
+
+Ce projet est pré-configuré pour un déploiement fluide sur Netlify grâce au fichier `netlify.toml`.
+
+1. Connectez votre dépôt GitHub/GitLab/Bitbucket à Netlify.
+2. Allez dans **Site settings > Environment variables** et ajoutez vos 3 variables d'environnement (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
+3. Déployez ! Netlify compilera automatiquement l'application React et déploiera la fonction d'invitation dans `netlify/functions/invite-user.ts`.
+
+## 🔒 Sécurité (Supabase RLS)
+
+Assurez-vous que les politiques RLS (Row Level Security) sont correctement configurées dans votre base de données Supabase pour protéger les tables `profiles`, `invoices`, et `team_members`.
+
+## 📄 Licence
+
+Ce projet est sous licence MIT.

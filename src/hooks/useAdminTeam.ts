@@ -44,18 +44,44 @@ export function useAdminTeam() {
     full_name: string
     role: string
   }) => {
-    // 1. Insérer dans team_members
-    const { error: insertError } = await supabase
+    // 1. Vérifier si l'utilisateur existe déjà
+    const { data: existingMember } = await supabase
       .from('team_members')
-      .insert({
-        email: data.email,
-        full_name: data.full_name,
-        role: data.role,
-        invited_by: user?.id,
-        status: 'pending'
-      })
+      .select('id, status')
+      .eq('email', data.email)
+      .single()
 
-    if (insertError) throw insertError
+    if (existingMember) {
+      if (existingMember.status === 'active') {
+        throw new Error("Cet utilisateur fait déjà partie de l'équipe.")
+      } else {
+        // Mettre à jour l'invitation existante
+        const { error: updateError } = await supabase
+          .from('team_members')
+          .update({
+            full_name: data.full_name,
+            role: data.role,
+            invited_by: user?.id,
+            status: 'pending'
+          })
+          .eq('id', existingMember.id)
+          
+        if (updateError) throw updateError
+      }
+    } else {
+      // Insérer dans team_members
+      const { error: insertError } = await supabase
+        .from('team_members')
+        .insert({
+          email: data.email,
+          full_name: data.full_name,
+          role: data.role,
+          invited_by: user?.id,
+          status: 'pending'
+        })
+
+      if (insertError) throw insertError
+    }
 
     // 2. Inviter via l'API serveur (qui utilise la Service Role Key)
     const { data: sessionData } = await supabase.auth.getSession()
@@ -63,7 +89,7 @@ export function useAdminTeam() {
 
     if (!token) throw new Error("Non authentifié")
 
-    const response = await fetch('/api/admin/invite-user', {
+    const response = await fetch('/.netlify/functions/invite-user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
