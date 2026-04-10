@@ -100,7 +100,7 @@ export const handler = async (event: any) => {
         .inviteUserByEmail(email, {
           data: { full_name, team_role },
           redirectTo:
-            'https://facty.netlify.app/auth'
+            'https://factyapp.logonova.site/auth'
         })
 
     if (inviteError) {

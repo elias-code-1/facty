@@ -187,7 +187,7 @@ async function startServer() {
           full_name,
           team_role
         },
-        redirectTo: 'https://facty.netlify.app/auth'
+        redirectTo: 'https://factyapp.logonova.site/auth'
       });
 
       if (inviteError) {

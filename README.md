@@ -14,14 +14,14 @@ Facty est une application moderne de gestion de facturation et d'administration 
 
 - **Frontend** : React 18, Vite, TypeScript, Tailwind CSS, Lucide React (icônes)
 - **Backend & Base de données** : Supabase (PostgreSQL, Auth, Row Level Security)
-- **Serverless** : Netlify Functions (pour les actions d'administration sécurisées comme l'invitation d'utilisateurs)
-- **Déploiement** : Netlify
+- **Serverless** : Vercel Functions (pour les actions d'administration sécurisées comme l'invitation d'utilisateurs)
+- **Déploiement** : Vercel
 
 ## ⚙️ Prérequis
 
 - Node.js (v18 ou supérieur)
 - Un projet [Supabase](https://supabase.com/) actif
-- Un compte [Netlify](https://www.netlify.com/) (pour le déploiement et les fonctions serverless)
+- Un compte [Vercel](https://vercel.com/) (pour le déploiement et les fonctions serverless)
 
 ## 📦 Installation locale
 
@@ -43,7 +43,7 @@ Facty est une application moderne de gestion de facturation et d'administration 
    VITE_SUPABASE_ANON_KEY=votre_cle_anon_supabase
    SUPABASE_SERVICE_ROLE_KEY=votre_cle_service_role_supabase
    ```
-   *Note : La `SUPABASE_SERVICE_ROLE_KEY` est requise pour les fonctions d'administration (Netlify Functions) comme l'invitation de membres d'équipe.*
+   *Note : La `SUPABASE_SERVICE_ROLE_KEY` est requise pour les fonctions d'administration (Vercel Functions) comme l'invitation de membres d'équipe.*
 
 4. **Lancer le serveur de développement**
    ```bash
@@ -51,13 +51,13 @@ Facty est une application moderne de gestion de facturation et d'administration 
    ```
    L'application sera accessible sur `http://localhost:3000`.
 
-## 🚀 Déploiement sur Netlify
+## 🚀 Déploiement sur Vercel
 
-Ce projet est pré-configuré pour un déploiement fluide sur Netlify grâce au fichier `netlify.toml`.
+Ce projet est pré-configuré pour un déploiement fluide sur Vercel grâce au fichier `vercel.json`.
 
-1. Connectez votre dépôt GitHub/GitLab/Bitbucket à Netlify.
-2. Allez dans **Site settings > Environment variables** et ajoutez vos 3 variables d'environnement (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
-3. Déployez ! Netlify compilera automatiquement l'application React et déploiera la fonction d'invitation dans `netlify/functions/invite-user.ts`.
+1. Connectez votre dépôt GitHub/GitLab/Bitbucket à Vercel.
+2. Allez dans **Project Settings > Environment Variables** et ajoutez vos 3 variables d'environnement (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
+3. Déployez ! Vercel compilera automatiquement l'application React et déploiera la fonction d'invitation dans `api/invite-user.ts`. L'application sera alors disponible sur `https://factyapp.logonova.site/`.
 
 ## 🔒 Sécurité (Supabase RLS)
 

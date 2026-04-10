@@ -89,7 +89,7 @@ export function useAdminTeam() {
 
     if (!token) throw new Error("Non authentifié")
 
-    const response = await fetch('/.netlify/functions/invite-user', {
+    const response = await fetch('/api/invite-user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
