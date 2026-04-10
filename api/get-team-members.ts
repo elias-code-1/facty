@@ -1,48 +1,22 @@
-import { createClient } from '@supabase/supabase-js'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { checkRateLimit, extractToken, verifyAdmin, handleError } from './_utils'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const authHeader = req.headers.authorization
-
-  const supabaseUrl = process.env.VITE_SUPABASE_URL!
-  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY!
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return res.status(500).json({ error: 'Configuration incomplète' })
+  // Rate Limiting: Max 30 requests per minute per IP
+  const clientIp = req.headers['x-forwarded-for']?.toString() || 'unknown'
+  if (!checkRateLimit(`get_team_${clientIp}`, 30, 60000)) {
+    return res.status(429).json({ error: 'Trop de requêtes, veuillez patienter' })
   }
 
   try {
-    const clientSupabase = createClient(supabaseUrl, supabaseAnonKey)
-    const token = authHeader?.replace('Bearer ', '')
+    const token = extractToken(req)
+    if (!token) throw new Error('UNAUTHORIZED')
 
-    if (!token) {
-      return res.status(401).json({ error: 'Non authentifié' })
-    }
-
-    const { data: { user }, error: authError } = await clientSupabase.auth.getUser(token)
-
-    if (authError || !user) {
-      return res.status(401).json({ error: 'Non authentifié' })
-    }
-
-    const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    })
-
-    const { data: profile } = await adminSupabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      return res.status(403).json({ error: 'Accès refusé' })
-    }
+    const { adminSupabase } = await verifyAdmin(token)
 
     const { data: members, error: membersError } = await adminSupabase
       .from('team_members')
@@ -50,11 +24,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .order('created_at', { ascending: false })
 
     if (membersError) {
-      return res.status(400).json({ error: membersError.message })
+      console.error('[Supabase DB Error]', membersError)
+      return res.status(500).json({ error: 'Erreur lors de la récupération des membres' })
     }
 
     return res.status(200).json({ members })
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message })
+  } catch (err) {
+    return handleError(res, err)
   }
 }

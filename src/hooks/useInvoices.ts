@@ -46,7 +46,7 @@ export function useInvoices(user: User | null) {
 
     try {
       // 0. Vérifier la limite du plan gratuit
-      let limitStr = '999999';
+      let limitStr = '3'; // Fail-safe limit instead of 999999
       try {
         const response = await fetch('/api/settings-public');
         if (response.ok) {
@@ -61,7 +61,7 @@ export function useInvoices(user: User | null) {
       
       const limit = parseInt(limitStr, 10);
 
-      if (!isNaN(limit) && limit < 999999) {
+      if (!isNaN(limit)) {
         // Compter les factures du mois courant
         const now = new Date();
         const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();

@@ -1,66 +1,40 @@
-import { createClient } from '@supabase/supabase-js'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { z } from 'zod'
+import { checkRateLimit, extractToken, verifyAdmin, handleError } from './_utils'
+
+const deleteUserSchema = z.object({
+  userId: z.string().uuid("Format d'ID invalide")
+})
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { userId } = req.body
-  const authHeader = req.headers.authorization
-
-  if (!userId) {
-    return res.status(400).json({ error: 'userId est requis' })
+  // Rate Limiting: Max 10 deletions per minute per IP
+  const clientIp = req.headers['x-forwarded-for']?.toString() || 'unknown'
+  if (!checkRateLimit(`delete_user_${clientIp}`, 10, 60000)) {
+    return res.status(429).json({ error: 'Trop de requêtes, veuillez patienter' })
   }
 
   try {
-    const supabaseUrl = process.env.VITE_SUPABASE_URL!
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY!
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const validatedData = deleteUserSchema.parse(req.body)
 
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return res.status(500).json({ error: 'Configuration incomplète' })
-    }
+    const token = extractToken(req)
+    if (!token) throw new Error('UNAUTHORIZED')
 
-    // 1. Vérifier que l'appelant est admin
-    const clientSupabase = createClient(supabaseUrl, supabaseAnonKey)
-    const token = authHeader?.replace('Bearer ', '')
-
-    if (!token) {
-      return res.status(401).json({ error: 'Non authentifié' })
-    }
-
-    const { data: { user }, error: authError } = await clientSupabase.auth.getUser(token)
-
-    if (authError || !user) {
-      return res.status(401).json({ error: 'Non authentifié' })
-    }
-
-    // 2. Initialiser le client Admin
-    const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    })
-
-    // 3. Vérifier le rôle admin
-    const { data: profile } = await adminSupabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      return res.status(403).json({ error: 'Accès refusé' })
-    }
+    const { adminSupabase } = await verifyAdmin(token)
 
     // 4. Supprimer l'utilisateur
-    const { error: deleteError } = await adminSupabase.auth.admin.deleteUser(userId)
+    const { error: deleteError } = await adminSupabase.auth.admin.deleteUser(validatedData.userId)
 
     if (deleteError) {
-      return res.status(400).json({ error: deleteError.message })
+      console.error('[Supabase Auth Delete Error]', deleteError)
+      return res.status(400).json({ error: "Impossible de supprimer l'utilisateur" })
     }
 
     return res.status(200).json({ success: true })
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message })
+  } catch (err) {
+    return handleError(res, err)
   }
 }

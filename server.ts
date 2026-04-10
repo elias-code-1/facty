@@ -20,7 +20,7 @@ async function startServer() {
       const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
       if (!supabaseUrl || !supabaseServiceKey) {
-        return res.json({ free_plan_invoice_limit: '999999' }); // Fallback
+        return res.status(500).json({ error: 'SERVER_CONFIG_ERROR' });
       }
 
       const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
@@ -42,19 +42,17 @@ async function startServer() {
       res.json(settings);
     } catch (err: any) {
       console.error("Erreur récupération settings publics:", err);
-      res.json({ free_plan_invoice_limit: '999999' }); // Fallback en cas d'erreur
+      res.status(500).json({ error: 'DATABASE_ERROR' });
     }
   });
 
   // API: Suppression d'utilisateur (nécessite SUPABASE_SERVICE_ROLE_KEY)
   app.post("/api/admin/delete-user", async (req, res) => {
-    console.log("--- Requête DELETE USER reçue ---");
     const { userId } = req.body;
     const authHeader = req.headers.authorization;
 
-    if (!userId) {
-      console.warn("userId manquant");
-      return res.status(400).json({ error: "userId est requis" });
+    if (!userId || typeof userId !== 'string') {
+      return res.status(400).json({ error: "userId est requis et doit être une chaîne" });
     }
 
     try {
@@ -63,38 +61,26 @@ async function startServer() {
       const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
       if (!supabaseUrl || !supabaseServiceKey) {
-        return res.status(500).json({ 
-          error: "Configuration serveur incomplète (SUPABASE_SERVICE_ROLE_KEY manquante)" 
-        });
+        return res.status(500).json({ error: "Configuration serveur incomplète" });
       }
 
       // 1. Vérifier que l'appelant est admin (via son token)
-      console.log("Tentative de suppression de l'utilisateur:", userId);
-      console.log("Authorization Header présent:", !!authHeader);
-      
       const clientSupabase = createClient(supabaseUrl, supabaseAnonKey!);
-      const token = authHeader?.replace("Bearer ", "");
+      const token = authHeader?.split(' ')[1]; // Extraction plus robuste
       
       if (!token) {
-        console.error("Token manquant dans la requête");
-        return res.status(401).json({ error: "Non authentifié (Token manquant)" });
+        return res.status(401).json({ error: "Non authentifié" });
       }
 
       const { data: { user }, error: authError } = await clientSupabase.auth.getUser(token);
 
       if (authError || !user) {
-        console.error("Erreur Supabase Auth:", authError?.message || "Utilisateur non trouvé");
-        return res.status(401).json({ error: `Non authentifié: ${authError?.message || "Utilisateur non trouvé"}` });
+        return res.status(401).json({ error: "Non authentifié" });
       }
-
-      console.log("Utilisateur authentifié:", user.email);
 
       // 2. Initialiser le client Admin (Service Role)
       const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
+        auth: { autoRefreshToken: false, persistSession: false }
       });
 
       // 3. Vérifier le rôle via le client Admin pour bypasser les RLS
@@ -104,36 +90,22 @@ async function startServer() {
         .eq("id", user.id)
         .single();
 
-      if (profileError) {
-        console.error("Erreur lors de la récupération du profil:", profileError.message);
-        return res.status(500).json({ error: "Impossible de vérifier votre rôle d'administrateur." });
-      }
-
-      if (profile?.role !== "admin") {
-        console.warn("Tentative d'accès non autorisé par:", user.email);
-        return res.status(403).json({ error: "Accès refusé : Vous devez être administrateur." });
+      if (profileError || profile?.role !== "admin") {
+        return res.status(403).json({ error: "Accès refusé" });
       }
 
       // 4. Supprimer l'utilisateur via la Service Role Key
-      console.log("Suppression effective de l'utilisateur:", userId);
       const { error: deleteError } = await adminSupabase.auth.admin.deleteUser(userId);
 
       if (deleteError) {
-        console.error("Erreur Supabase Admin Delete:", deleteError.message);
-        return res.status(400).json({ 
-          error: `Erreur Supabase: ${deleteError.message}`,
-          details: deleteError
-        });
+        console.error("[Supabase Admin Delete Error]", deleteError);
+        return res.status(400).json({ error: "Impossible de supprimer l'utilisateur" });
       }
 
-      console.log("Utilisateur supprimé avec succès");
       res.json({ success: true });
-    } catch (err: any) {
+    } catch (err) {
       console.error("Erreur serveur delete-user:", err);
-      res.status(500).json({ 
-        error: `Erreur interne serveur: ${err.message}`,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-      });
+      res.status(500).json({ error: "Une erreur interne est survenue" });
     }
   });
 
@@ -142,8 +114,8 @@ async function startServer() {
     const { email, full_name, team_role } = req.body;
     const authHeader = req.headers.authorization;
 
-    if (!email) {
-      return res.status(400).json({ error: "L'email est requis" });
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ error: "L'email est requis et doit être valide" });
     }
 
     try {
@@ -156,7 +128,7 @@ async function startServer() {
       }
 
       const clientSupabase = createClient(supabaseUrl, supabaseAnonKey!);
-      const token = authHeader?.replace("Bearer ", "");
+      const token = authHeader?.split(' ')[1]; // Extraction plus robuste
       
       if (!token) {
         return res.status(401).json({ error: "Non authentifié" });
@@ -179,24 +151,28 @@ async function startServer() {
         .single();
 
       if (profileError || profile?.role !== "admin") {
-        return res.status(403).json({ error: "Accès refusé : Vous devez être administrateur." });
+        return res.status(403).json({ error: "Accès refusé" });
       }
+
+      const redirectUrl = process.env.VITE_APP_URL || 'https://factyapp.logonova.site';
 
       const { data: inviteData, error: inviteError } = await adminSupabase.auth.admin.inviteUserByEmail(email, {
         data: {
-          full_name,
-          team_role
+          full_name: full_name?.toString() || '',
+          team_role: team_role?.toString() || 'member'
         },
-        redirectTo: 'https://factyapp.logonova.site/auth'
+        redirectTo: `${redirectUrl}/auth`
       });
 
       if (inviteError) {
-        return res.status(400).json({ error: inviteError.message });
+        console.error("[Supabase Admin Invite Error]", inviteError);
+        return res.status(400).json({ error: "Impossible d'envoyer l'invitation" });
       }
 
       res.json({ success: true, user: inviteData.user });
-    } catch (err: any) {
-      res.status(500).json({ error: `Erreur interne serveur: ${err.message}` });
+    } catch (err) {
+      console.error("Erreur serveur invite-user:", err);
+      res.status(500).json({ error: "Une erreur interne est survenue" });
     }
   });
 

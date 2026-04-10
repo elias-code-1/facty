@@ -1,9 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { checkRateLimit, handleError } from './_utils'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  // Rate Limiting: Max 60 requests per minute per IP for public settings
+  const clientIp = req.headers['x-forwarded-for']?.toString() || 'unknown'
+  if (!checkRateLimit(`settings_${clientIp}`, 60, 60000)) {
+    return res.status(429).json({ error: 'Trop de requêtes, veuillez patienter' })
   }
 
   try {
@@ -11,7 +18,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      return res.json({ free_plan_invoice_limit: '999999' })
+      throw new Error('SERVER_CONFIG_ERROR')
     }
 
     const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
@@ -23,7 +30,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .select('key, value')
       .in('key', ['free_plan_invoice_limit'])
 
-    if (error) throw error
+    if (error) {
+      console.error('[Supabase DB Error]', error)
+      throw new Error('DATABASE_ERROR')
+    }
 
     const settings = data.reduce((acc: any, item) => {
       acc[item.key] = item.value
@@ -31,8 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }, {})
 
     return res.json(settings)
-  } catch (err: any) {
-    console.error("Erreur récupération settings publics:", err)
-    return res.json({ free_plan_invoice_limit: '999999' })
+  } catch (err) {
+    return handleError(res, err)
   }
 }

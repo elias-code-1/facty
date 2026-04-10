@@ -1,65 +1,55 @@
-import { createClient } from '@supabase/supabase-js'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { z } from 'zod'
+import { checkRateLimit, extractToken, verifyAdmin, handleError } from './_utils'
+
+const inviteSchema = z.object({
+  email: z.string().email("Format d'email invalide"),
+  full_name: z.string().min(2, "Le nom doit contenir au moins 2 caractères").max(100),
+  team_role: z.string().min(1, "Le rôle est requis")
+})
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { email, full_name, team_role } = req.body
-  const authHeader = req.headers.authorization
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email requis' })
-  }
-
-  const supabaseUrl = process.env.VITE_SUPABASE_URL!
-  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY!
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return res.status(500).json({ error: 'Configuration incomplète' })
+  // Rate Limiting: Max 5 invitations per minute per IP
+  const clientIp = req.headers['x-forwarded-for']?.toString() || 'unknown'
+  if (!checkRateLimit(`invite_${clientIp}`, 5, 60000)) {
+    return res.status(429).json({ error: 'Trop de requêtes, veuillez patienter' })
   }
 
   try {
-    const clientSupabase = createClient(supabaseUrl, supabaseAnonKey)
-    const token = authHeader?.replace('Bearer ', '')
+    // 1. Validation des entrées
+    const validatedData = inviteSchema.parse(req.body)
 
-    if (!token) {
-      return res.status(401).json({ error: 'Non authentifié' })
-    }
+    // 2. Extraction et vérification du token
+    const token = extractToken(req)
+    if (!token) throw new Error('UNAUTHORIZED')
 
-    const { data: { user }, error: authError } = await clientSupabase.auth.getUser(token)
+    // 3. Vérification des droits admin
+    const { adminSupabase } = await verifyAdmin(token)
 
-    if (authError || !user) {
-      return res.status(401).json({ error: 'Non authentifié' })
-    }
+    // 4. Détermination de l'URL de redirection
+    const redirectUrl = process.env.VITE_APP_URL || 'https://factyapp.logonova.site'
 
-    const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    })
-
-    const { data: profile } = await adminSupabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      return res.status(403).json({ error: 'Accès refusé' })
-    }
-
-    const { data: inviteData, error: inviteError } = await adminSupabase.auth.admin.inviteUserByEmail(email, {
-      data: { full_name, team_role },
-      redirectTo: 'https://factyapp.logonova.site/auth'
+    // 5. Envoi de l'invitation
+    const { data: inviteData, error: inviteError } = await adminSupabase.auth.admin.inviteUserByEmail(validatedData.email, {
+      data: { 
+        full_name: validatedData.full_name, 
+        team_role: validatedData.team_role 
+      },
+      redirectTo: `${redirectUrl}/auth`
     })
 
     if (inviteError) {
-      return res.status(400).json({ error: inviteError.message })
+      // On ne renvoie pas l'erreur brute de Supabase en production, on la logge
+      console.error('[Supabase Invite Error]', inviteError)
+      return res.status(400).json({ error: "Impossible d'envoyer l'invitation" })
     }
 
     return res.status(200).json({ success: true, user: inviteData.user })
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message })
+  } catch (err) {
+    return handleError(res, err)
   }
 }
