@@ -188,21 +188,8 @@ export const AppRouter = () => {
         <Route path="/legal" element={<Legal />} />
         <Route path="/privacy" element={<Privacy />} />
         
-        {/* SEO Landing Pages Dynamiques */}
-        {SEO_PAGES.map(page => (
-          <Route 
-            key={page.slug}
-            path={`/${page.slug}`} 
-            element={
-              <SEOLanding 
-                title={page.title} 
-                description={page.description}
-                heroTitle={page.heroTitle}
-                heroSubtitle={page.heroSubtitle}
-              />
-            } 
-          />
-        ))}
+        {/* SEO Landing Pages Dynamiques (Catch-all) */}
+        <Route path="/:slug" element={<SEOLanding />} />
 
         <Route path="/auth" element={<Auth />} />
         
