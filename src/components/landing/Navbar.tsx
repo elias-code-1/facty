@@ -30,21 +30,33 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
 
   const scrollToSection = (id: string) => {
     setIsMobileMenuOpen(false);
+    
+    // Liste des pages qui se comportent comme la landing page (scroll interne)
+    const isLandingLikePage = location.pathname === '/' || (!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/dashboard') && !location.pathname.startsWith('/auth') && !location.pathname.startsWith('/settings') && !location.pathname.startsWith('/invoices') && !location.pathname.startsWith('/clients'));
+
     if (id === '') {
-      if (location.pathname !== '/') {
+      if (!isLandingLikePage) {
         navigate('/#');
       } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        window.history.pushState(null, '', '/#');
+        window.history.pushState(null, '', location.pathname + '#');
       }
       return;
     }
-    if (location.pathname !== '/') {
+
+    if (!isLandingLikePage) {
       navigate('/#' + id);
       return;
     }
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    window.history.pushState(null, '', '/#' + id);
+
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      window.history.pushState(null, '', location.pathname + '#' + id);
+    } else {
+      // Si l'élément n'existe pas sur cette page, on va à l'accueil
+      navigate('/#' + id);
+    }
   };
 
   return (
