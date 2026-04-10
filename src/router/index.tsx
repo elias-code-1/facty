@@ -39,6 +39,7 @@ import AdminTeam from '../pages/admin/AdminTeam';
 import Contact from '../pages/Contact';
 import Legal from '../pages/Legal';
 import Privacy from '../pages/Privacy';
+import SEOLanding from '../pages/SEOLanding';
 
 // Layouts
 import AppLayout from '../components/layout/AppLayout';
@@ -185,6 +186,41 @@ export const AppRouter = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/legal" element={<Legal />} />
         <Route path="/privacy" element={<Privacy />} />
+        
+        {/* SEO Landing Pages */}
+        <Route path="/logiciel-facturation-freelance" element={
+          <SEOLanding 
+            title="Meilleur Logiciel de Facturation pour Freelance" 
+            description="Facty est l'outil idéal pour les freelances : créez vos factures pro en 30s, gérez vos clients et suivez vos paiements simplement."
+            heroTitle="La facturation simple pour les Freelances"
+            heroSubtitle="Gagnez du temps sur votre administratif et concentrez-vous sur votre métier. Testez Facty gratuitement."
+          />
+        } />
+        <Route path="/logiciel-facturation-afrique" element={
+          <SEOLanding 
+            title="Logiciel de Facturation en Afrique (CFA)" 
+            description="La solution de facturation n°1 en Afrique francophone. Gérez vos factures en Franc CFA, envoyez-les par WhatsApp et soyez payé plus vite."
+            heroTitle="Le logiciel de facturation pensé pour l'Afrique"
+            heroSubtitle="Utilisez Facty au Togo, Sénégal, Côte d'Ivoire et partout en Afrique. Simple, rapide et adapté au Franc CFA."
+          />
+        } />
+        <Route path="/generateur-facture-gratuit" element={
+          <SEOLanding 
+            title="Générateur de Facture Gratuit en Ligne" 
+            description="Créez vos factures PDF professionnelles gratuitement avec notre générateur en ligne. Aucun compte requis pour commencer."
+            heroTitle="Générateur de facture pro & gratuit"
+            heroSubtitle="Créez, personnalisez et téléchargez vos factures en quelques clics. La solution la plus rapide du marché."
+          />
+        } />
+        <Route path="/logiciel-facturation-pme" element={
+          <SEOLanding 
+            title="Logiciel de Facturation pour PME et Startups" 
+            description="Automatisez la facturation de votre PME avec Facty. Suivi des paiements, relances automatiques et statistiques détaillées."
+            heroTitle="Boostez la croissance de votre PME"
+            heroSubtitle="Une gestion de facturation professionnelle et automatisée pour gagner en efficacité au quotidien."
+          />
+        } />
+
         <Route path="/auth" element={<Auth />} />
         
         {/* Route publique admin */}
