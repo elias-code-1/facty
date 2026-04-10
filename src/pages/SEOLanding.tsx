@@ -39,6 +39,9 @@ export default function SEOLanding() {
       
       setPageData(data);
       setLoading(false);
+      
+      // Sauvegarder le dernier chemin SEO visité pour la navigation contextuelle
+      localStorage.setItem('lastSEOPath', window.location.pathname);
     };
 
     fetchPage();
