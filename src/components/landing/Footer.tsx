@@ -87,10 +87,10 @@ export default function Footer({ content }: { content: Record<string, any> }) {
 
           <div className="flex flex-col gap-4">
             <h4 className="font-bold text-white text-lg mb-2">Solutions</h4>
-            <button onClick={() => navigate('/logiciel-facturation-freelance')} className="text-left text-slate-400 hover:text-white transition-colors">Freelances</button>
-            <button onClick={() => navigate('/logiciel-facturation-pme')} className="text-left text-slate-400 hover:text-white transition-colors">PME & Startups</button>
-            <button onClick={() => navigate('/logiciel-facturation-afrique')} className="text-left text-slate-400 hover:text-white transition-colors">Afrique (CFA)</button>
-            <button onClick={() => navigate('/generateur-facture-gratuit')} className="text-left text-slate-400 hover:text-white transition-colors">Générateur gratuit</button>
+            <button onClick={() => navigate('/facturation-developpeur-freelance')} className="text-left text-slate-400 hover:text-white transition-colors">Freelances</button>
+            <button onClick={() => navigate('/facturation-agence-marketing')} className="text-left text-slate-400 hover:text-white transition-colors">Agences & PME</button>
+            <button onClick={() => navigate('/logiciel-facturation-senegal')} className="text-left text-slate-400 hover:text-white transition-colors">Afrique (CFA)</button>
+            <button onClick={() => navigate('/logiciel-facture-gratuit-sans-compte')} className="text-left text-slate-400 hover:text-white transition-colors">Générateur gratuit</button>
           </div>
 
           <div className="flex flex-col gap-4">
