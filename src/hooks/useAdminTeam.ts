@@ -25,11 +25,17 @@ export function useAdminTeam() {
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      setMembers(data ?? [])
-    } catch (err) {
-      console.error('useAdminTeam fetch error:', err)
-      setMembers([])
+      if (error) {
+        console.error('Supabase error fetching members:', error);
+        throw error;
+      }
+      setMembers(data ?? []);
+    } catch (err: any) {
+      console.error('useAdminTeam fetch error:', err);
+      // On ne vide pas la liste si on a déjà des données (évite le clignotement/disparition)
+      if (members.length === 0) {
+        setMembers([]);
+      }
     } finally {
       setLoading(false)
     }
