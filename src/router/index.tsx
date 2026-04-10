@@ -37,6 +37,8 @@ import AdminSupport from '../pages/admin/AdminSupport';
 import AdminChat from '../pages/admin/AdminChat';
 import AdminTeam from '../pages/admin/AdminTeam';
 import Contact from '../pages/Contact';
+import Legal from '../pages/Legal';
+import Privacy from '../pages/Privacy';
 
 // Layouts
 import AppLayout from '../components/layout/AppLayout';
@@ -181,6 +183,8 @@ export const AppRouter = () => {
         {/* Routes publiques */}
         <Route path="/" element={<Landing />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/auth" element={<Auth />} />
         
         {/* Route publique admin */}

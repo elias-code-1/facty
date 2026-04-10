@@ -6,14 +6,14 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // On vérifie la présence des variables d'environnement avant d'initialiser le client
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error(
+  throw new Error(
     "Erreur: VITE_SUPABASE_URL ou VITE_SUPABASE_ANON_KEY est manquant dans les variables d'environnement. " +
     "Veuillez les configurer dans le panneau Secrets de l'AI Studio."
   );
 }
 
-// Initialisation du client (sera null ou provoquera une erreur gérée si les variables sont manquantes)
+// Initialisation du client
 export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
+  supabaseUrl,
+  supabaseAnonKey
 );

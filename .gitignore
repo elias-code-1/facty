@@ -6,3 +6,9 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Security: Ignore debug and schema files
+debug_db*
+check_db.ts
+update_trigger.ts
+*.sql

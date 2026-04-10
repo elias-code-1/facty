@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import DOMPurify from 'dompurify';
 
 /**
  * Exporte un élément HTML en PDF de haute qualité
@@ -53,11 +54,12 @@ export const exportInvoicePDF = async (
         for (let i = 0; i < styleTags.length; i++) {
           const tag = styleTags[i];
           if (tag.innerHTML.includes('oklch') || tag.innerHTML.includes('oklab') || tag.innerHTML.includes('color(')) {
-            // Remplacement global de toutes les fonctions de couleur modernes par du noir
-            // On utilise une regex plus large pour capturer les espaces et les slashes
-            tag.innerHTML = tag.innerHTML.replace(/oklch\([\s\S]*?\)/g, '#000000');
-            tag.innerHTML = tag.innerHTML.replace(/oklab\([\s\S]*?\)/g, '#000000');
-            tag.innerHTML = tag.innerHTML.replace(/color\([\s\S]*?\)/g, '#000000');
+            // Sanitiser avant manipulation
+            const sanitized = DOMPurify.sanitize(tag.innerHTML);
+            tag.innerHTML = sanitized
+              .replace(/oklch\([\s\S]*?\)/g, '#000000')
+              .replace(/oklab\([\s\S]*?\)/g, '#000000')
+              .replace(/color\([\s\S]*?\)/g, '#000000');
           }
         }
 

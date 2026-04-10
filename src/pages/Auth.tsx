@@ -12,24 +12,29 @@ type AuthMode = 'login' | 'register' | 'email-sent-register' | 'email-sent-reset
 interface InputFieldProps {
   label: string;
   type: string;
+  name: string;
   value: string;
   onChange: (val: string) => void;
   required?: boolean;
   placeholder?: string;
   minLength?: number;
+  autoComplete?: string;
   children?: React.ReactNode;
 }
 
-const InputField = ({ label, type, value, onChange, required, placeholder, minLength, children }: InputFieldProps) => (
+const InputField = ({ label, type, name, value, onChange, required, placeholder, minLength, autoComplete, children }: InputFieldProps) => (
   <div className="flex flex-col gap-1.5 mb-4">
-    <label className="text-sm font-medium text-slate-700">{label}</label>
+    <label htmlFor={name} className="text-sm font-medium text-slate-700">{label}</label>
     <input
+      id={name}
+      name={name}
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       required={required}
       placeholder={placeholder}
       minLength={minLength}
+      autoComplete={autoComplete}
       className="border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white"
     />
     {children}
@@ -462,12 +467,30 @@ export default function Auth() {
             onSubmit={handleSubmit}
           >
             {mode === 'register' && (
-              <InputField label="Nom complet" type="text" value={fullName} onChange={setFullName} required placeholder="Jean Dupont" />
+              <InputField 
+                label="Nom complet" 
+                type="text" 
+                name="name"
+                value={fullName} 
+                onChange={setFullName} 
+                required 
+                placeholder="Jean Dupont" 
+                autoComplete="name"
+              />
             )}
             
             {mode === 'reset-password' && (
               <>
-                <InputField label="Nouveau mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
+                <InputField 
+                  label="Nouveau mot de passe" 
+                  type="password" 
+                  name="password"
+                  value={password} 
+                  onChange={setPassword} 
+                  required 
+                  minLength={8}
+                  autoComplete="new-password"
+                >
                   {password && (
                     <div className="mt-2">
                       <div className="flex justify-between items-center mb-1">
@@ -484,14 +507,41 @@ export default function Auth() {
                     </div>
                   )}
                 </InputField>
-                <InputField label="Confirmer le mot de passe" type="password" value={confirmPassword} onChange={setConfirmPassword} required minLength={8} />
+                <InputField 
+                  label="Confirmer le mot de passe" 
+                  type="password" 
+                  name="confirmPassword"
+                  value={confirmPassword} 
+                  onChange={setConfirmPassword} 
+                  required 
+                  minLength={8} 
+                  autoComplete="new-password"
+                />
               </>
             )}
             
             {mode !== 'reset-password' && (
               <>
-                <InputField label="Email" type="email" value={email} onChange={setEmail} required placeholder="jean@exemple.com" />
-                <InputField label="Mot de passe" type="password" value={password} onChange={setPassword} required minLength={8}>
+                <InputField 
+                  label="Email" 
+                  type="email" 
+                  name="email"
+                  value={email} 
+                  onChange={setEmail} 
+                  required 
+                  placeholder="jean@exemple.com" 
+                  autoComplete="email"
+                />
+                <InputField 
+                  label="Mot de passe" 
+                  type="password" 
+                  name="password"
+                  value={password} 
+                  onChange={setPassword} 
+                  required 
+                  minLength={8}
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                >
                   {mode === 'register' && password && (
                     <div className="mt-2">
                       <div className="flex justify-between items-center mb-1">
@@ -516,6 +566,7 @@ export default function Auth() {
                 <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
+                    name="remember"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
@@ -533,7 +584,15 @@ export default function Auth() {
             )}
 
             {(mode === 'register' || mode === 'reset-password') && (
-              <InputField label="Confirmer le mot de passe" type="password" value={confirmPassword} onChange={setConfirmPassword} required />
+              <InputField 
+                label="Confirmer le mot de passe" 
+                type="password" 
+                name="confirmPassword"
+                value={confirmPassword} 
+                onChange={setConfirmPassword} 
+                required 
+                autoComplete="new-password"
+              />
             )}
 
             {error && (
@@ -576,10 +635,12 @@ export default function Auth() {
           <InputField
             label="Email"
             type="email"
+            name="resetEmail"
             value={resetEmail}
             onChange={setResetEmail}
             required
             placeholder="jean@exemple.com"
+            autoComplete="email"
           />
           <button
             type="submit"

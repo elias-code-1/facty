@@ -140,7 +140,7 @@ export function useAdminUsers() {
       }
       
       // Appel de notre API locale (Vercel)
-      const response = await fetch('/api/delete-user', {
+      const response = await fetch('/api/admin/delete-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

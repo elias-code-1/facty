@@ -6,4 +6,4 @@ Disallow: /clients
 Disallow: /settings
 Disallow: /admin
 
-Sitemap: https://facty.logonova.site/sitemap.xml
+Sitemap: https://factyapp.logonova.site/sitemap.xml

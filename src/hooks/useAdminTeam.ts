@@ -28,7 +28,7 @@ export function useAdminTeam() {
         return
       }
 
-      const response = await fetch('/api/get-team-members', {
+      const response = await fetch('/api/admin/team-members', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -102,7 +102,7 @@ export function useAdminTeam() {
 
     if (!token) throw new Error("Non authentifié")
 
-    const response = await fetch('/api/invite-user', {
+    const response = await fetch('/api/admin/invite-user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -172,7 +172,7 @@ export function useAdminTeam() {
 
       if (!token) throw new Error("Non authentifié")
 
-      const response = await fetch('/api/delete-team-member', {
+      const response = await fetch('/api/admin/delete-team-member', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
