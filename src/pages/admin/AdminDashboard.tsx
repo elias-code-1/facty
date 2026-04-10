@@ -61,7 +61,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const { profile } = useProfile(user);
   const { 
-    totalUsers, activeUsers, suspendedUsers, newUsersToday, newUsersThisMonth,
+    totalUsers, activeUsers, suspendedUsers, newUsersToday, newUsersThisMonth, totalTeamMembers,
     totalInvoices, totalRevenue, invoicesToday, invoicesThisMonth, pendingAmount,
     usersGrowthByMonth, invoicesByMonth, statusDistribution,
     recentLogs, unreadNotifications, topUsers, loading 
@@ -164,18 +164,19 @@ export default function AdminDashboard() {
           />
           <AdminStatCard
             index={1}
+            title="Membres d'équipe"
+            value={totalTeamMembers}
+            subtitle="Gérer l'équipe"
+            icon={<User className="w-5 h-5" />}
+            accentColor="blue"
+          />
+          <AdminStatCard
+            index={2}
             title="Utilisateurs actifs"
             value={activeUsers}
             subtitle={`${suspendedUsers} suspendus`}
             icon={<CheckCircle className="w-5 h-5" />}
             accentColor="green"
-          />
-          <AdminStatCard
-            index={2}
-            title="Nouveaux ce mois"
-            value={newUsersThisMonth}
-            icon={<TrendingUp className="w-5 h-5" />}
-            accentColor="blue"
           />
           <AdminStatCard
             index={3}

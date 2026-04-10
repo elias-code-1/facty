@@ -20,17 +20,29 @@ export function useAdminTeam() {
   const fetchMembers = useCallback(async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('team_members')
-        .select('*')
-        .order('created_at', { ascending: false })
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData.session?.access_token
 
-      if (error) {
-        console.error('Fetch members error:', error)
+      if (!token) {
         setMembers([])
-      } else {
-        setMembers(data ?? [])
+        return
       }
+
+      const response = await fetch('/api/get-team-members', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des membres')
+      }
+
+      const data = await response.json()
+      setMembers(data.members || [])
+    } catch (error) {
+      console.error('Fetch members error:', error)
+      setMembers([])
     } finally {
       setLoading(false)
     }

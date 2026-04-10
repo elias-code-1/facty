@@ -8,6 +8,7 @@ export interface AdminDashboardData {
   suspendedUsers: number;
   newUsersToday: number;
   newUsersThisMonth: number;
+  totalTeamMembers: number;
 
   totalInvoices: number;
   totalRevenue: number;
@@ -55,11 +56,13 @@ export function useAdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [rawData, setRawData] = useState<{
     profiles: Pick<Profile, 'id' | 'created_at' | 'is_suspended' | 'role' | 'full_name' | 'email'>[];
+    teamMembers: any[];
     invoices: Pick<Invoice, 'id' | 'total' | 'status' | 'created_at' | 'user_id'>[];
     logs: (AuditLog & { profiles: { full_name: string; email: string } | null })[];
     notifications: AdminNotification[];
   }>({
     profiles: [],
+    teamMembers: [],
     invoices: [],
     logs: [],
     notifications: [],
@@ -68,6 +71,26 @@ export function useAdminDashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      
+      // Fetch team members via API to bypass RLS
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      let teamMembersData = [];
+      
+      if (token) {
+        try {
+          const response = await fetch('/api/get-team-members', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            teamMembersData = data.members || [];
+          }
+        } catch (e) {
+          console.error('Error fetching team members for dashboard:', e);
+        }
+      }
+
       const [
         profilesRes,
         invoicesRes,
@@ -95,6 +118,7 @@ export function useAdminDashboard() {
 
       setRawData({
         profiles: profilesRes.data || [],
+        teamMembers: teamMembersData,
         invoices: invoicesRes.data || [],
         logs: (logsRes.data as any) || [],
         notifications: notificationsRes.data || [],
@@ -121,6 +145,7 @@ export function useAdminDashboard() {
     const suspendedUsers = rawData.profiles.filter(p => p.is_suspended).length;
     const newUsersToday = rawData.profiles.filter(p => new Date(p.created_at) >= today).length;
     const newUsersThisMonth = rawData.profiles.filter(p => new Date(p.created_at) >= firstDayOfMonth).length;
+    const totalTeamMembers = rawData.teamMembers.length;
 
     // Invoices stats
     const totalInvoices = rawData.invoices.length;
@@ -217,6 +242,7 @@ export function useAdminDashboard() {
       suspendedUsers,
       newUsersToday,
       newUsersThisMonth,
+      totalTeamMembers,
       totalInvoices,
       totalRevenue,
       invoicesToday,
