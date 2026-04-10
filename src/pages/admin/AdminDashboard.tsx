@@ -88,6 +88,7 @@ export default function AdminDashboard() {
 
   if (loading) return <FullPageSpinner />;
 
+  const isOwner = profile?.role === 'admin';
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
   const today = new Intl.DateTimeFormat('fr-FR', { 
     weekday: 'long', 
@@ -104,7 +105,7 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tableau de bord</h1>
           <p className="text-slate-500 mt-1">
             Bienvenue, <span className="font-semibold text-indigo-600">{firstName}</span> 👋 
-            Voici un aperçu complet de la plateforme.
+            Voici un aperçu de la plateforme.
           </p>
         </div>
         <div className="bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm text-sm font-medium text-slate-600 flex items-center gap-2">
@@ -114,7 +115,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Notifications non lues */}
-      {unreadNotifications.length > 0 && (
+      {isOwner && unreadNotifications.length > 0 && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -150,151 +151,165 @@ export default function AdminDashboard() {
         </motion.div>
       )}
 
-      {/* StatCards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        <AdminStatCard
-          index={0}
-          title="Total utilisateurs"
-          value={totalUsers}
-          subtitle={`+${newUsersToday} aujourd'hui`}
-          icon={<Users className="w-5 h-5" />}
-          accentColor="indigo"
-        />
-        <AdminStatCard
-          index={1}
-          title="Utilisateurs actifs"
-          value={activeUsers}
-          subtitle={`${suspendedUsers} suspendus`}
-          icon={<CheckCircle className="w-5 h-5" />}
-          accentColor="green"
-        />
-        <AdminStatCard
-          index={2}
-          title="Nouveaux ce mois"
-          value={newUsersThisMonth}
-          icon={<TrendingUp className="w-5 h-5" />}
-          accentColor="blue"
-        />
-        <AdminStatCard
-          index={3}
-          title="Total factures"
-          value={totalInvoices}
-          subtitle={`+${invoicesToday} aujourd'hui`}
-          icon={<FileText className="w-5 h-5" />}
-          accentColor="violet"
-        />
-        <AdminStatCard
-          index={4}
-          title="Revenus totaux"
-          value={formatCurrency(totalRevenue)}
-          icon={<DollarSign className="w-5 h-5" />}
-          accentColor="green"
-        />
-        <AdminStatCard
-          index={5}
-          title="En attente"
-          value={formatCurrency(pendingAmount)}
-          icon={<Clock className="w-5 h-5" />}
-          accentColor="orange"
-        />
-      </div>
-
-      {/* Graphes Principaux */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <InvoicesVolumeChart data={invoicesByMonth} />
+      {/* StatCards - Uniquement pour Admin ou roles spécifiques */}
+      {isOwner && (
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+          <AdminStatCard
+            index={0}
+            title="Total utilisateurs"
+            value={totalUsers}
+            subtitle={`+${newUsersToday} aujourd'hui`}
+            icon={<Users className="w-5 h-5" />}
+            accentColor="indigo"
+          />
+          <AdminStatCard
+            index={1}
+            title="Utilisateurs actifs"
+            value={activeUsers}
+            subtitle={`${suspendedUsers} suspendus`}
+            icon={<CheckCircle className="w-5 h-5" />}
+            accentColor="green"
+          />
+          <AdminStatCard
+            index={2}
+            title="Nouveaux ce mois"
+            value={newUsersThisMonth}
+            icon={<TrendingUp className="w-5 h-5" />}
+            accentColor="blue"
+          />
+          <AdminStatCard
+            index={3}
+            title="Total factures"
+            value={totalInvoices}
+            subtitle={`+${invoicesToday} aujourd'hui`}
+            icon={<FileText className="w-5 h-5" />}
+            accentColor="violet"
+          />
+          <AdminStatCard
+            index={4}
+            title="Revenus totaux"
+            value={formatCurrency(totalRevenue)}
+            icon={<DollarSign className="w-5 h-5" />}
+            accentColor="green"
+          />
+          <AdminStatCard
+            index={5}
+            title="En attente"
+            value={formatCurrency(pendingAmount)}
+            icon={<Clock className="w-5 h-5" />}
+            accentColor="orange"
+          />
         </div>
-        <div className="lg:col-span-1">
-          <StatusDistributionChart data={statusDistribution} />
-        </div>
-      </div>
+      )}
 
-      {/* Croissance et Activité */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <UsersGrowthChart data={usersGrowthByMonth} />
-        
-        {/* Activité récente */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-slate-800">Activité récente</h3>
-            <Link to="/admin/facty/logs" className="text-xs font-semibold text-indigo-600 hover:translate-x-1 transition-transform flex items-center gap-1">
-              Voir tous les logs <ArrowRight className="w-3 h-3" />
-            </Link>
+      {!isOwner && (
+        <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm text-center">
+          <p className="text-4xl mb-4">👋</p>
+          <h2 className="text-xl font-bold text-slate-800">Bienvenue dans l'équipe Facty</h2>
+          <p className="text-slate-500 mt-2 max-w-md mx-auto">
+            Utilisez la barre latérale pour accéder aux outils autorisés pour votre rôle.
+          </p>
+        </div>
+      )}
+
+      {/* Graphes Principaux - Uniquement pour Admin */}
+      {isOwner && (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <InvoicesVolumeChart data={invoicesByMonth} />
+            </div>
+            <div className="lg:col-span-1">
+              <StatusDistributionChart data={statusDistribution} />
+            </div>
           </div>
-          
-          <div className="space-y-4 flex-1">
-            {recentLogs.map((log) => {
-              const category = log.action.split('.')[0];
-              const initials = log.profiles?.full_name
-                ?.split(' ')
-                .map(n => n[0])
-                .join('')
-                .toUpperCase() || '?';
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <UsersGrowthChart data={usersGrowthByMonth} />
+            
+            {/* Activité récente */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-slate-800">Activité récente</h3>
+                <Link to="/admin/facty/logs" className="text-xs font-semibold text-indigo-600 hover:translate-x-1 transition-transform flex items-center gap-1">
+                  Voir tous les logs <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
               
-              return (
-                <div key={log.id} className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500 border-2 border-white shadow-sm">
-                    {initials}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-slate-800 truncate">
-                        {log.profiles?.full_name || 'Utilisateur inconnu'}
-                      </span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider ${ACTION_COLORS[category] || 'bg-slate-100 text-slate-600'}`}>
-                        {log.action}
-                      </span>
+              <div className="space-y-4 flex-1">
+                {recentLogs.map((log) => {
+                  const category = log.action.split('.')[0];
+                  const initials = log.profiles?.full_name
+                    ?.split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase() || '?';
+                  
+                  return (
+                    <div key={log.id} className="flex items-center gap-4 group">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500 border-2 border-white shadow-sm">
+                        {initials}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-slate-800 truncate">
+                            {log.profiles?.full_name || 'Utilisateur inconnu'}
+                          </span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider ${ACTION_COLORS[category] || 'bg-slate-100 text-slate-600'}`}>
+                            {log.action}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {ACTION_LABELS[log.action] || log.action} • {timeAgo(log.created_at)}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {ACTION_LABELS[log.action] || log.action} • {timeAgo(log.created_at)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Top Users */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <h3 className="text-lg font-bold text-slate-800 mb-6">Utilisateurs les plus actifs</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                <th className="pb-4 pl-2">#</th>
-                <th className="pb-4">Utilisateur</th>
-                <th className="pb-4">Factures</th>
-                <th className="pb-4">Revenus</th>
-                <th className="pb-4 text-right pr-2">Depuis</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {topUsers.map((u, i) => (
-                <tr key={u.id} className="group hover:bg-slate-50/50 transition-colors">
-                  <td className="py-4 pl-2 text-sm font-bold text-slate-400">{i + 1}</td>
-                  <td className="py-4">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-800">{u.name}</span>
-                      <span className="text-[10px] text-slate-400">{u.email}</span>
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <span className="text-sm font-semibold text-slate-600">{u.count}</span>
-                  </td>
-                  <td className="py-4">
-                    <span className="text-sm font-bold text-emerald-600">{formatCurrency(u.revenue)}</span>
-                  </td>
-                  <td className="py-4 text-right pr-2">
-                    <span className="text-xs text-slate-500">{new Date(u.since).toLocaleDateString('fr-FR')}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <h3 className="text-lg font-bold text-slate-800 mb-6">Utilisateurs les plus actifs</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
+                    <th className="pb-4 pl-2">#</th>
+                    <th className="pb-4">Utilisateur</th>
+                    <th className="pb-4">Factures</th>
+                    <th className="pb-4">Revenus</th>
+                    <th className="pb-4 text-right pr-2">Depuis</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {topUsers.map((u, i) => (
+                    <tr key={u.id} className="group hover:bg-slate-50/50 transition-colors">
+                      <td className="py-4 pl-2 text-sm font-bold text-slate-400">{i + 1}</td>
+                      <td className="py-4">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-800">{u.name}</span>
+                          <span className="text-[10px] text-slate-400">{u.email}</span>
+                        </div>
+                      </td>
+                      <td className="py-4">
+                        <span className="text-sm font-semibold text-slate-600">{u.count}</span>
+                      </td>
+                      <td className="py-4">
+                        <span className="text-sm font-bold text-emerald-600">{formatCurrency(u.revenue)}</span>
+                      </td>
+                      <td className="py-4 text-right pr-2">
+                        <span className="text-xs text-slate-500">{new Date(u.since).toLocaleDateString('fr-FR')}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

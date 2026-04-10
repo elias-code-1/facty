@@ -48,7 +48,7 @@ export function useInvoices(user: User | null) {
       // 0. Vérifier la limite du plan gratuit
       let limitStr = '999999';
       try {
-        const response = await fetch('/api/settings/public');
+        const response = await fetch('/api/settings-public');
         if (response.ok) {
           const settings = await response.json();
           if (settings.free_plan_invoice_limit) {

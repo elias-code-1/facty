@@ -1,8 +1,9 @@
 import { ReactNode, useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useProfile } from '../hooks/useProfile';
 import { supabase } from '../lib/supabase';
+import { TEAM_ROLES } from '../data/teamRoles';
 import Spinner from '../components/ui/Spinner';
 import FullPageSpinner from '../components/ui/FullPageSpinner';
 import ErrorBoundary from '../components/ui/ErrorBoundary';
@@ -129,6 +130,7 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
 const AdminRoute = () => {
   const { session, user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile(user);
+  const location = useLocation();
 
   // Attendre que LES DEUX soient chargés, et si on a une session, attendre d'avoir le profil
   if (authLoading || profileLoading || (session && !profile)) {
@@ -141,9 +143,31 @@ const AdminRoute = () => {
   }
 
   // Connecté mais pas admin → page login admin (pas de redirection vers /dashboard)
-  const hasAccess = profile?.role === 'admin' || !!profile?.team_role;
+  const isOwner = profile?.role === 'admin';
+  const hasAccess = isOwner || !!profile?.team_role;
+  
   if (!hasAccess) {
     return <Navigate to="/admin/facty/login" replace />;
+  }
+
+  // Vérification granulaire pour les membres de l'équipe
+  if (!isOwner && profile?.team_role) {
+    const roleConfig = TEAM_ROLES[profile.team_role as keyof typeof TEAM_ROLES];
+    if (roleConfig) {
+      // On vérifie si le chemin actuel est autorisé
+      const currentPath = location.pathname;
+      const isAuthorized = roleConfig.pages.some(p => {
+        if (p === currentPath) return true;
+        // Gérer les sous-pages (ex: /admin/facty/users/123)
+        if (p !== '/admin/facty' && currentPath.startsWith(p)) return true;
+        return false;
+      });
+
+      if (!isAuthorized) {
+        // Rediriger vers la première page autorisée ou dashboard admin
+        return <Navigate to="/admin/facty" replace />;
+      }
+    }
   }
 
   return <Outlet />;

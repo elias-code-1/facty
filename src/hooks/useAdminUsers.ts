@@ -138,8 +138,8 @@ export function useAdminUsers() {
         throw new Error("Session expirée ou invalide. Veuillez vous reconnecter.");
       }
       
-      // Appel de notre API locale (Express)
-      const response = await fetch('/api/admin/delete-user', {
+      // Appel de notre API locale (Vercel)
+      const response = await fetch('/api/delete-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

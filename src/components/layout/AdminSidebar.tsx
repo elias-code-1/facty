@@ -18,12 +18,7 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
 import { supabase } from '../../lib/supabase';
-
-interface AdminSidebarProps {
-  isMenuOpen?: boolean;
-  setIsMenuOpen?: (open: boolean) => void;
-  onClose?: () => void;
-}
+import { TEAM_ROLES } from '../../data/teamRoles';
 
 const navLinks = [
   { to: '/admin/facty', label: 'Vue globale', icon: <LayoutDashboard size={20} />, end: true },
@@ -38,6 +33,12 @@ const navLinks = [
   { to: '/admin/facty/settings', label: 'Paramètres', icon: <Settings size={20} /> },
 ];
 
+interface AdminSidebarProps {
+  isMenuOpen?: boolean;
+  setIsMenuOpen?: (open: boolean) => void;
+  onClose?: () => void;
+}
+
 export default function AdminSidebar({ isMenuOpen, setIsMenuOpen, onClose }: AdminSidebarProps) {
   const { user } = useAuth();
   const { profile } = useProfile(user);
@@ -45,6 +46,17 @@ export default function AdminSidebar({ isMenuOpen, setIsMenuOpen, onClose }: Adm
   const navigate = useNavigate();
   const [openTicketsCount, setOpenTicketsCount] = React.useState(0);
   const [unreadChatCount, setUnreadChatCount] = React.useState(0);
+
+  // Filtrer les liens en fonction du rôle
+  const filteredLinks = navLinks.filter(link => {
+    if (isOwner) return true;
+    if (!profile?.team_role) return false;
+    
+    const roleConfig = TEAM_ROLES[profile.team_role as keyof typeof TEAM_ROLES];
+    if (!roleConfig) return false;
+    
+    return roleConfig.pages.some(p => p === link.to);
+  });
 
   const isMobile = isMenuOpen !== undefined;
   const handleClose = () => {
@@ -145,7 +157,7 @@ export default function AdminSidebar({ isMenuOpen, setIsMenuOpen, onClose }: Adm
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto scrollbar-hide">
-          {navLinks.map((link) => (
+          {filteredLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -233,7 +245,9 @@ export default function AdminSidebar({ isMenuOpen, setIsMenuOpen, onClose }: Adm
             </div>
             <div className="flex-1 min-w-0 md:hidden lg:block">
               <p className="text-sm font-semibold truncate text-white">{profile?.full_name || 'Admin'}</p>
-              <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Administrateur</p>
+              <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">
+                {isOwner ? 'Administrateur' : (TEAM_ROLES[profile?.team_role as keyof typeof TEAM_ROLES]?.label || 'Membre')}
+              </p>
             </div>
             
             {/* Tooltip for compact mode */}

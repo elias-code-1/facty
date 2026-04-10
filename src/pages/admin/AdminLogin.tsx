@@ -19,7 +19,8 @@ export default function AdminLogin() {
   const { profile, loading: profileLoading } = useProfile(session?.user ?? null);
 
   useEffect(() => {
-    if (!authLoading && !profileLoading && session && profile?.role === 'admin') {
+    const hasAccess = profile?.role === 'admin' || !!profile?.team_role;
+    if (!authLoading && !profileLoading && session && hasAccess) {
       navigate('/admin/facty', { replace: true });
     }
   }, [session, profile, authLoading, profileLoading, navigate]);
@@ -42,7 +43,7 @@ export default function AdminLogin() {
       // Étape 2 : Vérifier le rôle immédiatement
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('role, is_suspended')
+        .select('role, team_role, is_suspended')
         .eq('id', data.user.id)
         .single();
 
@@ -55,9 +56,9 @@ export default function AdminLogin() {
         throw new Error('Ce compte est suspendu.');
       }
 
-      if (profileData.role !== 'admin') {
+      if (profileData.role !== 'admin' && !profileData.team_role) {
         await supabase.auth.signOut();
-        throw new Error("Accès refusé. Ce compte n'a pas les droits administrateur.");
+        throw new Error("Accès refusé. Ce compte n'a pas les droits d'accès au panneau d'administration.");
       }
 
       // Étape 4 : Redirection
