@@ -31,6 +31,55 @@ export default function AdminTeam() {
     onConfirm: () => void
   } | null>(null)
 
+  const handleSuspend = async (id: string, email: string) => {
+    try {
+      await suspendMember(id, email)
+      setToast({
+        message: 'Membre suspendu ✓',
+        type: 'success'
+      })
+      setConfirmAction(null)
+    } catch (err: any) {
+      setToast({
+        message: err.message ?? 'Erreur lors de la suspension',
+        type: 'error'
+      })
+      setConfirmAction(null)
+    }
+  }
+
+  const handleReactivate = async (id: string, email: string) => {
+    try {
+      await reactivateMember(id, email)
+      setToast({
+        message: 'Membre réactivé ✓',
+        type: 'success'
+      })
+    } catch (err: any) {
+      setToast({
+        message: err.message ?? 'Erreur lors de la réactivation',
+        type: 'error'
+      })
+    }
+  }
+
+  const handleRemove = async (id: string, email: string) => {
+    try {
+      await removeMember(id, email)
+      setToast({
+        message: 'Membre retiré ✓',
+        type: 'success'
+      })
+      setConfirmAction(null)
+    } catch (err: any) {
+      setToast({
+        message: err.message ?? 'Erreur lors de la suppression',
+        type: 'error'
+      })
+      setConfirmAction(null)
+    }
+  }
+
   const handleInvite = async () => {
     if (!inviteForm.email || !inviteForm.full_name || !inviteForm.role) {
       setToast({
@@ -123,6 +172,17 @@ export default function AdminTeam() {
       </div>
 
       {/* Liste membres */}
+      {loading && (
+        <p className="text-slate-400 text-sm mb-4">
+          Chargement...
+        </p>
+      )}
+      {!loading && members.length === 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-700 mb-6">
+          Aucun membre trouvé. Vérifiez la RLS Supabase.
+        </div>
+      )}
+
       {loading ? (
         <div className="text-center text-slate-400 py-12">
           Chargement...
@@ -181,7 +241,7 @@ export default function AdminTeam() {
                       setConfirmAction({
                         title: 'Suspendre ?',
                         message: `Suspendre ${member.full_name} ? Il ne pourra plus se connecter.`,
-                        onConfirm: () => suspendMember(member.id, member.email)
+                        onConfirm: () => handleSuspend(member.id, member.email)
                       })
                     }
                     className="text-xs text-orange-500 hover:text-orange-700"
@@ -191,7 +251,7 @@ export default function AdminTeam() {
                 )}
                 {member.status === 'suspended' && (
                   <button
-                    onClick={() => reactivateMember(member.id, member.email)}
+                    onClick={() => handleReactivate(member.id, member.email)}
                     className="text-xs text-green-500 hover:text-green-700"
                   >
                     Réactiver
@@ -202,7 +262,7 @@ export default function AdminTeam() {
                     setConfirmAction({
                       title: 'Retirer ?',
                       message: `Retirer ${member.full_name} de l'équipe ?`,
-                      onConfirm: () => removeMember(member.id, member.email)
+                      onConfirm: () => handleRemove(member.id, member.email)
                     })
                   }
                   className="text-xs text-red-400 hover:text-red-600"

@@ -218,7 +218,11 @@ export const AppRouter = () => {
             <Route path="/admin/facty/landing" element={<AdminLanding />} />
             <Route path="/admin/facty/support" element={<AdminSupport />} />
             <Route path="/admin/facty/chat" element={<AdminChat />} />
-            <Route path="/admin/facty/team" element={<AdminTeam />} />
+            <Route path="/admin/facty/team" element={
+              <ErrorBoundary>
+                <AdminTeam />
+              </ErrorBoundary>
+            } />
           </Route>
         </Route>
 
