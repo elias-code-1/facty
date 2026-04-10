@@ -11,11 +11,13 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
+    // Vérifier immédiatement au montage et au changement de route
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -32,11 +34,11 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
     setIsMobileMenuOpen(false);
     
     // Liste des pages qui se comportent comme la landing page (scroll interne)
-    const isLandingLikePage = location.pathname === '/' || (!location.pathname.startsWith('/admin') && !location.pathname.startsWith('/dashboard') && !location.pathname.startsWith('/auth') && !location.pathname.startsWith('/settings') && !location.pathname.startsWith('/invoices') && !location.pathname.startsWith('/clients') && !location.pathname.startsWith('/contact') && !location.pathname.startsWith('/legal') && !location.pathname.startsWith('/privacy'));
+    const isSystemPage = ['/admin', '/dashboard', '/auth', '/settings', '/invoices', '/clients', '/contact', '/legal', '/privacy', '/error'].some(path => location.pathname.startsWith(path));
+    const isLandingLikePage = location.pathname === '/' || !isSystemPage;
 
     if (id === '') {
       if (!isLandingLikePage) {
-        // Navigation contextuelle : on essaie de retourner sur la dernière page SEO ou l'accueil
         const lastSEOPath = localStorage.getItem('lastSEOPath');
         if (lastSEOPath && lastSEOPath !== location.pathname) {
           navigate(lastSEOPath);
@@ -51,7 +53,6 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
     }
 
     if (!isLandingLikePage) {
-      // Si on est sur une page statique (Contact, etc.), on redirige vers l'accueil ou le dernier SEO
       const lastSEOPath = localStorage.getItem('lastSEOPath');
       const targetBase = lastSEOPath || '/';
       navigate(targetBase + '#' + id);
@@ -63,17 +64,18 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
       element.scrollIntoView({ behavior: 'smooth' });
       window.history.pushState(null, '', location.pathname + '#' + id);
     } else {
-      // Si l'élément n'existe pas sur cette page, on va à l'accueil
       navigate('/#' + id);
     }
   };
 
-  // Déterminer si on doit forcer le fond blanc (sur les pages qui n'ont pas de Hero sombre/dégradé au top)
-  const isStaticPage = ['/contact', '/legal', '/privacy', '/auth'].some(path => location.pathname.startsWith(path));
-  const showOpaqueNavbar = isScrolled || isStaticPage;
+  // Déterminer si on doit forcer le fond blanc
+  // Seules la Home et les pages SEO peuvent être transparentes au top
+  const isSystemPage = ['/admin', '/dashboard', '/auth', '/settings', '/invoices', '/clients', '/contact', '/legal', '/privacy', '/error'].some(path => location.pathname.startsWith(path));
+  const canBeTransparent = location.pathname === '/' || !isSystemPage;
+  const showOpaqueNavbar = isScrolled || !canBeTransparent;
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${showOpaqueNavbar ? 'bg-white/95 backdrop-blur shadow-sm py-3' : 'bg-transparent py-5'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${showOpaqueNavbar ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           {content.nav_logo_url ? (
