@@ -46,7 +46,7 @@ export function useInvoices(user: User | null) {
 
     try {
       // 0. Vérifier la limite du plan gratuit
-      let limitStr = '3'; // Fail-safe limit instead of 999999
+      let limitStr = '999999'; // Default to unlimited instead of a low number
       try {
         const response = await fetch('/api/settings-public');
         if (response.ok) {
@@ -56,7 +56,7 @@ export function useInvoices(user: User | null) {
           }
         }
       } catch (err) {
-        console.warn('Impossible de récupérer la limite du plan gratuit', err);
+        // Silently fail and use default
       }
       
       const limit = parseInt(limitStr, 10);

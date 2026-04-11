@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       VitePWA({
-        registerType: 'prompt',
+        registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'robots.txt'],
         manifest: {
           id: '/',
@@ -28,18 +28,20 @@ export default defineConfig(({ mode }) => {
             {
               src: '/pwa-192x192.png',
               sizes: '192x192',
-              type: 'image/png'
-            },
-            {
-              src: '/pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png'
+              type: 'image/png',
+              purpose: 'any'
             },
             {
               src: '/pwa-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: '/pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         },
@@ -50,7 +52,15 @@ export default defineConfig(({ mode }) => {
         workbox: {
           skipWaiting: true,
           clientsClaim: true,
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+          cleanupOutdatedCaches: true,
+          globPatterns: [
+            '**/*.{js,css,html,ico,png,svg,woff2}'
+          ],
+          navigateFallback: 'index.html',
+          navigateFallbackDenylist: [
+            /^\/api\//,
+            /^\/admin\//
+          ],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -59,11 +69,9 @@ export default defineConfig(({ mode }) => {
                 cacheName: 'google-fonts-cache',
                 expiration: {
                   maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                  maxAgeSeconds: 60 * 60 * 24 * 365
                 },
-                cacheableResponse: {
-                  statuses: [0, 200]
-                }
+                cacheableResponse: { statuses: [0, 200] }
               }
             },
             {
@@ -73,11 +81,9 @@ export default defineConfig(({ mode }) => {
                 cacheName: 'gstatic-fonts-cache',
                 expiration: {
                   maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                  maxAgeSeconds: 60 * 60 * 24 * 365
                 },
-                cacheableResponse: {
-                  statuses: [0, 200]
-                }
+                cacheableResponse: { statuses: [0, 200] }
               }
             },
             {
@@ -86,20 +92,17 @@ export default defineConfig(({ mode }) => {
                 try {
                   const origin = new URL(supabaseUrl).origin
                   return url.origin === origin
-                } catch {
-                  return false
-                }
+                } catch { return false }
               },
               handler: 'NetworkFirst',
               options: {
                 cacheName: 'supabase-api-cache',
+                networkTimeoutSeconds: 10,
                 expiration: {
                   maxEntries: 50,
-                  maxAgeSeconds: 60 * 60 * 24 // 24 hours
+                  maxAgeSeconds: 60 * 60 * 24
                 },
-                cacheableResponse: {
-                  statuses: [0, 200]
-                }
+                cacheableResponse: { statuses: [0, 200] }
               }
             }
           ]

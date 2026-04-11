@@ -54,26 +54,14 @@ export const exportInvoicePDF = async (
         for (let i = 0; i < styleTags.length; i++) {
           const tag = styleTags[i];
           if (tag.innerHTML.includes('oklch') || tag.innerHTML.includes('oklab') || tag.innerHTML.includes('color(')) {
-            // Sanitiser avant manipulation
-            const sanitized = DOMPurify.sanitize(tag.innerHTML);
-            tag.innerHTML = sanitized
-              .replace(/oklch\([\s\S]*?\)/g, '#000000')
-              .replace(/oklab\([\s\S]*?\)/g, '#000000')
-              .replace(/color\([\s\S]*?\)/g, '#000000');
+            tag.innerHTML = tag.innerHTML
+              .replace(/oklch\([\s\S]*?\)/g, '#4f46e5')
+              .replace(/oklab\([\s\S]*?\)/g, '#4f46e5')
+              .replace(/color\([\s\S]*?\)/g, '#4f46e5');
           }
         }
 
-        // 2. Supprimer les balises <link> de styles externes qui pourraient contenir du oklab
-        // html2canvas essaie de les parser et plante. 
-        // On espère que les styles critiques sont dans <style> ou inline.
-        const links = clonedDoc.querySelectorAll('link[rel="stylesheet"]');
-        links.forEach(link => {
-          // Si c'est un lien local ou vers tailwind, on le supprime pour éviter le crash
-          // Les styles inline et les balises <style> déjà nettoyées suffiront
-          link.remove();
-        });
-
-        // 3. Forcer les styles calculés en RGB sur tous les éléments du clone
+        // 2. Forcer les styles calculés en RGB sur tous les éléments du clone
         const allElements = clonedDoc.querySelectorAll('*');
         allElements.forEach((el) => {
           const htmlEl = el as HTMLElement;

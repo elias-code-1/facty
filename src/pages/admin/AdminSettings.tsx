@@ -26,10 +26,10 @@ export default function AdminSettings() {
   
   // Initialize local state when settings load
   React.useEffect(() => {
-    if (!loading && Object.keys(settings).length > 0) {
+    if (!loading) {
       setMaintenanceTitle(settings.maintenance_title || '');
       setMaintenanceMessage(settings.maintenance_message || '');
-      setFreePlanLimit(settings.free_plan_invoice_limit || '999999');
+      setFreePlanLimit(settings.free_plan_invoice_limit || '10');
     }
   }, [settings, loading]);
 

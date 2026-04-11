@@ -21,8 +21,11 @@ export default function InstallPWA() {
 
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setIsVisible(true);
+      // Attendre 3 secondes avant d'afficher
+      setTimeout(() => {
+        setDeferredPrompt(e as BeforeInstallPromptEvent);
+        setIsVisible(true);
+      }, 3000);
     };
 
     // Pour Android/Chrome/Windows
@@ -30,12 +33,16 @@ export default function InstallPWA() {
 
     // Pour iOS : on affiche le bouton si on n'est pas déjà en standalone
     if (isIOS && !isStandalone) {
-      setIsVisible(true);
+      setTimeout(() => {
+        setIsVisible(true);
+      }, 3000);
     }
 
     // Si on est dans un iframe, on affiche quand même pour proposer d'ouvrir en plein écran
     if (isInIframe && !isStandalone) {
-      setIsVisible(true);
+      setTimeout(() => {
+        setIsVisible(true);
+      }, 3000);
     }
 
     const installedHandler = () => {
@@ -76,13 +83,7 @@ export default function InstallPWA() {
     deferredPrompt.prompt();
 
     // Attendre la réponse de l'utilisateur
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      if (import.meta.env.DEV) console.log('L\'utilisateur a accepté l\'installation');
-    } else {
-      if (import.meta.env.DEV) console.log('L\'utilisateur a refusé l\'installation');
-    }
+    await deferredPrompt.userChoice;
 
     // On ne peut utiliser l'événement qu'une seule fois
     setDeferredPrompt(null);

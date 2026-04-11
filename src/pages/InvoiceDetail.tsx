@@ -89,18 +89,23 @@ export default function InvoiceDetail() {
     if (!invoice || !user) return;
     setExportLoading(true);
     try {
+      // Attendre un peu pour que le DOM soit stable (animations, etc.)
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       await exportInvoicePDF(
         'invoice-template',
         `facty-${invoice.invoice_number}.pdf`
       );
       
-      // Logger l'export
-      await supabase.from('audit_logs').insert({
+      // Logger l'export (non bloquant)
+      supabase.from('audit_logs').insert({
         user_id: user.id,
         action: 'invoice.exported_pdf',
         entity_type: 'invoice',
         entity_id: invoice.id,
         metadata: { invoice_number: invoice.invoice_number }
+      }).then(({ error }) => {
+        if (error) console.warn('Audit log failed:', error);
       });
       
       showToast('PDF téléchargé avec succès ✓', 'success');

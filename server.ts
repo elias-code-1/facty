@@ -111,12 +111,11 @@ async function startServer() {
 
       const { data, error } = await adminSupabase
         .from('platform_settings')
-        .select('key, value')
-        .in('key', ['free_plan_invoice_limit']);
+        .select('key, value');
 
       if (error) throw error;
 
-      const settings = data.reduce(
+      const settings = (data || []).reduce(
         (acc: Record<string, string>, item) => {
           acc[item.key] = item.value;
           return acc;
@@ -128,6 +127,40 @@ async function startServer() {
     } catch (err: any) {
       console.error("Erreur récupération settings publics:", err);
       res.status(500).json({ error: 'DATABASE_ERROR' });
+    }
+  });
+
+  // API: Mettre à jour un paramètre plateforme (Admin)
+  app.post("/api/admin/update-setting", async (req, res) => {
+    const { key, value } = req.body;
+    if (!key) return res.status(400).json({ error: "key requise" });
+
+    const admin = await verifyAdmin(req, res);
+    if (!admin) return;
+
+    try {
+      const { error } = await admin.adminSupabase
+        .from('platform_settings')
+        .upsert({ 
+          key, 
+          value: value?.toString() || '', 
+          updated_at: new Date().toISOString() 
+        }, { onConflict: 'key' });
+
+      if (error) throw error;
+
+      // Log audit
+      await admin.adminSupabase.from('audit_logs').insert({
+        user_id: admin.user.id,
+        action: 'platform.setting_updated',
+        entity_type: 'platform_setting',
+        metadata: { key, new_value: value }
+      });
+
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Erreur update-setting:", err);
+      res.status(500).json({ error: "Erreur lors de la mise à jour" });
     }
   });
 

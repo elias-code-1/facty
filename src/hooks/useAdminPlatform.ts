@@ -10,20 +10,29 @@ export function useAdminPlatform() {
   const fetchSettings = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('platform_settings')
-        .select('*');
-
-      if (error) throw error;
-
-      const settingsMap = (data || []).reduce((acc, s) => ({
-        ...acc,
-        [s.key]: s.value
-      }), {} as Record<string, string>);
-
+      // Utiliser l'API publique pour éviter les problèmes de RLS en lecture
+      const response = await fetch('/api/settings-public');
+      if (!response.ok) throw new Error('Erreur lors de la récupération des paramètres');
+      
+      const settingsMap = await response.json();
       setSettings(settingsMap);
     } catch (err) {
       console.error('Erreur fetchSettings:', err);
+      // Fallback sur Supabase au cas où
+      try {
+        const { data, error } = await supabase
+          .from('platform_settings')
+          .select('*');
+        if (!error && data) {
+          const settingsMap = (data || []).reduce((acc, s) => ({
+            ...acc,
+            [s.key]: s.value
+          }), {} as Record<string, string>);
+          setSettings(settingsMap);
+        }
+      } catch (e) {
+        console.error('Fallback fetchSettings failed:', e);
+      }
     } finally {
       setLoading(false);
     }
@@ -35,27 +44,23 @@ export function useAdminPlatform() {
 
   const updateSetting = async (key: string, value: string) => {
     try {
-      const oldValue = settings[key];
+      const { data: { session } } = await supabase.auth.getSession();
       
-      // Utiliser upsert pour créer le paramètre s'il n'existe pas encore
-      const { error } = await supabase
-        .from('platform_settings')
-        .upsert({ 
-          key, 
-          value, 
-          updated_at: new Date().toISOString() 
-        }, { onConflict: 'key' });
+      const response = await fetch('/api/admin/update-setting', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ key, value })
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Erreur lors de la mise à jour');
+      }
 
       setSettings(prev => ({ ...prev, [key]: value }));
-
-      await supabase.from('audit_logs').insert({
-        user_id: user?.id,
-        action: 'platform.setting_updated',
-        entity_type: 'platform_setting',
-        metadata: { key, old_value: oldValue, new_value: value }
-      });
     } catch (err) {
       console.error('Erreur updateSetting:', err);
       throw err;
