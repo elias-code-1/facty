@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, Copy, Check, X } from 'lucide-react';
+import { CheckCircle2, XCircle, X } from 'lucide-react';
 
 interface ToastProps {
   message: string;
@@ -8,29 +8,16 @@ interface ToastProps {
   onClose: () => void;
 }
 
-/** Composant de notification Toast avec option de copie pour les erreurs */
+/** Composant de notification Toast */
 export default function Toast({ message, type, onClose }: ToastProps) {
-  const [copied, setCopied] = useState(false);
-
   useEffect(() => {
-    // Les erreurs durent plus longtemps pour permettre la lecture/copie
+    // Les erreurs durent plus longtemps pour permettre la lecture
     const duration = type === 'error' ? 8000 : 4000;
     const timer = setTimeout(() => {
       onClose();
     }, duration);
     return () => clearTimeout(timer);
   }, [onClose, type]);
-
-  const handleCopy = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(message);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
-  };
 
   const isSuccess = type === 'success';
 
@@ -52,19 +39,10 @@ export default function Toast({ message, type, onClose }: ToastProps) {
         </div>
         
         <div className="flex-grow min-w-0">
-          <p className="text-sm font-medium break-words leading-tight">{message}</p>
+          <p className={`text-sm font-medium break-words leading-tight ${!isSuccess ? 'select-none' : ''}`}>{message}</p>
         </div>
 
         <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-          {!isSuccess && (
-            <button
-              onClick={handleCopy}
-              title="Copier l'erreur"
-              className="p-1.5 hover:bg-red-100 rounded-lg transition-colors"
-            >
-              {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
-            </button>
-          )}
           <button
             onClick={onClose}
             className={`p-1.5 rounded-lg transition-colors ${

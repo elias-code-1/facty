@@ -8,10 +8,10 @@ export default function ReloadPrompt() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
-      console.log('SW Registered: ' + r);
+      if (import.meta.env.DEV) console.log('SW Registered: ' + r);
     },
     onRegisterError(error) {
-      console.log('SW registration error', error);
+      if (import.meta.env.DEV) console.log('SW registration error', error);
     },
   });
 

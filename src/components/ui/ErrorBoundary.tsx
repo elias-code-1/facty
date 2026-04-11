@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AlertTriangle, RefreshCw, Copy, Check } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface Props {
   children: React.ReactNode;
@@ -12,7 +12,6 @@ interface State {
 
 /**
  * ErrorBoundary pour capturer et afficher les erreurs de l'application
- * Permet de copier les détails techniques pour le débogage
  */
 class ErrorBoundary extends React.Component<Props, State> {
   public props: Props;
@@ -32,33 +31,10 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
-  }
-
-  private handleCopyError = async () => {
-    if (!this.state.error) return;
-    
-    const errorDetails = {
-      message: this.state.error.message,
-      stack: this.state.error.stack,
-      timestamp: new Date().toISOString(),
-      url: window.location.href
-    };
-
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(errorDetails, null, 2));
-      const btn = document.getElementById('copy-error-btn');
-      if (btn) {
-        const originalContent = btn.innerHTML;
-        btn.innerHTML = 'Copié !';
-        setTimeout(() => {
-          btn.innerHTML = originalContent;
-        }, 2000);
-      }
-    } catch (err) {
-      console.error('Failed to copy error details', err);
+    if (import.meta.env.DEV) {
+      console.error('Uncaught error:', error, errorInfo);
     }
-  };
+  }
 
   public render() {
     if (this.state.hasError) {
@@ -77,7 +53,7 @@ class ErrorBoundary extends React.Component<Props, State> {
             </div>
 
             {this.state.error && (
-              <div className="bg-slate-50 rounded-xl p-4 text-left overflow-hidden">
+              <div className="bg-slate-50 rounded-xl p-4 text-left overflow-hidden select-none">
                 <p className="text-xs font-mono text-red-600 break-words line-clamp-3">
                   {this.state.error.message}
                 </p>
@@ -91,15 +67,6 @@ class ErrorBoundary extends React.Component<Props, State> {
               >
                 <RefreshCw size={18} />
                 Rafraîchir la page
-              </button>
-              
-              <button
-                id="copy-error-btn"
-                onClick={this.handleCopyError}
-                className="w-full bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
-              >
-                <Copy size={18} />
-                Copier les détails de l'erreur
               </button>
             </div>
           </div>

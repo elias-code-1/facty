@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, X, Trash2, EyeOff } from 'lucide-react';
+import { X, Trash2, EyeOff } from 'lucide-react';
 
 export default function ErrorViewer() {
   const [errors, setErrors] = useState<string[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
@@ -26,16 +25,6 @@ export default function ErrorViewer() {
     };
   }, []);
 
-  const copyAllErrors = async () => {
-    try {
-      await navigator.clipboard.writeText(errors.join('\n---\n'));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy errors:', err);
-    }
-  };
-
   if (!isVisible || errors.length === 0) return null;
 
   return (
@@ -46,13 +35,6 @@ export default function ErrorViewer() {
           <span className="font-bold text-sm">Console Admin ({errors.length})</span>
         </div>
         <div className="flex gap-3">
-          <button 
-            onClick={copyAllErrors} 
-            title="Copier toutes les erreurs"
-            className="hover:scale-110 transition-transform"
-          >
-            {copied ? <Check size={14} /> : <Copy size={14} />}
-          </button>
           <button 
             onClick={() => setErrors([])} 
             title="Vider la console"
@@ -69,7 +51,7 @@ export default function ErrorViewer() {
           </button>
         </div>
       </div>
-      <div className="p-4 max-h-60 overflow-y-auto bg-slate-900">
+      <div className="p-4 max-h-60 overflow-y-auto bg-slate-900 select-none">
         {errors.map((err, i) => (
           <div key={i} className="text-[10px] text-red-400 mb-3 pb-3 border-b border-slate-800 last:mb-0 last:pb-0 last:border-0 font-mono break-words leading-relaxed">
             <span className="text-slate-500 mr-2">[{new Date().toLocaleTimeString()}]</span>

@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import * as JoyrideModule from 'react-joyride';
+import { Joyride as JoyrideBase, STATUS } from 'react-joyride';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
 
-// Handle potential default export issues in different environments
-const Joyride = (JoyrideModule as any).Joyride || (JoyrideModule as any).default || JoyrideModule;
-const STATUS = (JoyrideModule as any).STATUS || (JoyrideModule as any).default?.STATUS || {};
-type Step = any; 
+const Joyride = JoyrideBase as any;
+type Step = any;
 type CallBackProps = any;
-
-// Use any for the component to avoid TS issues with react-joyride exports
-const JoyrideComponent = Joyride as any;
 
 /**
  * Composant Tooltip personnalisé pour un look moderne
@@ -242,12 +237,12 @@ export default function Tutorial() {
     }
   };
 
-  if (!JoyrideComponent || (typeof JoyrideComponent !== 'function' && typeof JoyrideComponent !== 'object')) {
+  if (!Joyride) {
     return null;
   }
 
   return (
-    <JoyrideComponent
+    <Joyride
       callback={handleJoyrideCallback}
       continuous
       hideCloseButton
@@ -269,7 +264,7 @@ export default function Tutorial() {
         spotlight: {
           borderRadius: '24px',
         }
-      }}
+      } as any}
     />
   );
 }

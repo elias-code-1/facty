@@ -13,6 +13,15 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 });
 
+// Désactiver les logs en production pour plus de sécurité
+if (import.meta.env.PROD) {
+  console.log = () => {};
+  console.error = () => {};
+  console.warn = () => {};
+  console.info = () => {};
+  console.debug = () => {};
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
