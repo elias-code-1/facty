@@ -14,7 +14,9 @@ export default function Settings() {
   const restartTutorial = () => {
     if (user) {
       localStorage.removeItem(`tutorial_seen_${user.id}`);
-      showToast('Le tutoriel a été réinitialisé. Retournez au tableau de bord pour le voir.', 'success');
+      // Déclencher l'événement personnalisé pour le composant Tutorial
+      window.dispatchEvent(new CustomEvent('restart-tutorial'));
+      showToast('Le tutoriel a été relancé !', 'success');
     }
   };
 

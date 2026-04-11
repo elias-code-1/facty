@@ -130,14 +130,21 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
   }
 
   // Redirection vers l'onboarding si le profil est incomplet
-  const isIncomplete = profile && (!profile.full_name || !profile.company_name);
-  if (isIncomplete && location.pathname !== '/onboarding' && profile?.role !== 'admin') {
-    return <Navigate to="/onboarding" replace />;
-  }
+  // On vérifie que le profil est chargé et que les champs requis sont absents ou vides
+  const isProfileIncomplete = profile && (
+    !profile.full_name?.trim() || 
+    !profile.company_name?.trim()
+  );
 
-  // Si complet et sur onboarding, retour au dashboard
-  if (!isIncomplete && location.pathname === '/onboarding') {
-    return <Navigate to="/dashboard" replace />;
+  if (profile && profile.role !== 'admin') {
+    // Si incomplet et pas sur la page onboarding -> Rediriger vers onboarding
+    if (isProfileIncomplete && location.pathname !== '/onboarding') {
+      return <Navigate to="/onboarding" replace />;
+    }
+    
+    // NOTE: On ne redirige pas AUTOMATIQUEMENT de /onboarding vers /dashboard ici
+    // pour éviter les boucles infinies si l'état du profil met du temps à se rafraîchir.
+    // C'est la page Onboarding elle-même qui gère sa propre redirection.
   }
 
   return <>{children}</>;

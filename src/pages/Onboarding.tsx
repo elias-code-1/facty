@@ -41,9 +41,16 @@ export default function Onboarding() {
       setCompanyName(profile.company_name || '');
       setCurrency(profile.currency || 'FCFA');
       
-      // Si le profil est déjà complet, on redirige
-      if (profile.full_name && profile.company_name) {
-        navigate('/dashboard');
+      // Si le profil est déjà complet, on redirige vers le dashboard
+      // On utilise trim() pour être sûr qu'il y a du contenu réel
+      const isComplete = profile.full_name?.trim() && profile.company_name?.trim();
+      
+      if (isComplete) {
+        // Petit délai pour laisser l'utilisateur voir le succès s'il vient de valider
+        const timer = setTimeout(() => {
+          navigate('/dashboard');
+        }, 500);
+        return () => clearTimeout(timer);
       }
     }
   }, [profile, navigate]);
@@ -73,7 +80,7 @@ export default function Onboarding() {
         currency
       });
       showToast('Configuration terminée ! Bienvenue sur Facty.', 'success');
-      navigate('/dashboard');
+      // On laisse le useEffect gérer la redirection après le rafraîchissement du profil
     } catch (err) {
       showToast('Une erreur est survenue lors de la sauvegarde.', 'error');
     } finally {
