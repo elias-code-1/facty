@@ -7,6 +7,8 @@ import { useLanding } from '../hooks/useLanding';
 export default function Legal() {
   const { content } = useLanding();
 
+  const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'logonovaagency@gmail.com';
+
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
@@ -26,7 +28,7 @@ export default function Legal() {
             </p>
             <p>
               <strong>Logonova Agency</strong><br />
-              <strong>Email :</strong> logonovaagency@gmail.com
+              <strong>Email :</strong> {supportEmail}
             </p>
             <p className="italic text-sm">
               (ci-après « l’Éditeur »)

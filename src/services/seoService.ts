@@ -1,5 +1,11 @@
 import { supabase } from '../lib/supabase';
 
+export interface ContentBlock {
+  type: string;
+  content: string;
+  order?: number;
+}
+
 export interface SEOPageData {
   slug: string;
   title: string;
@@ -7,7 +13,7 @@ export interface SEOPageData {
   hero_title: string;
   hero_subtitle: string;
   category: string;
-  content_blocks?: any[];
+  content_blocks?: ContentBlock[];
 }
 
 export const seoService = {

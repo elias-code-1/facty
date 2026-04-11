@@ -40,8 +40,12 @@ export default function SEOLanding() {
       setPageData(data);
       setLoading(false);
       
-      // Sauvegarder le dernier chemin SEO visité pour la navigation contextuelle
-      localStorage.setItem('lastSEOPath', window.location.pathname);
+      // Sauvegarder le dernier chemin SEO visité pour la navigation contextuelle (expiration 24h)
+      const seoVisit = {
+        path: window.location.pathname,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('lastSEOPath', JSON.stringify(seoVisit));
     };
 
     fetchPage();

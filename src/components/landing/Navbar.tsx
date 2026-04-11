@@ -37,9 +37,25 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
     const isSystemPage = ['/admin', '/dashboard', '/auth', '/settings', '/invoices', '/clients', '/contact', '/legal', '/privacy', '/error'].some(path => location.pathname.startsWith(path));
     const isLandingLikePage = location.pathname === '/' || !isSystemPage;
 
+    const getValidLastSEOPath = () => {
+      const stored = localStorage.getItem('lastSEOPath');
+      if (!stored) return null;
+      try {
+        const { path, timestamp } = JSON.parse(stored);
+        const isExpired = Date.now() - timestamp > 24 * 60 * 60 * 1000;
+        if (isExpired) {
+          localStorage.removeItem('lastSEOPath');
+          return null;
+        }
+        return path;
+      } catch {
+        return null;
+      }
+    };
+
     if (id === '') {
       if (!isLandingLikePage) {
-        const lastSEOPath = localStorage.getItem('lastSEOPath');
+        const lastSEOPath = getValidLastSEOPath();
         if (lastSEOPath && lastSEOPath !== location.pathname) {
           navigate(lastSEOPath);
         } else {
@@ -53,7 +69,7 @@ export default function Navbar({ content }: { content: Record<string, any> }) {
     }
 
     if (!isLandingLikePage) {
-      const lastSEOPath = localStorage.getItem('lastSEOPath');
+      const lastSEOPath = getValidLastSEOPath();
       const targetBase = lastSEOPath || '/';
       navigate(targetBase + '#' + id);
       return;
