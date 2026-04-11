@@ -118,12 +118,14 @@ export default function Auth() {
             // Check if user is admin or team member to redirect correctly
             const { data: profile } = await supabase
               .from('profiles')
-              .select('role, team_role')
+              .select('role, team_role, full_name, company_name')
               .eq('id', data.session.user.id)
               .single();
               
             if (profile?.role === 'admin' || profile?.team_role) {
               navigate('/admin/facty');
+            } else if (!profile?.full_name || !profile?.company_name) {
+              navigate('/onboarding');
             } else {
               navigate('/dashboard');
             }
@@ -192,7 +194,7 @@ export default function Auth() {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     } else if (mode === 'email-verified' && countdown === 0) {
-      navigate('/dashboard');
+      navigate('/onboarding');
     }
   }, [mode, countdown, navigate]);
 
@@ -227,12 +229,14 @@ export default function Auth() {
           
           const { data: profile } = await supabase
             .from('profiles')
-            .select('role, team_role')
+            .select('role, team_role, full_name, company_name')
             .eq('id', data.session.user.id)
             .single();
             
           if (profile?.role === 'admin' || profile?.team_role) {
             navigate('/admin/facty');
+          } else if (!profile?.full_name || !profile?.company_name) {
+            navigate('/onboarding');
           } else {
             navigate('/dashboard');
           }

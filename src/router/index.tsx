@@ -40,6 +40,7 @@ import Contact from '../pages/Contact';
 import Legal from '../pages/Legal';
 import Privacy from '../pages/Privacy';
 import SEOLanding from '../pages/SEOLanding';
+import Onboarding from '../pages/Onboarding';
 import { SEO_PAGES } from '../data/seoPages';
 
 // Layouts
@@ -50,6 +51,7 @@ import AdminLayout from '../components/layout/AdminLayout';
 const PrivateRoute = ({ children }: { children: ReactNode }) => {
   const { session, user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile(user);
+  const location = useLocation();
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceData, setMaintenanceData] = useState({ title: '', message: '' });
   const [settingsLoading, setSettingsLoading] = useState(true);
@@ -127,6 +129,17 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
     );
   }
 
+  // Redirection vers l'onboarding si le profil est incomplet
+  const isIncomplete = profile && (!profile.full_name || !profile.company_name);
+  if (isIncomplete && location.pathname !== '/onboarding' && profile?.role !== 'admin') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Si complet et sur onboarding, retour au dashboard
+  if (!isIncomplete && location.pathname === '/onboarding') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return <>{children}</>;
 };
 
@@ -192,6 +205,11 @@ export const AppRouter = () => {
         <Route path="/:slug" element={<SEOLanding />} />
 
         <Route path="/auth" element={<Auth />} />
+        <Route path="/onboarding" element={
+          <PrivateRoute>
+            <Onboarding />
+          </PrivateRoute>
+        } />
         
         {/* Route publique admin */}
         <Route path="/admin/facty/login" element={<AdminLogin />} />

@@ -3,18 +3,14 @@ import * as JoyrideModule from 'react-joyride';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-/**
- * Correction de l'import pour react-joyride.
- * Cette bibliothèque a des comportements d'exportation différents entre le dev et le build.
- */
+// Handle potential default export issues in different environments
 const Joyride = (JoyrideModule as any).Joyride || (JoyrideModule as any).default || JoyrideModule;
 const STATUS = (JoyrideModule as any).STATUS || (JoyrideModule as any).default?.STATUS || {};
+type Step = any; 
+type CallBackProps = any;
 
-// On s'assure que JoyrideComponent est bien une fonction/composant et non l'objet module
-const JoyrideComponent = typeof Joyride === 'function' ? Joyride : (Joyride.default || Joyride);
-
-type Step = any;
-type JoyrideCallBackProps = any;
+// Use any for the component to avoid TS issues with react-joyride exports
+const JoyrideComponent = Joyride as any;
 
 const DASHBOARD_STEPS: Step[] = [
   {
@@ -103,7 +99,7 @@ export default function Tutorial() {
     }
   }, [location.pathname, hasSeenTutorial]);
 
-  const handleJoyrideCallback = (data: JoyrideCallBackProps) => {
+  const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
