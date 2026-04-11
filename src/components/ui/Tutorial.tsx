@@ -3,15 +3,17 @@ import * as JoyrideModule from 'react-joyride';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-// Handle potential default export issues in different environments
-const Joyride = (JoyrideModule as any).default || JoyrideModule;
-const STATUS = (JoyrideModule as any).STATUS || (JoyrideModule as any).default?.STATUS;
-type Step = any; // Use any for Step to avoid complex type issues from the module
+/**
+ * Correction de l'import pour react-joyride.
+ * Cette bibliothèque a des comportements d'exportation différents entre le dev et le build.
+ */
+const Joyride = (JoyrideModule as any).Joyride || (JoyrideModule as any).default || JoyrideModule;
+const STATUS = (JoyrideModule as any).STATUS || (JoyrideModule as any).default?.STATUS || {};
 
-// Use any for the component to avoid TS issues with react-joyride exports
-const JoyrideComponent = Joyride as any;
+// On s'assure que JoyrideComponent est bien une fonction/composant et non l'objet module
+const JoyrideComponent = typeof Joyride === 'function' ? Joyride : (Joyride.default || Joyride);
 
-// Use any for callback props to avoid TS issues with react-joyride exports
+type Step = any;
 type JoyrideCallBackProps = any;
 
 const DASHBOARD_STEPS: Step[] = [
@@ -127,6 +129,11 @@ export default function Tutorial() {
       setRun(false);
     }
   };
+
+  // Sécurité : si le composant n'est pas valide, on ne l'affiche pas pour éviter de crash l'app
+  if (!JoyrideComponent || (typeof JoyrideComponent !== 'function' && typeof JoyrideComponent !== 'object')) {
+    return null;
+  }
 
   return (
     <JoyrideComponent
