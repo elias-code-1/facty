@@ -32,6 +32,9 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Serve public directory (sitemap.xml, robots.txt, etc.)
+  app.use(express.static(path.join(__dirname, "public")));
+
   // Rate limiting global
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 min
