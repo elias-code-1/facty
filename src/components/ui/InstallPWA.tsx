@@ -15,15 +15,29 @@ export default function InstallPWA() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
+
     const handler = (e: Event) => {
-      // Empêcher Chrome 67 et versions antérieures d'afficher automatiquement l'invite
       e.preventDefault();
-      // Stocker l'événement pour qu'il puisse être déclenché plus tard
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsVisible(true);
     };
 
+    // Pour Android/Chrome/Windows
     window.addEventListener('beforeinstallprompt', handler);
+
+    // Pour iOS : on affiche le bouton si on n'est pas déjà en standalone
+    if (isIOS && !isStandalone) {
+      setIsVisible(true);
+    }
+
+    const installedHandler = () => {
+      setIsVisible(false);
+      setDeferredPrompt(null);
+    };
+
+    window.addEventListener('appinstalled', installedHandler);
 
     // Vérifier si l'app est déjà installée (standalone)
     if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -32,10 +46,18 @@ export default function InstallPWA() {
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('appinstalled', installedHandler);
     };
   }, []);
 
   const handleInstallClick = async () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+
+    if (isIOS) {
+      alert("Pour installer Facty sur iOS :\n1. Cliquez sur le bouton 'Partager' en bas de votre navigateur.\n2. Sélectionnez 'Sur l'écran d'accueil'.");
+      return;
+    }
+
     if (!deferredPrompt) return;
 
     // Afficher l'invite d'installation
