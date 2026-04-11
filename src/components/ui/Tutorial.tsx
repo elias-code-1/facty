@@ -99,13 +99,19 @@ const DASHBOARD_STEPS: Step[] = [
   {
     target: '#tour-stats',
     title: 'Vos chiffres clés',
-    content: 'Suivez vos revenus et vos impayés en temps réel. La clarté avant tout.',
+    content: 'Suivez vos revenus encaissés, vos montants en attente et le nombre total de factures. La clarté avant tout.',
     placement: 'bottom',
   },
   {
     target: '#tour-charts',
     title: 'Analyses visuelles',
-    content: 'Visualisez la croissance de votre activité grâce à des graphiques dynamiques.',
+    content: 'Visualisez la croissance de votre activité et la répartition des statuts de vos factures grâce à ces graphiques dynamiques.',
+    placement: 'top',
+  },
+  {
+    target: '#tour-recent',
+    title: 'Activités récentes',
+    content: 'Gardez un œil sur vos dernières factures créées et accédez-y rapidement pour les consulter ou les modifier.',
     placement: 'top',
   },
   {
@@ -115,9 +121,21 @@ const DASHBOARD_STEPS: Step[] = [
     placement: 'right',
   },
   {
+    target: '#tour-nav-clients',
+    title: 'Carnet d\'adresses',
+    content: 'Enregistrez vos clients pour automatiser la création de vos factures et suivre leur historique.',
+    placement: 'right',
+  },
+  {
     target: '#tour-nav-settings',
     title: 'Personnalisation',
-    content: 'N\'oubliez pas de configurer vos informations pour des factures à votre image.',
+    content: 'N\'oubliez pas de configurer vos informations professionnelles et votre logo pour des factures à votre image.',
+    placement: 'right',
+  },
+  {
+    target: '#tour-user-profile',
+    title: 'Votre compte',
+    content: 'Gérez votre profil et déconnectez-vous en toute sécurité ici. Vous avez maintenant toutes les clés en main !',
     placement: 'right',
   }
 ];
@@ -126,14 +144,48 @@ const INVOICES_STEPS: Step[] = [
   {
     target: '#tour-invoice-new',
     title: 'Nouvelle facture',
-    content: 'Prêt à être payé ? Créez votre facture ici. On s\'occupe des calculs pour vous.',
+    content: 'Prêt à être payé ? Créez votre facture ici. On s\'occupe des calculs et de la mise en page pour vous.',
     placement: 'bottom',
     disableBeacon: true,
   },
   {
+    target: '#tour-invoice-stats',
+    title: 'Résumé financier',
+    content: 'Consultez le total de vos factures, vos brouillons, ainsi que les montants payés et en attente.',
+    placement: 'bottom',
+  },
+  {
+    target: '#tour-invoice-filters',
+    title: 'Recherche & Filtres',
+    content: 'Retrouvez facilement une facture par son numéro ou le nom du client, et filtrez par statut (Payé, Envoyé, etc.).',
+    placement: 'bottom',
+  },
+  {
     target: '#tour-invoice-list',
-    title: 'Gestion simplifiée',
-    content: 'Filtrez par statut pour savoir exactement qui vous doit quoi.',
+    title: 'Liste des factures',
+    content: 'Toutes vos factures sont listées ici. Vous pouvez changer leur statut ou accéder aux actions rapides via le menu à droite.',
+    placement: 'top',
+  }
+];
+
+const CLIENTS_STEPS: Step[] = [
+  {
+    target: '#tour-client-new',
+    title: 'Nouveau client',
+    content: 'Ajoutez un client en renseignant ses coordonnées pour pouvoir lui envoyer des factures rapidement.',
+    placement: 'bottom',
+    disableBeacon: true,
+  },
+  {
+    target: '#tour-client-search',
+    title: 'Recherche rapide',
+    content: 'Cherchez un client par son nom, son email ou son numéro de téléphone.',
+    placement: 'bottom',
+  },
+  {
+    target: '#tour-client-list',
+    title: 'Vos contacts',
+    content: 'Retrouvez tous vos clients ici. Vous pouvez voir le nombre de factures associées à chacun et modifier leurs informations.',
     placement: 'top',
   }
 ];
@@ -166,6 +218,9 @@ export default function Tutorial() {
       setRun(true);
     } else if (location.pathname === '/invoices') {
       setSteps(INVOICES_STEPS);
+      setRun(true);
+    } else if (location.pathname === '/clients') {
+      setSteps(CLIENTS_STEPS);
       setRun(true);
     } else {
       setRun(false);

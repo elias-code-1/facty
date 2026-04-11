@@ -145,6 +145,7 @@ export default function Clients() {
           <p className="text-sm md:text-base text-slate-500">Gérez votre carnet d'adresses</p>
         </div>
         <button
+          id="tour-client-new"
           onClick={() => handleOpenModal()}
           className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
         >
@@ -154,7 +155,7 @@ export default function Clients() {
       </div>
 
       {/* Search Bar */}
-      <div className="relative mb-8">
+      <div className="relative mb-8" id="tour-client-search">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
         <input
           type="text"
@@ -174,116 +175,118 @@ export default function Clients() {
       </div>
 
       {/* Clients Grid */}
-      {filteredClients.length > 0 ? (
-        <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6"
-          variants={containerVariants}
-          initial="initial"
-          animate="animate"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredClients.map((client, index) => (
-              <motion.div
-                key={client.id}
-                layout
-                variants={itemVariants}
-                exit={{ opacity: 0, scale: 0.95 }}
-                whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative bg-white rounded-2xl p-5 border border-slate-100 shadow-sm transition-all duration-200"
-              >
-                {/* Actions (visible on hover on desktop, always on mobile) */}
-                <div className="absolute top-4 right-4 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => handleOpenModal(client)}
-                    className="p-2 bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
-                    title="Modifier"
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedClient(client);
-                      setIsConfirmOpen(true);
-                    }}
-                    className="p-2 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
-                    title="Supprimer"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-lg">
-                    {getInitials(client.name)}
+      <div id="tour-client-list">
+        {filteredClients.length > 0 ? (
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6"
+            variants={containerVariants}
+            initial="initial"
+            animate="animate"
+          >
+            <AnimatePresence mode="popLayout">
+              {filteredClients.map((client, index) => (
+                <motion.div
+                  key={client.id}
+                  layout
+                  variants={itemVariants}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group relative bg-white rounded-2xl p-5 border border-slate-100 shadow-sm transition-all duration-200"
+                >
+                  {/* Actions (visible on hover on desktop, always on mobile) */}
+                  <div className="absolute top-4 right-4 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleOpenModal(client)}
+                      className="p-2 bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
+                      title="Modifier"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedClient(client);
+                        setIsConfirmOpen(true);
+                      }}
+                      className="p-2 bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+                      title="Supprimer"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0 pr-16">
-                    <h3 className="font-semibold text-slate-800 truncate">{client.name}</h3>
-                    <div className="mt-2 space-y-1">
-                      {client.email && (
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                          <Mail size={14} className="flex-shrink-0" />
-                          <span className="truncate">{client.email}</span>
-                        </div>
-                      )}
-                      {client.phone && (
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                          <Phone size={14} className="flex-shrink-0" />
-                          <span>{client.phone}</span>
-                        </div>
-                      )}
+
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-lg">
+                      {getInitials(client.name)}
+                    </div>
+                    <div className="flex-1 min-w-0 pr-16">
+                      <h3 className="font-semibold text-slate-800 truncate">{client.name}</h3>
+                      <div className="mt-2 space-y-1">
+                        {client.email && (
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <Mail size={14} className="flex-shrink-0" />
+                            <span className="truncate">{client.email}</span>
+                          </div>
+                        )}
+                        {client.phone && (
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <Phone size={14} className="flex-shrink-0" />
+                            <span>{client.phone}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 text-slate-600 rounded-full text-xs font-medium">
-                    <FileText size={12} />
-                    {client.invoices?.[0]?.count || 0} facture{ (client.invoices?.[0]?.count || 0) > 1 ? 's' : '' }
+                  <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 text-slate-600 rounded-full text-xs font-medium">
+                      <FileText size={12} />
+                      {client.invoices?.[0]?.count || 0} facture{ (client.invoices?.[0]?.count || 0) > 1 ? 's' : '' }
+                    </div>
+                    <span className="text-[10px] text-slate-400">
+                      Ajouté le {new Date(client.created_at).toLocaleDateString()}
+                    </span>
                   </div>
-                  <span className="text-[10px] text-slate-400">
-                    Ajouté le {new Date(client.created_at).toLocaleDateString()}
-                  </span>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
+            {searchQuery ? (
+              <div className="text-center">
+                <div className="bg-slate-50 p-4 rounded-full inline-block mb-4">
+                  <Search size={32} className="text-slate-300" />
                 </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
-          {searchQuery ? (
-            <div className="text-center">
-              <div className="bg-slate-50 p-4 rounded-full inline-block mb-4">
-                <Search size={32} className="text-slate-300" />
+                <h3 className="text-lg font-semibold text-slate-800">Aucun résultat</h3>
+                <p className="text-slate-500">Aucun client ne correspond à "{searchQuery}"</p>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="mt-4 text-indigo-600 font-medium hover:underline"
+                >
+                  Effacer la recherche
+                </button>
               </div>
-              <h3 className="text-lg font-semibold text-slate-800">Aucun résultat</h3>
-              <p className="text-slate-500">Aucun client ne correspond à "{searchQuery}"</p>
-              <button
-                onClick={() => setSearchQuery('')}
-                className="mt-4 text-indigo-600 font-medium hover:underline"
-              >
-                Effacer la recherche
-              </button>
-            </div>
-          ) : (
-            <div className="text-center">
-              <div className="bg-indigo-50 p-6 rounded-full inline-block mb-6">
-                <UserPlus size={48} className="text-indigo-400" />
+            ) : (
+              <div className="text-center">
+                <div className="bg-indigo-50 p-6 rounded-full inline-block mb-6">
+                  <UserPlus size={48} className="text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-2">Aucun client pour l'instant</h3>
+                <p className="text-slate-500 mb-8 max-w-sm">
+                  Commencez par ajouter votre premier client pour pouvoir créer des factures.
+                </p>
+                <button
+                  onClick={() => handleOpenModal()}
+                  className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                >
+                  Ajouter votre premier client
+                </button>
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Aucun client pour l'instant</h3>
-              <p className="text-slate-500 mb-8 max-w-sm">
-                Commencez par ajouter votre premier client pour pouvoir créer des factures.
-              </p>
-              <button
-                onClick={() => handleOpenModal()}
-                className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
-              >
-                Ajouter votre premier client
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Modal Formulaire Client */}
       <Modal

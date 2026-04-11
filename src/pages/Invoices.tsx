@@ -178,7 +178,7 @@ export default function Invoices() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8" id="tour-invoice-stats">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-5">
           <div className="p-2 bg-slate-50 text-slate-500 rounded-lg w-fit mb-3 md:mb-4">
             <FileText size={18} className="md:w-5 md:h-5" />
@@ -214,7 +214,7 @@ export default function Invoices() {
       </div>
 
       {/* Filters */}
-      <div className="mb-8">
+      <div className="mb-8" id="tour-invoice-filters">
         <InvoiceFilters
           activeStatus={activeStatus}
           onStatusChange={(s) => { setActiveStatus(s); setCurrentPage(1); }}
