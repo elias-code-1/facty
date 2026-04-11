@@ -1,11 +1,11 @@
-const CACHE_NAME = 'facty-cache-v1';
+const CACHE_NAME = 'facty-cache-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.ico',
-  '/pwa-192x192.png',
-  '/pwa-512x512.png',
+  '/Icon192.png',
+  '/Icon512.png',
   '/apple-touch-icon.png'
 ];
 
