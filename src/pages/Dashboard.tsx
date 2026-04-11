@@ -61,7 +61,7 @@ export default function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto pb-20">
       {/* SECTION 1 : Salutation */}
-      <div className="mb-8">
+      <div className="mb-8" id="tour-welcome">
         <h1 className="text-2xl font-bold text-slate-800">
           Bonjour, {firstName} 👋
         </h1>
@@ -98,6 +98,7 @@ export default function Dashboard() {
 
       {/* SECTION 2 : StatCards */}
       <motion.div 
+        id="tour-stats"
         className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6 mb-8"
         variants={containerVariants}
         initial="initial"
@@ -162,6 +163,7 @@ export default function Dashboard() {
         <>
           {/* SECTION 3 : Graphes */}
           <motion.div 
+            id="tour-charts"
             className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-8"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -177,6 +179,7 @@ export default function Dashboard() {
 
           {/* SECTION 4 : Factures récentes */}
           <motion.div 
+            id="tour-recent"
             className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}

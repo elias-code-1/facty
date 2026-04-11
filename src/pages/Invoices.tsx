@@ -167,6 +167,7 @@ export default function Invoices() {
             <span className="truncate">Exporter CSV</span>
           </button>
           <button
+            id="tour-invoice-new"
             onClick={() => navigate('/invoices/new')}
             className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
           >
@@ -225,7 +226,7 @@ export default function Invoices() {
       </div>
 
       {/* Table / Card View */}
-      <div className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <div id="tour-invoice-list" className="bg-white rounded-2xl md:rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
         {filteredInvoices.length > 0 ? (
           <>
             {/* Table View (Tablet/Desktop) */}

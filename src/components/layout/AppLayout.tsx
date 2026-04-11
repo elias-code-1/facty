@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ChatWidget from '../ui/ChatWidget';
+import Tutorial from '../ui/Tutorial';
 
 export default function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -11,6 +12,7 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
+      <Tutorial />
       {/* Sidebar Desktop/Tablet */}
       <aside className="hidden md:block fixed inset-y-0 left-0 z-20 no-print transition-all duration-300 w-20 lg:w-64">
         <Sidebar />

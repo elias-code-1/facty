@@ -69,10 +69,10 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   const navLinks = [
-    { to: '/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-    { to: '/invoices', label: 'Factures', icon: <InvoiceIcon /> },
-    ...(clients ? [{ to: '/clients', label: 'Clients', icon: <ClientIcon /> }] : []),
-    { to: '/settings', label: 'Paramètres', icon: <SettingsIcon /> },
+    { to: '/dashboard', label: 'Dashboard', icon: <DashboardIcon />, id: 'tour-nav-dashboard' },
+    { to: '/invoices', label: 'Factures', icon: <InvoiceIcon />, id: 'tour-nav-invoices' },
+    ...(clients ? [{ to: '/clients', label: 'Clients', icon: <ClientIcon />, id: 'tour-nav-clients' }] : []),
+    { to: '/settings', label: 'Paramètres', icon: <SettingsIcon />, id: 'tour-nav-settings' },
   ];
 
   return (
@@ -93,6 +93,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           <NavLink
             key={link.to}
             to={link.to}
+            id={link.id}
             onClick={onClose}
             title={link.label} // Tooltip for condensed mode
           >

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useProfile } from '../hooks/useProfile';
 import { useToast } from '../hooks/useToast';
-import { Upload, Trash2, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, Trash2, Image as ImageIcon, Loader2, PlayCircle } from 'lucide-react';
 import Spinner from '../components/ui/Spinner';
 
 /** Page des paramètres utilisateur et entreprise */
@@ -10,6 +10,13 @@ export default function Settings() {
   const { user } = useAuth();
   const { profile, loading: profileLoading, updateProfile, uploadLogo, deleteLogo } = useProfile(user);
   const { showToast } = useToast();
+
+  const restartTutorial = () => {
+    if (user) {
+      localStorage.removeItem(`tutorial_seen_${user.id}`);
+      showToast('Le tutoriel a été réinitialisé. Retournez au tableau de bord pour le voir.', 'success');
+    }
+  };
 
   // États du formulaire
   const [fullName, setFullName] = useState('');
@@ -202,7 +209,7 @@ export default function Settings() {
       </div>
 
       {/* Section 3: Logo */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-8">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
         <div className="p-4 md:p-6 border-b border-slate-100">
           <h2 className="text-base font-semibold text-slate-800">Logo de l'entreprise</h2>
           <p className="text-xs md:text-sm text-slate-500">Apparaît en haut de vos factures (PNG, JPG, max 2MB)</p>
@@ -269,6 +276,23 @@ export default function Settings() {
             accept="image/png, image/jpeg"
             className="hidden"
           />
+        </div>
+      </div>
+
+      {/* Section 4: Aide & Tutoriel */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-8">
+        <div className="p-4 md:p-6 border-b border-slate-100">
+          <h2 className="text-base font-semibold text-slate-800">Aide & Tutoriel</h2>
+          <p className="text-xs md:text-sm text-slate-500">Besoin d'un rappel sur le fonctionnement de Facty ?</p>
+        </div>
+        <div className="p-4 md:p-6">
+          <button
+            onClick={restartTutorial}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors"
+          >
+            <PlayCircle size={18} />
+            Relancer le tutoriel de bienvenue
+          </button>
         </div>
       </div>
 
