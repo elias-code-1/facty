@@ -113,10 +113,13 @@ async function startServer() {
 
       if (error) throw error;
 
-      const settings = data.reduce((acc: any, item) => {
-        acc[item.key] = item.value;
-        return acc;
-      }, {});
+      const settings = data.reduce(
+        (acc: Record<string, string>, item) => {
+          acc[item.key] = item.value;
+          return acc;
+        },
+        {} as Record<string, string>
+      );
 
       res.json(settings);
     } catch (err: any) {

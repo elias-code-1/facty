@@ -7,7 +7,7 @@ import { useLanding } from '../hooks/useLanding';
 export default function Legal() {
   const { content } = useLanding();
 
-  const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'logonovaagency@gmail.com';
+  const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'support@factyapp.com';
 
   return (
     <div className="min-h-screen bg-white">
