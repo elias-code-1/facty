@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
 import { useFeatureFlags } from '../../hooks/useFeatureFlags';
+import PWAInstallButton from '../ui/PWAInstallButton';
 
 const DashboardIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -117,6 +118,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
       {/* Footer Sidebar */}
       <div className={`p-2 lg:p-4 border-t border-slate-800`} id="tour-user-profile">
+        <PWAInstallButton isMobileOverlay={isMobileOverlay} />
         <div className={`flex items-center ${isMobileOverlay ? 'justify-start' : 'justify-center lg:justify-start'} gap-3 px-2 mb-4`}>
           <div className="w-10 h-10 rounded-full bg-indigo-500 flex-shrink-0 flex items-center justify-center text-sm font-bold">
             {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || '?'}
