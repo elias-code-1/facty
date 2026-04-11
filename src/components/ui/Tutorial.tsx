@@ -150,17 +150,15 @@ export default function Tutorial() {
 
     const checkTutorial = () => {
       const seen = localStorage.getItem(`tutorial_seen_${user.id}`);
-      if (!seen) {
-        setHasSeenTutorial(false);
-      }
+      // On met à jour l'état selon si le tuto a été vu ou non
+      setHasSeenTutorial(!!seen);
     };
 
     checkTutorial();
-  }, [user]);
+  }, [user, location.pathname]);
 
   useEffect(() => {
     // Si l'utilisateur a déjà vu le tuto, on ne le lance pas automatiquement
-    // SAUF si on est sur une page spécifique et qu'on veut forcer (via un bouton par ex)
     if (hasSeenTutorial && !run) return;
 
     if (location.pathname === '/dashboard') {
@@ -175,7 +173,7 @@ export default function Tutorial() {
   }, [location.pathname, hasSeenTutorial]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type } = data;
+    const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
@@ -188,17 +186,6 @@ export default function Tutorial() {
       }
     }
   };
-
-  // Écouter l'événement personnalisé pour relancer le tuto
-  useEffect(() => {
-    const handleRestart = () => {
-      setHasSeenTutorial(false);
-      setRun(true);
-    };
-
-    window.addEventListener('restart-tutorial', handleRestart);
-    return () => window.removeEventListener('restart-tutorial', handleRestart);
-  }, []);
 
   if (!JoyrideComponent || (typeof JoyrideComponent !== 'function' && typeof JoyrideComponent !== 'object')) {
     return null;

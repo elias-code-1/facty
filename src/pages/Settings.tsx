@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useProfile } from '../hooks/useProfile';
 import { useToast } from '../hooks/useToast';
@@ -8,15 +9,16 @@ import Spinner from '../components/ui/Spinner';
 /** Page des paramètres utilisateur et entreprise */
 export default function Settings() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { profile, loading: profileLoading, updateProfile, uploadLogo, deleteLogo } = useProfile(user);
   const { showToast } = useToast();
 
   const restartTutorial = () => {
     if (user) {
       localStorage.removeItem(`tutorial_seen_${user.id}`);
-      // Déclencher l'événement personnalisé pour le composant Tutorial
-      window.dispatchEvent(new CustomEvent('restart-tutorial'));
-      showToast('Le tutoriel a été relancé !', 'success');
+      showToast('Redirection vers le tableau de bord pour le tutoriel...', 'success');
+      // On redirige vers le dashboard car c'est là que commence le tuto
+      navigate('/dashboard');
     }
   };
 
