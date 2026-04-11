@@ -31,6 +31,74 @@ async function startServer() {
   });
 
   app.use(express.json());
+  
+  // Dynamic Sitemap.xml
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      const supabaseUrl = process.env.VITE_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+      if (!supabaseUrl || !supabaseServiceKey) {
+        return res.status(500).send('Server configuration error');
+      }
+
+      const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: { autoRefreshToken: false, persistSession: false }
+      });
+
+      // Fetch dynamic slugs from Supabase
+      const { data: seoPages, error } = await adminSupabase
+        .from('seo_pages')
+        .select('slug, updated_at')
+        .eq('is_published', true);
+
+      if (error) throw error;
+
+      const baseUrl = 'https://factyapp.logonova.site';
+      const today = new Date().toISOString().split('T')[0];
+
+      // Static pages
+      const staticPages = [
+        { url: '/', priority: '1.0', changefreq: 'weekly' },
+        { url: '/auth', priority: '0.8', changefreq: 'monthly' },
+        { url: '/contact', priority: '0.7', changefreq: 'monthly' },
+        { url: '/legal', priority: '0.3', changefreq: 'monthly' },
+        { url: '/privacy', priority: '0.3', changefreq: 'monthly' },
+      ];
+
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+      // Add static pages
+      staticPages.forEach(page => {
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
+        xml += `    <lastmod>${today}</lastmod>\n`;
+        xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+        xml += `    <priority>${page.priority}</priority>\n`;
+        xml += `  </url>\n`;
+      });
+
+      // Add dynamic SEO pages
+      (seoPages || []).forEach(page => {
+        const lastmod = page.updated_at ? page.updated_at.split('T')[0] : today;
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/${page.slug}</loc>\n`;
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.9</priority>\n`;
+        xml += `  </url>\n`;
+      });
+
+      xml += `</urlset>`;
+
+      res.header('Content-Type', 'application/xml');
+      res.send(xml);
+    } catch (err) {
+      console.error("Error generating sitemap:", err);
+      res.status(500).send('Error generating sitemap');
+    }
+  });
 
   // Serve public directory (sitemap.xml, robots.txt, etc.)
   app.use(express.static(path.join(__dirname, "public")));
