@@ -2,8 +2,10 @@ User-agent: *
 Allow: /
 Disallow: /dashboard
 Disallow: /invoices
+Disallow: /invoices/
 Disallow: /clients
 Disallow: /settings
-Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/facty/
 
 Sitemap: https://factyapp.logonova.site/sitemap.xml
