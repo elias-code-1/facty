@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
+import { SEO_PAGES } from '../src/data/seoPages'
 
 export default async function handler(
   req: VercelRequest,
@@ -17,37 +18,45 @@ export default async function handler(
       }
     )
 
-    // Récupérer uniquement les pages publiées
-    const { data: seoPages, error } =
+    // Récupérer les pages publiées en base de données
+    const { data: dbSeoPages, error } =
       await supabase
         .from('seo_pages')
         .select('slug, updated_at')
         .eq('is_published', true)
-        .order('created_at', {
-          ascending: false
-        })
 
     if (error) {
-      console.error('Sitemap error:', error)
+      console.error('Sitemap error fetching DB pages:', error)
     }
+
+    // Fusionner les pages locales (hardcoded) et les pages en base de données
+    // On utilise un Map pour éviter les doublons de slugs
+    const allSeoPagesMap = new Map<string, string | null>()
+
+    // 1. Ajouter les pages locales (considérées comme publiées)
+    SEO_PAGES.forEach(page => {
+      allSeoPagesMap.set(page.slug, null)
+    })
+
+    // 2. Ajouter/Écraser avec les pages de la DB (qui ont une date de mise à jour)
+    if (dbSeoPages) {
+      dbSeoPages.forEach(page => {
+        allSeoPagesMap.set(page.slug, page.updated_at)
+      })
+    }
+
+    const seoPagesArray = Array.from(allSeoPagesMap.entries()).map(([slug, updated_at]) => ({
+      slug,
+      updated_at
+    }))
 
     // Pages statiques fixes
     const staticPages = [
-      {
-        url: '/',
-        priority: '1.0',
-        changefreq: 'weekly'
-      },
-      {
-        url: '/auth',
-        priority: '0.8',
-        changefreq: 'monthly'
-      },
-      {
-        url: '/contact',
-        priority: '0.7',
-        changefreq: 'monthly'
-      },
+      { url: '/', priority: '1.0', changefreq: 'weekly' },
+      { url: '/auth', priority: '0.8', changefreq: 'monthly' },
+      { url: '/contact', priority: '0.7', changefreq: 'monthly' },
+      { url: '/legal', priority: '0.5', changefreq: 'monthly' },
+      { url: '/privacy', priority: '0.5', changefreq: 'monthly' },
     ]
 
     const baseUrl = 'https://factyapp.logonova.site'
@@ -61,7 +70,7 @@ ${staticPages.map(page => `  <url>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
   </url>`).join('\n')}
-${(seoPages ?? []).map(page => `  <url>
+${seoPagesArray.map(page => `  <url>
     <loc>${baseUrl}/${page.slug}</loc>
     <lastmod>${
       page.updated_at
