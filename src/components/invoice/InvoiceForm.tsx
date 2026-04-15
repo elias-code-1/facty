@@ -54,7 +54,7 @@ export default function InvoiceForm({
               className="text-xs md:text-sm font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5"
             >
               <Plus size={16} />
-              Nouveau client
+              <span>Nouveau client</span>
             </button>
           </div>
 
@@ -250,7 +250,7 @@ export default function InvoiceForm({
                 min="0"
                 max="100"
                 value={formData.tax_rate}
-                onChange={(e) => onChange({ tax_rate: isNaN(Number(e.target.value)) ? 0 : Number(e.target.value) })}
+                onChange={(e) => onChange({ tax_rate: e.target.value === '' ? '' as any : (isNaN(Number(e.target.value)) ? 0 : Number(e.target.value)) })}
                 className="w-16 md:w-20 border border-slate-200 rounded-lg px-2 md:px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 outline-none text-right font-bold text-sm md:text-base"
               />
               <span className="text-sm font-bold text-slate-800 w-20 md:w-24 text-right">

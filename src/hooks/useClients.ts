@@ -37,7 +37,7 @@ export function useClients(user: User | null) {
   }, [user]);
 
   const createClient = async (data: Omit<Client, 'id' | 'user_id' | 'created_at'>) => {
-    if (!user) return;
+    if (!user) return null;
     try {
       const { data: newClient, error } = await supabase
         .from('clients')
@@ -57,6 +57,7 @@ export function useClients(user: User | null) {
       });
 
       await fetchClients();
+      return newClient;
     } catch (err) {
       console.error('Erreur lors de la création du client:', err);
       throw err;

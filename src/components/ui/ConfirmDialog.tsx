@@ -46,7 +46,7 @@ export default function ConfirmDialog({
             disabled={loading}
             className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 disabled:opacity-50"
           >
-            Annuler
+            <span>Annuler</span>
           </button>
           <button
             onClick={onConfirm}
@@ -58,7 +58,7 @@ export default function ConfirmDialog({
             } disabled:opacity-50`}
           >
             {loading && <Loader2 size={16} className="animate-spin" />}
-            {confirmLabel}
+            <span>{confirmLabel}</span>
           </button>
         </div>
       </div>

@@ -141,7 +141,7 @@ export default function InvoiceActions({
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
               >
                 <Send size={16} />
-                Marquer comme envoyée
+                <span>Marquer comme envoyée</span>
               </button>
             )}
 
@@ -152,14 +152,14 @@ export default function InvoiceActions({
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 transition-colors"
                 >
                   <CheckCircle size={16} />
-                  Marquer comme payée
+                  <span>Marquer comme payée</span>
                 </button>
                 <button
                   onClick={() => { onStatusChange('cancelled'); setIsDropdownOpen(false); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-red-50 hover:text-red-600 transition-colors"
                 >
                   <XCircle size={16} />
-                  Annuler la facture
+                  <span>Annuler la facture</span>
                 </button>
               </>
             )}
@@ -170,7 +170,7 @@ export default function InvoiceActions({
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
               >
                 <RefreshCw size={16} />
-                Remettre en brouillon
+                <span>Remettre en brouillon</span>
               </button>
             )}
 
@@ -188,7 +188,7 @@ export default function InvoiceActions({
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
               <Trash2 size={16} />
-              Supprimer la facture
+              <span>Supprimer la facture</span>
             </button>
           </motion.div>
         )}

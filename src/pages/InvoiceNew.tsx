@@ -139,10 +139,13 @@ export default function InvoiceNew() {
 
     setNewClientLoading(true);
     try {
-      await createClient(newClientData);
+      const newClient = await createClient(newClientData);
       showToast('Client créé avec succès !', 'success');
       setIsNewClientModalOpen(false);
       setNewClientData({ name: '', email: '', phone: '', address: '' });
+      if (newClient) {
+        setFormData(prev => ({ ...prev, client_id: newClient.id }));
+      }
     } catch (err) {
       showToast('Erreur lors de la création du client.', 'error');
     } finally {
@@ -184,7 +187,7 @@ export default function InvoiceNew() {
             className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all disabled:opacity-50"
           >
             <Save size={18} />
-            Sauvegarder brouillon
+            <span>Sauvegarder brouillon</span>
           </button>
           <button
             onClick={() => handleSave(formData.status === 'draft' ? 'sent' : formData.status)}
@@ -192,7 +195,7 @@ export default function InvoiceNew() {
             className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
           >
             {saving ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-            {formData.status === 'draft' ? 'Finaliser & Envoyer' : 'Enregistrer'}
+            <span>{formData.status === 'draft' ? 'Finaliser & Envoyer' : 'Enregistrer'}</span>
           </button>
         </div>
       </div>
@@ -205,7 +208,7 @@ export default function InvoiceNew() {
           className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-slate-600 bg-slate-50 rounded-xl active:bg-slate-100 transition-all disabled:opacity-50"
         >
           <Save size={18} />
-          Brouillon
+          <span>Brouillon</span>
         </button>
         <button
           onClick={() => handleSave(formData.status === 'draft' ? 'sent' : formData.status)}
@@ -213,7 +216,7 @@ export default function InvoiceNew() {
           className="flex-[2] flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-indigo-600 rounded-xl active:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
         >
           {saving ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-          {formData.status === 'draft' ? 'Finaliser' : 'Enregistrer'}
+          <span>{formData.status === 'draft' ? 'Finaliser' : 'Enregistrer'}</span>
         </button>
       </div>
 
@@ -329,7 +332,7 @@ export default function InvoiceNew() {
               onClick={() => setIsNewClientModalOpen(false)}
               className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
             >
-              Annuler
+              <span>Annuler</span>
             </button>
             <button
               type="submit"
@@ -337,7 +340,7 @@ export default function InvoiceNew() {
               className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-indigo-700 transition-all disabled:opacity-50"
             >
               {newClientLoading && <Loader2 size={18} className="animate-spin" />}
-              Créer le client
+              <span>Créer le client</span>
             </button>
           </div>
         </form>

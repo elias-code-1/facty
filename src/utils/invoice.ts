@@ -8,10 +8,10 @@ export const generateInvoiceNumber = (count: number): string => {
 
 /** Calcule les totaux d'une facture */
 export const calculateTotals = (items: { quantity: number; unit_price: number }[], taxRate: number) => {
-  const safeTaxRate = isNaN(taxRate) ? 0 : taxRate;
+  const safeTaxRate = isNaN(Number(taxRate)) ? 0 : Number(taxRate);
   const subtotal = items.reduce((acc, item) => {
-    const q = isNaN(item.quantity) ? 0 : item.quantity;
-    const p = isNaN(item.unit_price) ? 0 : item.unit_price;
+    const q = isNaN(Number(item.quantity)) ? 0 : Number(item.quantity);
+    const p = isNaN(Number(item.unit_price)) ? 0 : Number(item.unit_price);
     return acc + (q * p);
   }, 0);
   

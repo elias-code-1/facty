@@ -196,14 +196,14 @@ export default function InvoiceDetail() {
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 text-slate-600 font-semibold hover:bg-slate-50 rounded-xl transition-all"
           >
             <ArrowLeft size={20} />
-            Retour aux factures
+            <span>Retour aux factures</span>
           </button>
           <button
             onClick={() => window.location.reload()}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
           >
             <RefreshCw size={20} />
-            Réessayer
+            <span>Réessayer</span>
           </button>
         </div>
       </div>

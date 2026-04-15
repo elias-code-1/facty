@@ -35,13 +35,20 @@ export default function ItemsTable({ items, onChange, currency }: ItemsTableProp
     if (field === 'description') {
       item.description = value as string;
     } else {
-      const numValue = isNaN(Number(value)) ? 0 : Number(value);
-      if (field === 'quantity') item.quantity = numValue;
-      if (field === 'unit_price') item.unit_price = numValue;
-      
-      const q = isNaN(item.quantity) ? 0 : item.quantity;
-      const p = isNaN(item.unit_price) ? 0 : item.unit_price;
-      item.total = q * p;
+      // Allow empty string to let user clear the input
+      if (value === '') {
+        if (field === 'quantity') item.quantity = '' as any;
+        if (field === 'unit_price') item.unit_price = '' as any;
+        item.total = 0;
+      } else {
+        const numValue = isNaN(Number(value)) ? 0 : Number(value);
+        if (field === 'quantity') item.quantity = numValue;
+        if (field === 'unit_price') item.unit_price = numValue;
+        
+        const q = isNaN(Number(item.quantity)) ? 0 : Number(item.quantity);
+        const p = isNaN(Number(item.unit_price)) ? 0 : Number(item.unit_price);
+        item.total = q * p;
+      }
     }
 
     newItems[index] = item;
@@ -175,7 +182,7 @@ export default function ItemsTable({ items, onChange, currency }: ItemsTableProp
         className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all disabled:opacity-50"
       >
         <Plus size={18} />
-        Ajouter une ligne
+        <span>Ajouter une ligne</span>
       </button>
     </div>
   );
