@@ -197,8 +197,8 @@ export default function Invoices() {
           <div className="p-2 bg-green-50 text-green-500 rounded-lg w-fit mb-3 md:mb-4">
             <CheckCircle2 size={18} className="md:w-5 md:h-5" />
           </div>
-          <p className="text-lg md:text-2xl font-bold text-slate-800 truncate" title={formatCurrency(stats.paidTotal, profile?.currency || 'FCFA')}>
-            {formatCurrency(stats.paidTotal, profile?.currency || 'FCFA')}
+          <p className="text-lg md:text-2xl font-bold text-slate-800 truncate" title={formatCurrency(stats.paidTotal, profile?.currency || 'EUR')}>
+            {formatCurrency(stats.paidTotal, profile?.currency || 'EUR')}
           </p>
           <p className="text-[10px] md:text-sm text-slate-500">{stats.paidCount} payée{stats.paidCount > 1 ? 's' : ''}</p>
         </div>
@@ -206,8 +206,8 @@ export default function Invoices() {
           <div className="p-2 bg-blue-50 text-blue-500 rounded-lg w-fit mb-3 md:mb-4">
             <RefreshCw size={18} className="md:w-5 md:h-5 animate-spin-slow" />
           </div>
-          <p className="text-lg md:text-2xl font-bold text-slate-800 truncate" title={formatCurrency(stats.pendingTotal, profile?.currency || 'FCFA')}>
-            {formatCurrency(stats.pendingTotal, profile?.currency || 'FCFA')}
+          <p className="text-lg md:text-2xl font-bold text-slate-800 truncate" title={formatCurrency(stats.pendingTotal, profile?.currency || 'EUR')}>
+            {formatCurrency(stats.pendingTotal, profile?.currency || 'EUR')}
           </p>
           <p className="text-[10px] md:text-sm text-slate-500">{stats.pendingCount} en attente</p>
         </div>
@@ -291,7 +291,7 @@ export default function Invoices() {
                             </div>
                           </td>
                           <td className="px-6 py-4 font-bold text-slate-800">
-                            {formatCurrency(inv.total, profile?.currency || 'FCFA')}
+                            {formatCurrency(inv.total, inv.currency)}
                           </td>
                           <td className="px-6 py-4">
                             <InvoiceStatusSelect 
@@ -390,7 +390,7 @@ export default function Invoices() {
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-slate-900">
-                        {formatCurrency(inv.total, profile?.currency || 'FCFA')}
+                        {formatCurrency(inv.total, inv.currency)}
                       </span>
                       <span className="text-[10px] text-slate-400">{formatDate(inv.issue_date)}</span>
                     </div>

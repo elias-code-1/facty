@@ -1,4 +1,4 @@
-const CACHE_NAME = 'facty-cache-v3';
+const CACHE_NAME = 'facty-cache-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -6,7 +6,7 @@ const ASSETS_TO_CACHE = [
   '/favicon.ico',
   '/Icon192.png',
   '/Icon512.png',
-  '/apple-touch-icon.png'
+  '/Icon180.png'
 ];
 
 // Install event - caching assets

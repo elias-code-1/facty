@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Save, Send, ChevronLeft, Layout, FileText, UserPlus, Loader2 } from 'lucide-react';
+import { InvoiceStatus } from '../types/database';
 import { useAuth } from '../hooks/useAuth';
 import { useProfile } from '../hooks/useProfile';
 import { useClients } from '../hooks/useClients';
@@ -82,7 +83,7 @@ export default function InvoiceNew() {
     clients.find(c => c.id === formData.client_id) || null
   , [clients, formData.client_id]);
 
-  const validateForm = (status: 'draft' | 'sent') => {
+  const validateForm = (status: InvoiceStatus) => {
     // Pour un brouillon, on est plus souple
     if (status === 'draft') {
       if (!formData.invoice_number) return 'Le numéro de facture est requis.';
@@ -100,7 +101,7 @@ export default function InvoiceNew() {
     return null;
   };
 
-  const handleSave = async (status: 'draft' | 'sent') => {
+  const handleSave = async (status: InvoiceStatus) => {
     const error = validateForm(status);
     if (error) {
       showToast(error, 'error');
@@ -186,12 +187,12 @@ export default function InvoiceNew() {
             Sauvegarder brouillon
           </button>
           <button
-            onClick={() => handleSave('sent')}
+            onClick={() => handleSave(formData.status === 'draft' ? 'sent' : formData.status)}
             disabled={saving}
             className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
           >
             {saving ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-            Finaliser
+            {formData.status === 'draft' ? 'Finaliser & Envoyer' : 'Enregistrer'}
           </button>
         </div>
       </div>
@@ -207,12 +208,12 @@ export default function InvoiceNew() {
           Brouillon
         </button>
         <button
-          onClick={() => handleSave('sent')}
+          onClick={() => handleSave(formData.status === 'draft' ? 'sent' : formData.status)}
           disabled={saving}
           className="flex-[2] flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-indigo-600 rounded-xl active:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
         >
           {saving ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-          Finaliser
+          {formData.status === 'draft' ? 'Finaliser' : 'Enregistrer'}
         </button>
       </div>
 

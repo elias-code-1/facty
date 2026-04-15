@@ -109,23 +109,23 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
         </div>
 
         {/* TABLEAU DES PRESTATIONS */}
-        <div className="mb-10 overflow-hidden rounded-2xl border border-slate-200" style={{ borderColor: '#e2e8f0' }}>
-          <table className="w-full border-collapse">
+        <div className="mb-10 overflow-x-auto rounded-2xl border border-slate-200" style={{ borderColor: '#e2e8f0' }}>
+          <table className="w-full border-collapse min-w-[600px] md:min-w-full">
             <thead>
               <tr className="bg-slate-800 text-white" style={{ backgroundColor: '#1e293b', color: '#ffffff' }}>
-                <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-widest">Description</th>
-                <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-widest w-24">Qté</th>
-                <th className="text-right px-6 py-4 text-xs font-bold uppercase tracking-widest w-40">Prix unit.</th>
-                <th className="text-right px-6 py-4 text-xs font-bold uppercase tracking-widest w-40">Total</th>
+                <th className="text-left px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold uppercase tracking-widest">Description</th>
+                <th className="text-center px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold uppercase tracking-widest w-16 md:w-24">Qté</th>
+                <th className="text-right px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold uppercase tracking-widest w-32 md:w-40">Prix unit.</th>
+                <th className="text-right px-4 md:px-6 py-4 text-[10px] md:text-xs font-bold uppercase tracking-widest w-32 md:w-40">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100" style={{ borderColor: '#f1f5f9' }}>
               {invoice.items.map((item, index) => (
                 <tr key={item.id} className={index % 2 === 1 ? 'bg-slate-50/30' : 'bg-white'} style={{ backgroundColor: index % 2 === 1 ? '#f8fafc' : '#ffffff' }}>
-                  <td className="px-6 py-5 text-sm text-slate-700 font-medium" style={{ color: '#334155' }}>{item.description}</td>
-                  <td className="px-6 py-5 text-sm text-slate-500 text-center" style={{ color: '#64748b' }}>{item.quantity}</td>
-                  <td className="px-6 py-5 text-sm text-slate-500 text-right" style={{ color: '#64748b' }}>{formatCurrency(item.unit_price, invoice.currency)}</td>
-                  <td className="px-6 py-5 text-sm text-slate-900 font-bold text-right" style={{ color: '#0f172a' }}>{formatCurrency(item.total, invoice.currency)}</td>
+                  <td className="px-4 md:px-6 py-4 md:py-5 text-xs md:text-sm text-slate-700 font-medium" style={{ color: '#334155' }}>{item.description}</td>
+                  <td className="px-4 md:px-6 py-4 md:py-5 text-xs md:text-sm text-slate-500 text-center" style={{ color: '#64748b' }}>{item.quantity}</td>
+                  <td className="px-4 md:px-6 py-4 md:py-5 text-xs md:text-sm text-slate-500 text-right whitespace-nowrap" style={{ color: '#64748b' }}>{formatCurrency(item.unit_price, invoice.currency)}</td>
+                  <td className="px-4 md:px-6 py-4 md:py-5 text-xs md:text-sm text-slate-900 font-bold text-right whitespace-nowrap" style={{ color: '#0f172a' }}>{formatCurrency(item.total, invoice.currency)}</td>
                 </tr>
               ))}
             </tbody>
