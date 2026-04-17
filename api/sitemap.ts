@@ -1,14 +1,15 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
 import { SEO_PAGES } from '../src/data/seoPages'
 
 export default async function handler(
-  req: any,
-  res: any
+  req: VercelRequest,
+  res: VercelResponse
 ) {
   try {
     const supabase = createClient(
-      process.env.VITE_SUPABASE_URL || '',
-      process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+      process.env.VITE_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
       {
         auth: {
           autoRefreshToken: false,
@@ -91,7 +92,8 @@ ${seoPagesArray.map(page => `  <url>
   } catch (err) {
     console.error('Sitemap generation error:', err)
     return res.status(500).send(
-      '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>'
+      '<?xml version="1.0" encoding="UTF-8"?>' +
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>'
     )
   }
 }
