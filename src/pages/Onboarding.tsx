@@ -33,27 +33,29 @@ export default function Onboarding() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const hasRedirected = useRef(false);
+
   useEffect(() => {
-    if (profile) {
-      setFullName(profile.full_name || '');
-      setPhone(profile.phone || '');
-      setAddress(profile.address || '');
-      setCompanyName(profile.company_name || '');
-      setCurrency(profile.currency || 'FCFA');
-      
-      // Si le profil est déjà complet, on redirige vers le dashboard
-      // On utilise trim() pour être sûr qu'il y a du contenu réel
-      const isComplete = profile.full_name?.trim() && profile.company_name?.trim();
-      
-      if (isComplete) {
-        // Petit délai pour laisser l'utilisateur voir le succès s'il vient de valider
-        const timer = setTimeout(() => {
-          navigate('/dashboard');
-        }, 500);
-        return () => clearTimeout(timer);
-      }
+    if (!profile || hasRedirected.current) return;
+
+    setFullName(profile.full_name || '');
+    setPhone(profile.phone || '');
+    setAddress(profile.address || '');
+    setCompanyName(profile.company_name || '');
+    setCurrency(profile.currency || 'FCFA');
+
+    const isComplete =
+      profile.full_name?.trim() &&
+      profile.company_name?.trim();
+
+    if (isComplete) {
+      hasRedirected.current = true;
+      const timer = setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [profile, navigate]);
+  }, [profile?.id, profile?.full_name, profile?.company_name, navigate]);
 
   const handleNext = () => {
     if (step === 1 && !fullName) {

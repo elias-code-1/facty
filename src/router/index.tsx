@@ -58,32 +58,71 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const fetchMaintenance = async () => {
-      const { data } = await supabase
-        .from('platform_settings')
-        .select('key, value')
-        .in('key', [
-          'maintenance_enabled',
-          'maintenance_title',
-          'maintenance_message'
+      try {
+        const timeoutPromise = new Promise<null>(
+          (resolve) => setTimeout(() => resolve(null), 5000)
+        );
+
+        const fetchPromise = supabase
+          .from('platform_settings')
+          .select('key, value')
+          .in('key', [
+            'maintenance_enabled',
+            'maintenance_title',
+            'maintenance_message'
+          ]);
+
+        const result = await Promise.race([
+          fetchPromise,
+          timeoutPromise
         ]);
 
-      if (data) {
-        const map = data.reduce((acc, s) => ({
-          ...acc, [s.key]: s.value
-        }), {} as Record<string, string>);
-
-        setMaintenanceMode(
-          map['maintenance_enabled'] === 'true'
-        );
-        setMaintenanceData({
-          title: map['maintenance_title'] ?? 'Maintenance en cours',
-          message: map['maintenance_message'] ?? ''
-        });
+        if (result && 'data' in result && result.data) {
+          const map: Record<string, string> = result.data.reduce(
+            (acc: Record<string, string>, s: any) => ({
+              ...acc, [s.key]: s.value
+            }), {} as Record<string, string>
+          );
+          setMaintenanceMode(
+            map['maintenance_enabled'] === 'true'
+          );
+          setMaintenanceData({
+            title: map['maintenance_title'] ?? 'Maintenance en cours',
+            message: map['maintenance_message'] ?? ''
+          });
+        }
+      } catch (err) {
+        // En cas d'erreur → pas de maintenance
+        // L'app reste accessible
+        console.warn('Impossible de charger les settings maintenance:', err);
+      } finally {
+        // TOUJOURS débloquer après 5s max
+        setSettingsLoading(false);
       }
-      setSettingsLoading(false);
     };
 
     fetchMaintenance();
+
+    // Écouter les changements en temps réel
+    const channel = supabase
+      .channel('maintenance_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'platform_settings',
+          filter: 'key=eq.maintenance_enabled'
+        },
+        (payload) => {
+          setMaintenanceMode(payload.new.value === 'true');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Vérification des variables d'environnement (pour le preview AI Studio)
@@ -202,26 +241,26 @@ export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Routes publiques */}
+        {/* Routes publiques FIXES - AVANT le catch-all */}
         <Route path="/" element={<Landing />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/legal" element={<Legal />} />
         <Route path="/privacy" element={<Privacy />} />
-        
-        {/* SEO Landing Pages Dynamiques (Catch-all) */}
-        <Route path="/:slug" element={<SEOLanding />} />
 
-        <Route path="/auth" element={<Auth />} />
+        {/* Route admin login - AVANT le catch-all */}
+        <Route
+          path="/admin/facty/login"
+          element={<AdminLogin />}
+        />
+
+        {/* Routes protégées user - AVANT le catch-all */}
         <Route path="/onboarding" element={
           <PrivateRoute>
             <Onboarding />
           </PrivateRoute>
         } />
-        
-        {/* Route publique admin */}
-        <Route path="/admin/facty/login" element={<AdminLogin />} />
-        
-        {/* Routes protégées (Utilisateur standard) */}
+
         <Route element={
           <PrivateRoute>
             <ErrorBoundary>
@@ -236,10 +275,9 @@ export const AppRouter = () => {
           <Route path="/invoices/:id/edit" element={<InvoiceEdit />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/settings" element={<Settings />} />
-          {/* <Route path="/" element={<Navigate to="/dashboard" replace />} /> */}
         </Route>
 
-        {/* Routes Admin */}
+        {/* Routes admin - AVANT le catch-all */}
         <Route element={<AdminRoute />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin/facty" element={<AdminDashboard />} />
@@ -261,10 +299,13 @@ export const AppRouter = () => {
           </Route>
         </Route>
 
-        {/* Routes d'erreurs */}
+        {/* Erreurs fixes - AVANT le catch-all */}
         <Route path="/error/:code" element={<ErrorPage />} />
 
-        {/* Fallback */}
+        {/* SEO catch-all - EN DERNIER */}
+        <Route path="/:slug" element={<SEOLanding />} />
+
+        {/* Fallback 404 */}
         <Route path="*" element={<ErrorPage defaultCode="404" />} />
       </Routes>
     </BrowserRouter>
