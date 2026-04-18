@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Printer, 
   Download, 
@@ -8,7 +9,7 @@ import {
   Send, 
   XCircle, 
   RefreshCw,
-  ChevronDown
+  Edit2
 } from 'lucide-react';
 import { Invoice } from '../../types/database';
 import { useToast } from '../../hooks/useToast';
@@ -42,6 +43,7 @@ export default function InvoiceActions({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   // Fermer le dropdown au clic à l'extérieur
   useEffect(() => {
@@ -54,8 +56,28 @@ export default function InvoiceActions({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const canEdit = invoice.status !== 'paid' && invoice.status !== 'cancelled';
+
   return (
     <div className={`flex items-center gap-2 md:gap-3 no-print ${isMobile ? 'w-full' : ''}`}>
+      {/* Bouton Modifier */}
+      {canEdit && (
+        <motion.button
+          initial={{ opacity: 0, x: 12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.04 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
+          className={`flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-indigo-600 transition-all shadow-sm no-print ${
+            isMobile ? 'flex-1' : ''
+          }`}
+        >
+          <Edit2 size={18} />
+          <span className={isMobile ? 'inline' : 'hidden sm:inline'}>Modifier</span>
+        </motion.button>
+      )}
+
       {/* Bouton Imprimer */}
       {onPrint && (
         <motion.button

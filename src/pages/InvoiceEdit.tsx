@@ -71,7 +71,9 @@ export default function InvoiceEdit() {
 
         // Vérifier si la facture est modifiable (pas payée/annulée)
         if (data.status === 'paid' || data.status === 'cancelled') {
-          throw new Error('Cette facture est verrouillée et ne peut plus être modifiée.');
+          navigate(`/invoices/${id}`, { replace: true });
+          showToast('Cette facture ne peut pas être modifiée', 'error');
+          return;
         }
 
         setFormData({
@@ -100,7 +102,7 @@ export default function InvoiceEdit() {
     };
 
     loadInvoice();
-  }, [id, user, getInvoiceWithItems]);
+  }, [id, user, getInvoiceWithItems, navigate, showToast]);
 
   const selectedClient = useMemo(() => 
     clients.find(c => c.id === formData.client_id) || null
@@ -202,41 +204,25 @@ export default function InvoiceEdit() {
 
         <div className="hidden md:flex items-center gap-3">
           <button
-            onClick={() => handleSave('draft')}
-            disabled={saving}
-            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all disabled:opacity-50"
-          >
-            <Save size={18} />
-            Enregistrer brouillon
-          </button>
-          <button
-            onClick={() => handleSave('sent')}
+            onClick={() => handleSave(formData.status as any)}
             disabled={saving}
             className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
           >
-            {saving ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-            Mettre à jour & Envoyer
+            {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+            Sauvegarder les modifications
           </button>
         </div>
       </div>
 
       {/* Fixed Action Bar (Mobile Only) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-40 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 z-40 flex shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         <button
-          onClick={() => handleSave('draft')}
+          onClick={() => handleSave(formData.status as any)}
           disabled={saving}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-slate-600 bg-slate-50 rounded-xl active:bg-slate-100 transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-indigo-600 rounded-xl active:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
         >
-          <Save size={18} />
-          Brouillon
-        </button>
-        <button
-          onClick={() => handleSave('sent')}
-          disabled={saving}
-          className="flex-[2] flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-indigo-600 rounded-xl active:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
-        >
-          {saving ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-          Mettre à jour
+          {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+          Sauvegarder les modifications
         </button>
       </div>
 
