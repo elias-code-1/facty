@@ -37,12 +37,21 @@ export function useAdminPlatform() {
   const updateSetting = async (key: string, value: string) => {
     try {
       if (!user) throw new Error("Utilisateur non connecté");
+      const { data: { session } } = await supabase.auth.getSession();
       
-      const { error } = await supabase
-        .from('platform_settings')
-        .upsert({ key, value }, { onConflict: 'key' });
+      const response = await fetch('/api/admin/update-setting', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ key, value })
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Erreur lors de la mise à jour');
+      }
 
       setSettings(prev => ({ ...prev, [key]: value }));
     } catch (err) {

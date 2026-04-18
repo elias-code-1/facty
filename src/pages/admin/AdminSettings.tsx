@@ -125,6 +125,21 @@ export default function AdminSettings() {
 
   return (
     <div className="space-y-8 pb-12">
+      {/* NOUVELLE VERSION ANNONCE */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-xl shadow-sm mb-4"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-xl">🚀</span>
+          <div>
+            <h3 className="text-indigo-800 font-bold text-sm">Ceci est la nouvelle version !</h3>
+            <p className="text-indigo-600 text-xs mt-0.5">La mise à jour des paramètres utilise maintenant l'API Serverless Vercel sans bloquage de sécurité RLS.</p>
+          </div>
+        </div>
+      </motion.div>
+
       {/* En-tête */}
       <div>
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Paramètres plateforme</h1>
