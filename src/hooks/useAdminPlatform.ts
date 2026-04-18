@@ -10,29 +10,21 @@ export function useAdminPlatform() {
   const fetchSettings = useCallback(async () => {
     try {
       setLoading(true);
-      // Utiliser l'API publique pour éviter les problèmes de RLS en lecture
-      const response = await fetch('/api/settings-public');
-      if (!response.ok) throw new Error('Erreur lors de la récupération des paramètres');
+      const { data, error } = await supabase
+        .from('platform_settings')
+        .select('*');
+        
+      if (error) throw error;
       
-      const settingsMap = await response.json();
-      setSettings(settingsMap);
+      if (data) {
+        const settingsMap = data.reduce((acc, s) => ({
+          ...acc,
+          [s.key]: s.value
+        }), {} as Record<string, string>);
+        setSettings(settingsMap);
+      }
     } catch (err) {
       console.error('Erreur fetchSettings:', err);
-      // Fallback sur Supabase au cas où
-      try {
-        const { data, error } = await supabase
-          .from('platform_settings')
-          .select('*');
-        if (!error && data) {
-          const settingsMap = (data || []).reduce((acc, s) => ({
-            ...acc,
-            [s.key]: s.value
-          }), {} as Record<string, string>);
-          setSettings(settingsMap);
-        }
-      } catch (e) {
-        console.error('Fallback fetchSettings failed:', e);
-      }
     } finally {
       setLoading(false);
     }
@@ -44,21 +36,13 @@ export function useAdminPlatform() {
 
   const updateSetting = async (key: string, value: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      if (!user) throw new Error("Utilisateur non connecté");
       
-      const response = await fetch('/api/admin/update-setting', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
-        },
-        body: JSON.stringify({ key, value })
-      });
+      const { error } = await supabase
+        .from('platform_settings')
+        .upsert({ key, value }, { onConflict: 'key' });
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || 'Erreur lors de la mise à jour');
-      }
+      if (error) throw error;
 
       setSettings(prev => ({ ...prev, [key]: value }));
     } catch (err) {
