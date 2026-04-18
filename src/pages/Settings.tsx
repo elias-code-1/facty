@@ -120,17 +120,6 @@ export default function Settings() {
 
   return (
     <div className="max-w-4xl mx-auto pb-24 md:pb-20">
-      {/* NOUVELLE VERSION ANNONCE */}
-      <div className="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-r-xl shadow-sm mb-6">
-        <div className="flex items-center gap-3">
-          <span className="text-xl">🚀</span>
-          <div>
-            <h3 className="text-indigo-800 font-bold text-sm">Ceci est la nouvelle version !</h3>
-            <p className="text-indigo-600 text-xs mt-0.5">L'enregistrement de vos paramètres est réparé et pleinement fonctionnel.</p>
-          </div>
-        </div>
-      </div>
-
       <div className="mb-8">
         <h1 className="text-xl md:text-2xl xl:text-3xl font-bold text-slate-800">Paramètres</h1>
         <p className="text-xs md:text-sm text-slate-500">Gérez vos informations personnelles et celles de votre entreprise</p>
