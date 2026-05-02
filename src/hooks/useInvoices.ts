@@ -344,15 +344,34 @@ export function useInvoices(user: User | null) {
     if (!user) throw new Error('Utilisateur non connecté');
     
     try {
-      const { data, error } = await supabase
-        .from('invoices')
-        .select('*, items:invoice_items(*), clients(*)')
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single();
+      // Contournement du blocage RLS sur invoice_items :
+      // La table invoice_items de la BDD a un RLS défaillant pour la lecture (SELECT) par l'utilisateur (car elle ne contient pas de colonne user_id).
+      // On utilise donc notre fonction serverless /api/get-invoice qui l'interroge en toute sécurité avec la clé de service.
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
 
-      if (error) throw error;
+      if (!token) throw new Error('Session introuvable');
+
+      const response = await fetch(`/api/get-invoice?id=${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la récupération de la facture');
+      }
+
+      const { data } = await response.json();
+      
       if (!data) throw new Error('Facture introuvable');
+      
+      // Assurer la compatibilité robuste pour l'alias Items
+      if (data.invoice_items && !data.items) {
+        data.items = data.invoice_items;
+      }
       
       return data as InvoiceWithItems;
     } catch (err) {

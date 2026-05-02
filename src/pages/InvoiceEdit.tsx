@@ -77,22 +77,30 @@ export default function InvoiceEdit() {
         }
 
         setFormData({
-          client_id: data.client_id,
+          client_id: data.client_id || '',
           invoice_number: data.invoice_number,
           status: data.status,
-          currency: data.currency,
+          currency: data.currency || 'FCFA',
           issue_date: data.issue_date,
           due_date: data.due_date,
           notes: data.notes || '',
-          tax_rate: data.tax_rate,
+          tax_rate: data.tax_rate || 0,
         });
 
-        setItems(data.items.map(item => ({
-          description: item.description,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          total: item.total
-        })));
+        // Supabase retourne parfois les relations sans appliquer l'alias dans de rares cas on gère les deux.
+        const sourceItems = data.items || (data as any).invoice_items || [];
+        
+        if (sourceItems.length > 0) {
+          setItems(sourceItems.map((item: any) => ({
+            description: item.description || '',
+            quantity: item.quantity || 1,
+            unit_price: item.unit_price || 0,
+            total: item.total || 0
+          })));
+        } else {
+          // Fallback s'il n'y a vraiment aucune prestation
+          setItems([{ description: '', quantity: 1, unit_price: 0, total: 0 }]);
+        }
 
       } catch (err: any) {
         setError(err.message);
