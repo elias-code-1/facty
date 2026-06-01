@@ -72,7 +72,7 @@ export default function SecuritySection({ content }: { content: Record<string, a
               className="relative z-10"
             >
               <img 
-                src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1000" 
+                src="/securite.avif" 
                 alt="Security" 
                 className="rounded-3xl shadow-2xl border-8 border-white"
                 referrerPolicy="no-referrer"
