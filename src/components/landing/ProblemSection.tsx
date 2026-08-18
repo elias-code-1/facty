@@ -15,7 +15,7 @@ export default function ProblemSection({ content }: { content: Record<string, an
   const items = content.problem_items || defaultItems;
 
   return (
-    <section id="problem" className="bg-slate-50 py-24">
+    <section id="problem" className="bg-brand-lightGray py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           ref={ref}
@@ -24,10 +24,10 @@ export default function ProblemSection({ content }: { content: Record<string, an
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="text-center max-w-3xl mx-auto mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-geist font-extrabold text-brand-textDark mb-4">
             {content.problem_title || 'La facturation ne devrait pas être une corvée'}
           </h2>
-          <p className="text-lg text-slate-500">
+          <p className="text-lg text-brand-textMuted">
             {content.problem_subtitle || 'La plupart des indépendants perdent un temps précieux sur des tâches administratives.'}
           </p>
         </motion.div>
@@ -39,13 +39,13 @@ export default function ProblemSection({ content }: { content: Record<string, an
               initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
               transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
-              className="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-red-200 hover:border-red-400 transition-colors"
+              className="bg-brand-white rounded-2xl shadow-sm p-6 border border-brand-border hover:border-brand-redError transition-colors"
             >
-              <div className="text-red-500 mb-4">
+              <div className="text-brand-redError mb-4">
                 <DynamicIcon name={item.icon} size={36} />
               </div>
-              <h3 className="text-xl font-semibold text-slate-800 mb-2">{item.title}</h3>
-              <p className="text-slate-500">{item.description}</p>
+              <h3 className="text-xl font-geist font-semibold text-brand-textDark mb-2">{item.title}</h3>
+              <p className="text-brand-textMuted">{item.description}</p>
             </motion.div>
           ))}
         </div>
