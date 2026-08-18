@@ -21,6 +21,7 @@ import SuspendedPage from '../pages/Suspended';
 import Maintenance from '../pages/Maintenance';
 import Landing from '../pages/Landing';
 import ErrorPage from '../pages/ErrorPage';
+import Upgrade from '../pages/Upgrade';
 
 // Admin Pages
 import AdminLogin from '../pages/admin/AdminLogin';
@@ -275,6 +276,7 @@ export const AppRouter = () => {
           <Route path="/invoices/:id/edit" element={<InvoiceEdit />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/upgrade" element={<Upgrade />} />
         </Route>
 
         {/* Routes admin - AVANT le catch-all */}

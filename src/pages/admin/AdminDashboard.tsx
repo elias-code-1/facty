@@ -11,7 +11,9 @@ import {
   ArrowRight,
   User,
   AlertTriangle,
-  XCircle
+  XCircle,
+  CreditCard,
+  Crown
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAdminDashboard } from '../../hooks/useAdminDashboard';
@@ -63,6 +65,7 @@ export default function AdminDashboard() {
   const { 
     totalUsers, activeUsers, suspendedUsers, newUsersToday, newUsersThisMonth, totalTeamMembers,
     totalInvoices, totalRevenue, invoicesToday, invoicesThisMonth, pendingAmount,
+    platformRevenue, premiumUsers,
     usersGrowthByMonth, invoicesByMonth, statusDistribution,
     recentLogs, unreadNotifications, topUsers, loading 
   } = useAdminDashboard();
@@ -153,52 +156,38 @@ export default function AdminDashboard() {
 
       {/* StatCards - Uniquement pour Admin ou roles spécifiques */}
       {isOwner && (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           <AdminStatCard
             index={0}
-            title="Total utilisateurs"
-            value={totalUsers}
-            subtitle={`+${newUsersToday} aujourd'hui`}
-            icon={<Users className="w-5 h-5" />}
-            accentColor="indigo"
+            title="Revenus Facty (Pro)"
+            value={`${platformRevenue.toLocaleString()} FCFA`}
+            subtitle="Chiffre d'affaires"
+            icon={<CreditCard className="w-5 h-5 text-white" />}
+            accentColor="emerald"
           />
           <AdminStatCard
             index={1}
-            title="Membres d'équipe"
-            value={totalTeamMembers}
-            subtitle="Gérer l'équipe"
-            icon={<User className="w-5 h-5" />}
-            accentColor="blue"
+            title="Utilisateurs Premium"
+            value={premiumUsers}
+            subtitle={`${((premiumUsers / Math.max(totalUsers, 1)) * 100).toFixed(1)}% des inscrits`}
+            icon={<Crown className="w-5 h-5 text-white" />}
+            accentColor="yellow"
           />
           <AdminStatCard
             index={2}
-            title="Utilisateurs actifs"
-            value={activeUsers}
-            subtitle={`${suspendedUsers} suspendus`}
-            icon={<CheckCircle className="w-5 h-5" />}
-            accentColor="green"
+            title="Total utilisateurs"
+            value={totalUsers}
+            subtitle={`+${newUsersToday} aujourd'hui`}
+            icon={<Users className="w-5 h-5 text-white" />}
+            accentColor="indigo"
           />
           <AdminStatCard
             index={3}
-            title="Total factures"
+            title="Total factures (Plateforme)"
             value={totalInvoices}
             subtitle={`+${invoicesToday} aujourd'hui`}
-            icon={<FileText className="w-5 h-5" />}
+            icon={<FileText className="w-5 h-5 text-white" />}
             accentColor="violet"
-          />
-          <AdminStatCard
-            index={4}
-            title="Revenus totaux"
-            value={formatCurrency(totalRevenue)}
-            icon={<DollarSign className="w-5 h-5" />}
-            accentColor="green"
-          />
-          <AdminStatCard
-            index={5}
-            title="En attente"
-            value={formatCurrency(pendingAmount)}
-            icon={<Clock className="w-5 h-5" />}
-            accentColor="orange"
           />
         </div>
       )}
@@ -272,7 +261,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <h3 className="text-lg font-bold text-slate-800 mb-6">Utilisateurs les plus actifs</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-6">Utilisateurs les plus actifs (Facturation platforme)</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -280,7 +269,7 @@ export default function AdminDashboard() {
                     <th className="pb-4 pl-2">#</th>
                     <th className="pb-4">Utilisateur</th>
                     <th className="pb-4">Factures</th>
-                    <th className="pb-4">Revenus</th>
+                    <th className="pb-4">Revenus traités</th>
                     <th className="pb-4 text-right pr-2">Depuis</th>
                   </tr>
                 </thead>

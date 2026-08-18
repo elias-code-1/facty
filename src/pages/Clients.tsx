@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Plus, 
   Search, 
@@ -12,9 +13,11 @@ import {
   UserPlus, 
   Loader2, 
   X,
-  User as UserIcon
+  User as UserIcon,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useProfile } from '../hooks/useProfile';
 import { useClients, ClientWithCount } from '../hooks/useClients';
 import { useToast } from '../hooks/useToast';
 import Modal from '../components/ui/Modal';
@@ -35,6 +38,8 @@ const itemVariants = {
 /** Page de gestion des clients */
 export default function Clients() {
   const { user } = useAuth();
+  const { profile } = useProfile(user);
+  const navigate = useNavigate();
   const { clients, loading, createClient, updateClient, deleteClient } = useClients(user);
   const { showToast } = useToast();
 
@@ -52,6 +57,9 @@ export default function Clients() {
     phone: '',
     address: ''
   });
+
+  const isPremium = profile?.is_premium || profile?.role === 'admin';
+  const isClientLimitReached = !isPremium && clients.length >= 10;
 
   // Filtrage des clients
   const filteredClients = useMemo(() => {
@@ -74,11 +82,16 @@ export default function Clients() {
         phone: client.phone || '',
         address: client.address || ''
       });
+      setIsModalOpen(true);
     } else {
+      if (isClientLimitReached) {
+        showToast('Limite de 10 clients atteinte. Passez à la version Premium.', 'error');
+        return;
+      }
       setSelectedClient(null);
       setFormData({ name: '', email: '', phone: '', address: '' });
+      setIsModalOpen(true);
     }
-    setIsModalOpen(true);
   };
 
   // Soumission du formulaire
@@ -92,12 +105,15 @@ export default function Clients() {
         await updateClient(selectedClient.id, formData);
         showToast('Client mis à jour avec succès !', 'success');
       } else {
+        if (isClientLimitReached) {
+           throw new Error('Vous avez atteint la limite de clients.');
+        }
         await createClient(formData);
         showToast('Client créé avec succès !', 'success');
       }
       setIsModalOpen(false);
-    } catch (err) {
-      showToast('Une erreur est survenue.', 'error');
+    } catch (err: any) {
+      showToast(err.message || 'Une erreur est survenue.', 'error');
     } finally {
       setActionLoading(false);
     }

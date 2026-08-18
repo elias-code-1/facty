@@ -15,6 +15,9 @@ export interface AdminDashboardData {
   invoicesToday: number;
   invoicesThisMonth: number;
   pendingAmount: number;
+  
+  platformRevenue: number;
+  premiumUsers: number;
 
   usersGrowthByMonth: {
     month: string;
@@ -55,24 +58,25 @@ export interface AdminDashboardData {
 export function useAdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [rawData, setRawData] = useState<{
-    profiles: Pick<Profile, 'id' | 'created_at' | 'is_suspended' | 'role' | 'full_name' | 'email'>[];
+    profiles: Pick<Profile, 'id' | 'created_at' | 'is_suspended' | 'role' | 'full_name' | 'email' | 'is_premium'>[];
     teamMembers: any[];
     invoices: Pick<Invoice, 'id' | 'total' | 'status' | 'created_at' | 'user_id'>[];
     logs: (AuditLog & { profiles: { full_name: string; email: string } | null })[];
     notifications: AdminNotification[];
+    payments: { amount: number; status: string }[];
   }>({
     profiles: [],
     teamMembers: [],
     invoices: [],
     logs: [],
     notifications: [],
+    payments: [],
   });
 
   const fetchData = async () => {
     try {
       setLoading(true);
       
-      // Fetch team members via API to bypass RLS
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
       let teamMembersData = [];
@@ -95,10 +99,11 @@ export function useAdminDashboard() {
         profilesRes,
         invoicesRes,
         logsRes,
-        notificationsRes
+        notificationsRes,
+        paymentsRes
       ] = await Promise.all([
         supabase.from('profiles')
-          .select('id, created_at, is_suspended, role, full_name, email')
+          .select('id, created_at, is_suspended, role, full_name, email, is_premium')
           .neq('role', 'admin')
           .is('team_role', null),
 
@@ -113,7 +118,11 @@ export function useAdminDashboard() {
         supabase.from('admin_notifications')
           .select('*')
           .eq('is_read', false)
-          .order('created_at', { ascending: false })
+          .order('created_at', { ascending: false }),
+          
+        supabase.from('payments')
+          .select('amount, status')
+          .eq('status', 'SUCCESS')
       ]);
 
       setRawData({
@@ -122,6 +131,7 @@ export function useAdminDashboard() {
         invoices: invoicesRes.data || [],
         logs: (logsRes.data as any) || [],
         notifications: notificationsRes.data || [],
+        payments: paymentsRes.data || [],
       });
     } catch (err) {
       console.error('Error fetching admin dashboard data:', err);
@@ -139,15 +149,16 @@ export function useAdminDashboard() {
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // Users stats
     const totalUsers = rawData.profiles.length;
     const activeUsers = rawData.profiles.filter(p => !p.is_suspended).length;
     const suspendedUsers = rawData.profiles.filter(p => p.is_suspended).length;
     const newUsersToday = rawData.profiles.filter(p => new Date(p.created_at) >= today).length;
     const newUsersThisMonth = rawData.profiles.filter(p => new Date(p.created_at) >= firstDayOfMonth).length;
     const totalTeamMembers = rawData.teamMembers.length;
+    
+    const premiumUsers = rawData.profiles.filter(p => p.is_premium).length;
+    const platformRevenue = rawData.payments.reduce((sum, p) => sum + p.amount, 0);
 
-    // Invoices stats
     const totalInvoices = rawData.invoices.length;
     const totalRevenue = rawData.invoices
       .filter(i => i.status === 'paid')
@@ -158,7 +169,6 @@ export function useAdminDashboard() {
       .filter(i => i.status === 'sent')
       .reduce((sum, i) => sum + i.total, 0);
 
-    // Status distribution
     const statusDistribution = {
       draft: rawData.invoices.filter(i => i.status === 'draft').length,
       sent: rawData.invoices.filter(i => i.status === 'sent').length,
@@ -166,7 +176,6 @@ export function useAdminDashboard() {
       cancelled: rawData.invoices.filter(i => i.status === 'cancelled').length,
     };
 
-    // Helper for months (last 6 months)
     const last6Months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
@@ -177,7 +186,6 @@ export function useAdminDashboard() {
       };
     }).reverse();
 
-    // Users growth by month
     const usersGrowthByMonth = last6Months.map(m => {
       const newInMonth = rawData.profiles.filter(p => {
         const d = new Date(p.created_at);
@@ -197,7 +205,6 @@ export function useAdminDashboard() {
       };
     });
 
-    // Invoices by month
     const invoicesByMonth = last6Months.map(m => {
       const inMonth = rawData.invoices.filter(i => {
         const d = new Date(i.created_at);
@@ -211,7 +218,6 @@ export function useAdminDashboard() {
       };
     });
 
-    // Top users calculation
     const userStatsMap = new Map<string, { count: number; revenue: number }>();
     rawData.invoices.forEach(inv => {
       const current = userStatsMap.get(inv.user_id) || { count: 0, revenue: 0 };
@@ -248,6 +254,8 @@ export function useAdminDashboard() {
       invoicesToday,
       invoicesThisMonth,
       pendingAmount,
+      platformRevenue,
+      premiumUsers,
       usersGrowthByMonth,
       invoicesByMonth,
       statusDistribution,

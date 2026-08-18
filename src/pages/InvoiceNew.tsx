@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Save, Send, ChevronLeft, Layout, FileText, UserPlus, Loader2 } from 'lucide-react';
+import { Save, Send, ChevronLeft, Layout, FileText, UserPlus, Loader2, Shield, AlertTriangle } from 'lucide-react';
 import { InvoiceStatus } from '../types/database';
 import { useAuth } from '../hooks/useAuth';
 import { useProfile } from '../hooks/useProfile';
@@ -84,14 +84,12 @@ export default function InvoiceNew() {
   , [clients, formData.client_id]);
 
   const validateForm = (status: InvoiceStatus) => {
-    // Pour un brouillon, on est plus souple
     if (status === 'draft') {
       if (!formData.invoice_number) return 'Le numéro de facture est requis.';
       if (!formData.client_id) return 'Veuillez sélectionner un client pour enregistrer le brouillon.';
       return null;
     }
 
-    // Pour une finalisation, on est strict
     if (!formData.client_id) return 'Veuillez sélectionner un client.';
     if (!formData.due_date) return 'Veuillez renseigner une date d\'échéance.';
     if (items.length === 0) return 'Veuillez ajouter au moins une ligne de prestation.';
@@ -111,18 +109,16 @@ export default function InvoiceNew() {
 
     setSaving(true);
     try {
-      // Filtrer les lignes vides pour les brouillons
       const filteredItems = items.filter(item => item.description.trim() !== '');
 
       const invoiceId = await createInvoice({ ...formData, status }, filteredItems);
       showToast(status === 'draft' ? 'Brouillon enregistré !' : 'Facture créée avec succès !', 'success');
       
-      // Redirection différente selon le statut
       setTimeout(() => {
         if (status === 'draft') {
-          navigate('/invoices'); // Retour à la liste pour les brouillons
+          navigate('/invoices');
         } else {
-          navigate(`/invoices/${invoiceId}`); // Voir le détail pour les factures finalisées
+          navigate(`/invoices/${invoiceId}`);
         }
       }, 1500);
     } catch (err) {
@@ -133,9 +129,16 @@ export default function InvoiceNew() {
     }
   };
 
+  const isClientLimitReached = !profile?.is_premium && profile?.role !== 'admin' && clients.length >= 10;
+
   const handleCreateClient = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newClientData.name.trim()) return;
+
+    if (isClientLimitReached) {
+      showToast('Limite de clients atteinte pour la version gratuite.', 'error');
+      return;
+    }
 
     setNewClientLoading(true);
     try {
@@ -162,6 +165,47 @@ export default function InvoiceNew() {
   }
 
   if (!profile) return null;
+
+  // Calcul des limites pour l'utilisateur
+  const isPremium = profile.is_premium || profile.role === 'admin';
+  const currentMonthInvoices = invoices.filter(inv => {
+    const dateStr = inv.created_at || inv.issue_date;
+    if (!dateStr) return false;
+    const invDate = new Date(dateStr);
+    const now = new Date();
+    return invDate.getMonth() === now.getMonth() && invDate.getFullYear() === now.getFullYear();
+  });
+  
+  const isInvoiceLimitReached = !isPremium && currentMonthInvoices.length >= 3;
+
+  if (isInvoiceLimitReached) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-12 flex flex-col items-center">
+          <div className="w-20 h-20 bg-brand-goldCertified/10 rounded-full flex items-center justify-center mb-6">
+            <Shield className="text-brand-goldCertified w-10 h-10" />
+          </div>
+          <h2 className="text-2xl font-geist font-extrabold text-brand-textDark mb-4">Limite mensuelle atteinte</h2>
+          <p className="text-brand-textMuted mb-8 text-lg">
+            Vous avez atteint votre limite de 3 factures pour ce mois-ci sur le plan gratuit.
+            Passez à la version Premium pour créer des factures en illimité et développer votre activité sans contrainte.
+          </p>
+          <button
+            onClick={() => navigate('/upgrade')}
+            className="bg-brand-bluePrimary hover:bg-brand-bluePrimary/90 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-brand-bluePrimary/20 transition-all"
+          >
+            Débloquer l'accès illimité
+          </button>
+          <button
+            onClick={() => navigate('/invoices')}
+            className="mt-4 text-slate-500 hover:text-slate-700 font-medium"
+          >
+            Retour aux factures
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto pb-20">
