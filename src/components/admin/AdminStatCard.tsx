@@ -6,7 +6,7 @@ interface AdminStatCardProps {
   value: string | number;
   subtitle?: string;
   icon: ReactNode;
-  accentColor: 'indigo' | 'green' | 'blue' | 'violet' | 'orange';
+  accentColor: 'indigo' | 'green' | 'blue' | 'violet' | 'orange' | 'emerald' | 'yellow';
   index: number;
 }
 
@@ -35,6 +35,16 @@ const colorMap = {
     bg: 'bg-orange-50',
     text: 'text-orange-600',
     iconBg: 'bg-orange-100',
+  },
+  emerald: {
+    bg: 'bg-emerald-50',
+    text: 'text-emerald-600',
+    iconBg: 'bg-emerald-500',
+  },
+  yellow: {
+    bg: 'bg-yellow-50',
+    text: 'text-yellow-600',
+    iconBg: 'bg-yellow-500',
   },
 };
 

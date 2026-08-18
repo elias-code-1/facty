@@ -13,6 +13,7 @@ export interface Profile {
   team_role?: string | null;
   invited_by?: string | null;
   is_suspended: boolean;
+  is_premium?: boolean;
   last_seen_at: string | null;
   created_at: string;
 }

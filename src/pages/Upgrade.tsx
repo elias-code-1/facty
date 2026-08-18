@@ -67,11 +67,15 @@ export default function Upgrade() {
       showToast('Le paiement a échoué ou a été annulé.', 'error');
     }
 
+    // @ts-ignore
     addKkiapayListener('success', successHandler);
+    // @ts-ignore
     addKkiapayListener('failed', failureHandler);
 
     return () => {
+      // @ts-ignore
       removeKkiapayListener('success', successHandler);
+      // @ts-ignore
       removeKkiapayListener('failed', failureHandler);
     };
   }, [addKkiapayListener, removeKkiapayListener, showToast]);

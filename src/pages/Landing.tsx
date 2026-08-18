@@ -7,6 +7,7 @@ import ProblemSection from '../components/landing/ProblemSection';
 import SolutionSection from '../components/landing/SolutionSection';
 import ProductSection from '../components/landing/ProductSection';
 import BenefitsSection from '../components/landing/BenefitsSection';
+import PricingSection from '../components/landing/PricingSection';
 import FaqSection from '../components/landing/FaqSection';
 import StepsSection from '../components/landing/StepsSection';
 import SecuritySection from '../components/landing/SecuritySection';
@@ -58,6 +59,7 @@ export default function Landing() {
       {(content.testimonials_visible === 'true' || content.testimonials_visible === true || content.testimonials_visible === undefined) && (
         <TestimonialsSection content={content} />
       )}
+      <PricingSection content={content} />
       <FaqSection content={content} />
       <CtaSection content={content} />
       <Footer content={content} />
