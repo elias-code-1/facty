@@ -70,7 +70,7 @@ export function useAdminPayments() {
       ]);
 
       setRawData({
-        transactions: transactionsRes.data || [],
+        transactions: (transactionsRes.data || []) as unknown as PaymentTransaction[],
         profiles: profilesRes.data || [],
       });
     } catch (err) {
@@ -98,7 +98,8 @@ export function useAdminPayments() {
     const nombreTransactions = successTransactions.length;
     const panierMoyen = nombreTransactions > 0 ? revenuTotal / nombreTransactions : 0;
     
-    const tauxEchec = transactions.length > 0 ? (failedTransactions.length / (failedTransactions.length + successTransactions.length)) * 100 : 0;
+    const totalDecided = failedTransactions.length + successTransactions.length;
+    const tauxEchec = totalDecided > 0 ? (failedTransactions.length / totalDecided) * 100 : 0;
     
     const fraisTotal = successTransactions.reduce((sum, t) => sum + (t.fees || 0), 0);
 
