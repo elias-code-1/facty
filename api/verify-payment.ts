@@ -32,8 +32,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // 2. Verify payment with KKiaPay
-  // Si la clé privée commence par "test_", on utilise l'API sandbox
-  const isSandbox = kkiapayPrivateKey.startsWith('test_') || process.env.VITE_KKIAPAY_SANDBOX === 'true';
+  // Mode sandbox forcé
+  const isSandbox = true;
   const kkiapayUrl = isSandbox 
     ? 'https://api-sandbox.kkiapay.me/api/v1/transactions/status'
     : 'https://api.kkiapay.me/api/v1/transactions/status';
