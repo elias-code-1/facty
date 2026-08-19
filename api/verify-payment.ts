@@ -32,8 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // 2. Verify payment with KKiaPay
-  // Mode sandbox forcé
-  const isSandbox = true;
+  const isSandbox = kkiapayPrivateKey.startsWith('test_') || process.env.VITE_KKIAPAY_SANDBOX === 'true';
   const kkiapayUrl = isSandbox 
     ? 'https://api-sandbox.kkiapay.me/api/v1/transactions/status'
     : 'https://api.kkiapay.me/api/v1/transactions/status';
@@ -51,6 +50,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const paymentData = await kkiapayResponse.json();
     
+    // DEBUG - à retirer après diagnostic
+    console.log('KKiaPay verify — URL appelée:', kkiapayUrl);
+    console.log('KKiaPay verify — HTTP status:', kkiapayResponse.status);
+    console.log('KKiaPay verify — Réponse complète:', JSON.stringify(paymentData));
+
     // 3. Update database using service role (bypass RLS)
     const adminClient = createClient(supabaseUrl, serviceKey);
 
@@ -64,7 +68,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         status: 'failed',
         failure_reason: paymentData.reason ?? null
       });
-      return res.status(400).json({ error: 'Le paiement n\'a pas été validé par KKiaPay.' });
+      return res.status(400).json({ 
+        error: 'Le paiement n\'a pas été validé par KKiaPay.',
+        debug: paymentData
+      });
     }
 
     // Verify the amount is correct (ex: 2000 FCFA)

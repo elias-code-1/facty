@@ -15,8 +15,16 @@ export default function Upgrade() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isSandboxMode, setIsSandboxMode] = useState<boolean | null>(null);
 
   const { openKkiapayWidget, addKkiapayListener, removeKkiapayListener } = useKKiaPay();
+
+  useEffect(() => {
+    fetch('/api/kkiapay-config')
+      .then(res => res.json())
+      .then(data => setIsSandboxMode(data.sandbox))
+      .catch(() => setIsSandboxMode(true)); // fallback sûr : sandbox par défaut si l'appel échoue
+  }, []);
 
   useEffect(() => {
     // Si l'utilisateur est déjà premium, on le redirige
@@ -99,12 +107,12 @@ export default function Upgrade() {
   }, [addKkiapayListener, removeKkiapayListener, showToast]);
 
   const handlePayment = () => {
-    if (!profile) return;
+    if (!profile || isSandboxMode === null) return;
     
     openKkiapayWidget({
       amount: 2000,
       api_key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY,
-      sandbox: true, // Forcé en mode sandbox
+      sandbox: isSandboxMode,
       email: user?.email || '',
       phone: profile.phone || '',
       theme: '#5865F2', // Brand Primary Blue
@@ -143,7 +151,8 @@ export default function Upgrade() {
           
           <button
             onClick={handlePayment}
-            className="w-full bg-brand-bluePrimary hover:bg-brand-bluePrimary/90 text-white font-geist font-bold py-4 rounded-xl shadow-lg shadow-brand-bluePrimary/20 transition-all flex justify-center items-center gap-2"
+            disabled={isSandboxMode === null}
+            className="w-full bg-brand-bluePrimary hover:bg-brand-bluePrimary/90 text-white font-geist font-bold py-4 rounded-xl shadow-lg shadow-brand-bluePrimary/20 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Shield size={20} />
             Payer avec KKiaPay
