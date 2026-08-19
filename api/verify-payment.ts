@@ -43,7 +43,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'x-api-key': kkiapayPrivateKey
+        'x-api-key': process.env.VITE_KKIAPAY_PUBLIC_KEY || '',
+        'x-private-key': kkiapayPrivateKey,
+        'x-secret-key': process.env.KKIAPAY_SECRET_KEY || ''
       },
       body: JSON.stringify({ transactionId })
     });
@@ -58,7 +60,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 3. Update database using service role (bypass RLS)
     const adminClient = createClient(supabaseUrl, serviceKey);
 
-    if (paymentData.status !== 'SUCCESS') {
+    const isSuccess = paymentData.status === 'SUCCESS' || paymentData.status === 'SUCCESSFUL' || paymentData.status === 'success';
+    if (!isSuccess) {
       // Log the failure
       await adminClient.from('payments').insert({
         user_id: user.id,

@@ -177,7 +177,9 @@ async function startServer() {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'x-api-key': kkiapayPrivateKey
+          'x-api-key': process.env.VITE_KKIAPAY_PUBLIC_KEY || '',
+          'x-private-key': kkiapayPrivateKey,
+          'x-secret-key': process.env.KKIAPAY_SECRET_KEY || ''
         },
         body: JSON.stringify({ transactionId })
       });
@@ -189,7 +191,8 @@ async function startServer() {
 
       const adminClient = createClient(supabaseUrl, serviceKey);
 
-      if (paymentData.status !== 'SUCCESS') {
+      const isSuccess = paymentData.status === 'SUCCESS' || paymentData.status === 'SUCCESSFUL' || paymentData.status === 'success';
+      if (!isSuccess) {
         await adminClient.from('payments').insert({
           user_id: user.id,
           amount: paymentData.amount ?? 2000,
