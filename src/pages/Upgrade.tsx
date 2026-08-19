@@ -86,7 +86,7 @@ export default function Upgrade() {
     openKkiapayWidget({
       amount: 2000,
       api_key: import.meta.env.VITE_KKIAPAY_PUBLIC_KEY,
-      sandbox: import.meta.env.VITE_KKIAPAY_SANDBOX === 'true',
+      sandbox: (import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || '').startsWith('test_'),
       email: user?.email || '',
       phone: profile.phone || '',
       theme: '#5865F2', // Brand Primary Blue
