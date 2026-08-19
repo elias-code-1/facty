@@ -79,19 +79,26 @@ export function useAdminDashboard() {
       
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
-      let teamMembersData = [];
       
       if (token) {
         try {
-          const response = await fetch('/api/get-team-members', {
+          const response = await fetch('/api/admin/dashboard-stats', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (response.ok) {
             const data = await response.json();
-            teamMembersData = data.members || [];
+            setRawData({
+              profiles: data.profiles || [],
+              teamMembers: data.teamMembers || [],
+              invoices: data.invoices || [],
+              logs: data.logs || [],
+              notifications: data.notifications || [],
+              payments: data.payments || [],
+            });
+            return;
           }
         } catch (e) {
-          console.error('Error fetching team members for dashboard:', e);
+          console.error('Error fetching dashboard stats from API:', e);
         }
       }
 
@@ -127,7 +134,7 @@ export function useAdminDashboard() {
 
       setRawData({
         profiles: profilesRes.data || [],
-        teamMembers: teamMembersData,
+        teamMembers: [],
         invoices: invoicesRes.data || [],
         logs: (logsRes.data as any) || [],
         notifications: notificationsRes.data || [],

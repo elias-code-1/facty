@@ -325,6 +325,42 @@ async function startServer() {
     }
   });
 
+  // API: Toutes les données du Dashboard Admin
+  app.get("/api/admin/dashboard-stats", async (req, res) => {
+    const admin = await verifyAdmin(req, res);
+    if (!admin) return;
+
+    try {
+      const [
+        { data: profiles },
+        { data: teamMembers },
+        { data: invoices },
+        { data: logs },
+        { data: notifications },
+        { data: payments }
+      ] = await Promise.all([
+        admin.adminSupabase.from('profiles').select('id, created_at, is_suspended, role, full_name, email, is_premium').neq('role', 'admin').is('team_role', null),
+        admin.adminSupabase.from('team_members').select('*'),
+        admin.adminSupabase.from('invoices').select('id, total, status, created_at, user_id'),
+        admin.adminSupabase.from('audit_logs').select('*, profiles(full_name, email)').order('created_at', { ascending: false }).limit(10),
+        admin.adminSupabase.from('admin_notifications').select('*').eq('is_read', false).order('created_at', { ascending: false }),
+        admin.adminSupabase.from('payments').select('amount, status').eq('status', 'success')
+      ]);
+
+      res.json({
+        profiles: profiles || [],
+        teamMembers: teamMembers || [],
+        invoices: invoices || [],
+        logs: logs || [],
+        notifications: notifications || [],
+        payments: payments || [],
+      });
+    } catch (err) {
+      console.error("Erreur dashboard-stats:", err);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
   // API: Liste des membres de l'équipe
   app.get("/api/admin/team-members", async (req, res) => {
     const admin = await verifyAdmin(req, res);
