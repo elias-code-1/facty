@@ -9,6 +9,7 @@ export const TEAM_ROLES = {
       '/admin/facty/invoices',
       '/admin/facty/logs',
       '/admin/facty/stats',
+      '/admin/facty/payments',
       '/admin/facty/chat',
       '/admin/facty/support',
       '/admin/facty/landing',

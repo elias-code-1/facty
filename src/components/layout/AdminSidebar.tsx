@@ -13,7 +13,8 @@ import {
   Megaphone,
   LayoutTemplate,
   Headphones,
-  MessageSquare
+  MessageSquare,
+  CreditCard
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
@@ -26,6 +27,7 @@ const navLinks = [
   { to: '/admin/facty/invoices', label: 'Factures', icon: <FileText size={20} /> },
   { to: '/admin/facty/logs', label: 'Logs', icon: <Activity size={20} /> },
   { to: '/admin/facty/stats', label: 'Statistiques', icon: <BarChart3 size={20} /> },
+  { to: '/admin/facty/payments', label: 'Paiements', icon: <CreditCard size={20} /> },
   { to: '/admin/facty/communication', label: 'Communication', icon: <Megaphone size={20} /> },
   { to: '/admin/facty/landing', label: 'Landing Page', icon: <LayoutTemplate size={20} /> },
   { to: '/admin/facty/support', label: 'Support', icon: <Headphones size={20} /> },

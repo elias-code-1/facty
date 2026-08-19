@@ -35,6 +35,7 @@ import AdminCommunication from '../pages/admin/AdminCommunication';
 import AdminSettings from '../pages/admin/AdminSettings';
 import AdminLanding from '../pages/admin/AdminLanding';
 import AdminSupport from '../pages/admin/AdminSupport';
+import AdminPayments from '../pages/admin/AdminPayments';
 import AdminChat from '../pages/admin/AdminChat';
 import AdminTeam from '../pages/admin/AdminTeam';
 import Contact from '../pages/Contact';
@@ -292,6 +293,7 @@ export const AppRouter = () => {
             <Route path="/admin/facty/settings" element={<AdminSettings />} />
             <Route path="/admin/facty/landing" element={<AdminLanding />} />
             <Route path="/admin/facty/support" element={<AdminSupport />} />
+            <Route path="/admin/facty/payments" element={<AdminPayments />} />
             <Route path="/admin/facty/chat" element={<AdminChat />} />
             <Route path="/admin/facty/team" element={
               <ErrorBoundary>

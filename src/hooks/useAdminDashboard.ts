@@ -122,7 +122,7 @@ export function useAdminDashboard() {
           
         supabase.from('payments')
           .select('amount, status')
-          .eq('status', 'SUCCESS')
+          .eq('status', 'success')
       ]);
 
       setRawData({
