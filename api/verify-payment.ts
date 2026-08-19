@@ -50,8 +50,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     const paymentData = await kkiapayResponse.json();
+    
+    // 3. Update database using service role (bypass RLS)
+    const adminClient = createClient(supabaseUrl, serviceKey);
 
     if (paymentData.status !== 'SUCCESS') {
+      // Log the failure
+      await adminClient.from('payments').insert({
+        user_id: user.id,
+        amount: paymentData.amount ?? 2000,
+        currency: 'XOF',
+        transaction_id: transactionId,
+        status: 'failed',
+        failure_reason: paymentData.reason ?? null
+      });
       return res.status(400).json({ error: 'Le paiement n\'a pas été validé par KKiaPay.' });
     }
 
@@ -59,9 +71,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (paymentData.amount < 2000) {
       return res.status(400).json({ error: 'Le montant payé est insuffisant.' });
     }
-
-    // 3. Update database using service role (bypass RLS)
-    const adminClient = createClient(supabaseUrl, serviceKey);
 
     // Check if transaction already exists to prevent double-crediting
     const { data: existingPayment } = await adminClient
@@ -82,7 +91,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         amount: paymentData.amount,
         currency: 'XOF',
         transaction_id: transactionId,
-        status: 'success'
+        status: 'success',
+        payment_method: paymentData.source ?? null,
+        country: paymentData.country ?? null,
+        fees: paymentData.fees ?? null
       });
 
     if (insertError) {

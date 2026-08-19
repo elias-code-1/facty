@@ -62,9 +62,27 @@ export default function Upgrade() {
       }
     }
 
-    function failureHandler(error: any) {
+    async function failureHandler(error: any) {
       console.log('KKiaPay Error:', error);
       showToast('Le paiement a échoué ou a été annulé.', 'error');
+      
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData.session?.access_token;
+        if (token) {
+          fetch('/api/log-payment-attempt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ 
+              status: 'failed', 
+              transactionId: error?.transactionId, 
+              reason: error?.message || error?.reason 
+            })
+          }).catch(console.error); // Fire and forget inner catch
+        }
+      } catch (e) {
+        console.error('Failed to log payment attempt:', e);
+      }
     }
 
     // @ts-ignore

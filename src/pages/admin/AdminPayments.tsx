@@ -33,6 +33,10 @@ export default function AdminPayments() {
     nombreTransactions, 
     tauxConversion, 
     panierMoyen, 
+    tauxEchec,
+    fraisTotal,
+    repartitionMethodePaiement,
+    repartitionPays,
     revenuParMois, 
     transactions, 
     loading, 
@@ -41,6 +45,8 @@ export default function AdminPayments() {
 
   const [activeTab, setActiveTab] = useState<'all' | 'success' | 'failed' | 'pending'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const revenuNet = revenuTotal - fraisTotal;
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter(t => {
@@ -115,93 +121,135 @@ export default function AdminPayments() {
         </button>
       </div>
 
-      <div className="bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3 rounded-xl text-sm flex gap-3">
-        <Activity className="shrink-0 mt-0.5" size={18} />
-        <p>
-          <strong>Note :</strong> Ces chiffres reflètent les paiements confirmés uniquement — les tentatives échouées ne sont pas encore toutes enregistrées si l'utilisateur quitte la page trop tôt.
-        </p>
-      </div>
-
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
         <AdminStatCard 
-          title="Revenu total" 
+          title="Revenu brut" 
           value={formatCurrency(revenuTotal, 'XOF')}
           icon={<DollarSign size={24} />}
           accentColor="indigo"
           index={0}
         />
         <AdminStatCard 
-          title="Revenu ce mois" 
-          value={formatCurrency(revenuCeMois, 'XOF')}
-          icon={<Calendar size={24} />}
-          accentColor="blue"
+          title="Revenu net" 
+          value={formatCurrency(revenuNet, 'XOF')}
+          icon={<CheckCircle size={24} />}
+          accentColor="emerald"
           index={1}
         />
         <AdminStatCard 
           title="Transactions" 
           value={nombreTransactions}
           icon={<CreditCard size={24} />}
-          accentColor="green"
+          accentColor="blue"
           index={2}
         />
         <AdminStatCard 
-          title="Conversion" 
+          title="Taux conversion" 
           value={`${tauxConversion.toFixed(1)}%`}
           icon={<TrendingUp size={24} />}
           accentColor="orange"
           index={3}
         />
         <AdminStatCard 
+          title="Taux d'échec" 
+          value={`${tauxEchec.toFixed(1)}%`}
+          icon={<XCircle size={24} />}
+          accentColor="red"
+          index={4}
+        />
+        <AdminStatCard 
           title="Panier moyen" 
           value={formatCurrency(panierMoyen, 'XOF')}
           icon={<Activity size={24} />}
           accentColor="violet"
-          index={4}
+          index={5}
         />
       </div>
 
-      {/* Graphique */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-          <TrendingUp size={20} className="text-indigo-500" />
-          Évolution des revenus
-        </h3>
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={revenuParMois} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.2}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis 
-                dataKey="month" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fontSize: 12, fill: '#64748b' }}
-                dy={10}
-              />
-              <YAxis 
-                yAxisId="left"
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fontSize: 12, fill: '#64748b' }}
-                tickFormatter={(val) => `${val / 1000}k`}
-              />
-              <Tooltip 
-                cursor={{ fill: '#f8fafc' }}
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                formatter={(value: number, name: string) => [
-                  name === 'revenue' ? formatCurrency(value, 'XOF') : value, 
-                  name === 'revenue' ? 'Revenu' : 'Transactions'
-                ]}
-              />
-              <Bar yAxisId="left" dataKey="revenue" fill="url(#colorRevenue)" radius={[4, 4, 0, 0]} maxBarSize={40} />
-            </ComposedChart>
-          </ResponsiveContainer>
+      {/* Graphique et Répartition */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <TrendingUp size={20} className="text-indigo-500" />
+            Évolution des revenus
+          </h3>
+          <div className="h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={revenuParMois} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.2}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis 
+                  dataKey="month" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  dy={10}
+                />
+                <YAxis 
+                  yAxisId="left"
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tickFormatter={(val) => `${val / 1000}k`}
+                />
+                <Tooltip 
+                  cursor={{ fill: '#f8fafc' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  formatter={(value: number, name: string) => [
+                    name === 'revenue' ? formatCurrency(value, 'XOF') : value, 
+                    name === 'revenue' ? 'Revenu' : 'Transactions'
+                  ]}
+                />
+                <Bar yAxisId="left" dataKey="revenue" fill="url(#colorRevenue)" radius={[4, 4, 0, 0]} maxBarSize={40} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-6">
+          <div>
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <CreditCard size={20} className="text-blue-500" />
+              Moyens de paiement
+            </h3>
+            <div className="space-y-3">
+              {Object.entries(repartitionMethodePaiement).length === 0 ? (
+                <p className="text-sm text-slate-500 italic">Aucune donnée</p>
+              ) : (
+                Object.entries(repartitionMethodePaiement).map(([method, count]) => (
+                  <div key={method} className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600 font-medium capitalize">{method.toLowerCase()}</span>
+                    <span className="text-sm font-bold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-full">{count}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          
+          <div className="pt-6 border-t border-slate-100">
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <Activity size={20} className="text-emerald-500" />
+              Pays d'origine
+            </h3>
+            <div className="space-y-3">
+              {Object.entries(repartitionPays).length === 0 ? (
+                <p className="text-sm text-slate-500 italic">Aucune donnée</p>
+              ) : (
+                Object.entries(repartitionPays).map(([country, count]) => (
+                  <div key={country} className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600 font-medium">{country}</span>
+                    <span className="text-sm font-bold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-full">{count}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -274,7 +322,14 @@ export default function AdminPayments() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      {getStatusBadge(tx.status)}
+                      <div className="flex flex-col items-start gap-1">
+                        {getStatusBadge(tx.status)}
+                        {tx.status.toLowerCase() === 'failed' && tx.failure_reason && (
+                          <span className="text-[10px] text-red-500 max-w-[120px] truncate" title={tx.failure_reason}>
+                            {tx.failure_reason}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-slate-500">
                       {formatDate(tx.created_at)}

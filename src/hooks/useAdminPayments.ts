@@ -9,6 +9,10 @@ export interface PaymentTransaction {
   currency: string;
   transaction_id: string;
   status: string;
+  payment_method?: string;
+  country?: string;
+  fees?: number;
+  failure_reason?: string;
   created_at: string;
   profiles: {
     full_name: string;
@@ -23,6 +27,10 @@ export interface AdminPaymentsData {
   nombreTransactions: number;
   panierMoyen: number;
   tauxConversion: number;
+  tauxEchec: number;
+  fraisTotal: number;
+  repartitionMethodePaiement: Record<string, number>;
+  repartitionPays: Record<string, number>;
   revenuParMois: {
     month: string;
     revenue: number;
@@ -50,7 +58,7 @@ export function useAdminPayments() {
         supabase
           .from('payments')
           .select(`
-            id, user_id, amount, currency, transaction_id, status, created_at,
+            id, user_id, amount, currency, transaction_id, status, payment_method, country, fees, failure_reason, created_at,
             profiles ( full_name, email )
           `)
           .order('created_at', { ascending: false }),
@@ -84,10 +92,27 @@ export function useAdminPayments() {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
     const successTransactions = transactions.filter(t => t.status.toLowerCase() === 'success');
+    const failedTransactions = transactions.filter(t => t.status.toLowerCase() === 'failed');
     
     const revenuTotal = successTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
     const nombreTransactions = successTransactions.length;
     const panierMoyen = nombreTransactions > 0 ? revenuTotal / nombreTransactions : 0;
+    
+    const tauxEchec = transactions.length > 0 ? (failedTransactions.length / (failedTransactions.length + successTransactions.length)) * 100 : 0;
+    
+    const fraisTotal = successTransactions.reduce((sum, t) => sum + (t.fees || 0), 0);
+
+    const repartitionMethodePaiement = successTransactions.reduce((acc, t) => {
+      const method = t.payment_method || 'Inconnu';
+      acc[method] = (acc[method] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const repartitionPays = successTransactions.reduce((acc, t) => {
+      const c = t.country || 'Inconnu';
+      acc[c] = (acc[c] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
     let revenuCeMois = 0;
     let revenuAujourdhui = 0;
@@ -132,6 +157,10 @@ export function useAdminPayments() {
       nombreTransactions,
       panierMoyen,
       tauxConversion,
+      tauxEchec,
+      fraisTotal,
+      repartitionMethodePaiement,
+      repartitionPays,
       revenuParMois,
       transactions,
       loading
