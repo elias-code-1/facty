@@ -32,7 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // 2. Verify payment with KKiaPay
-  const isSandbox = kkiapayPrivateKey.startsWith('test_') || process.env.VITE_KKIAPAY_SANDBOX === 'true';
+  const isSandbox = true; // Mode sandbox forcé
   const kkiapayUrl = isSandbox 
     ? 'https://api-sandbox.kkiapay.me/api/v1/transactions/status'
     : 'https://api.kkiapay.me/api/v1/transactions/status';
