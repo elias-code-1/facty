@@ -25,13 +25,13 @@ export default function TestimonialsSection({ content }: { content: Record<strin
   ];
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-brand-white border-t border-brand-border/50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-geist font-extrabold text-brand-textDark mb-4 tracking-tight">
             {content.testimonials_title || 'Ils nous font confiance'}
           </h2>
-          <p className="text-slate-500 max-w-2xl mx-auto text-lg">
+          <p className="text-brand-textMuted max-w-2xl mx-auto text-lg">
             {content.testimonials_subtitle || 'Découvrez pourquoi des centaines de professionnels choisissent Facty pour leur facturation.'}
           </p>
         </div>
@@ -44,19 +44,19 @@ export default function TestimonialsSection({ content }: { content: Record<strin
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="bg-slate-50 p-8 rounded-3xl border border-slate-100 relative group hover:bg-white hover:shadow-xl hover:border-indigo-100 transition-all duration-300"
+              className="bg-brand-lightGray p-8 rounded-3xl border border-brand-border/50 relative group hover:bg-brand-white hover:shadow-2xl hover:shadow-brand-bluePrimary/5 hover:border-brand-bluePrimary/20 transition-all duration-300"
             >
-              <div className="absolute -top-4 left-8 w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+              <div className="absolute -top-4 left-8 w-10 h-10 bg-brand-bluePrimary text-white rounded-xl flex items-center justify-center shadow-lg shadow-brand-bluePrimary/20">
                 <Quote size={20} />
               </div>
               
               <div className="flex gap-1 mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
+                  <Star key={i} size={14} className="fill-brand-goldCertified text-brand-goldCertified" />
                 ))}
               </div>
               
-              <p className="text-slate-600 mb-8 leading-relaxed italic">
+              <p className="text-brand-textMuted mb-8 leading-relaxed italic">
                 "{testimonial.content}"
               </p>
               
@@ -64,12 +64,12 @@ export default function TestimonialsSection({ content }: { content: Record<strin
                 <img 
                   src={testimonial.avatar} 
                   alt={testimonial.name} 
-                  className="w-12 h-12 rounded-full border-2 border-white shadow-sm"
+                  className="w-12 h-12 rounded-full border-2 border-brand-white shadow-sm"
                   referrerPolicy="no-referrer"
                 />
                 <div>
-                  <h4 className="font-bold text-slate-800">{testimonial.name}</h4>
-                  <p className="text-xs text-slate-500">{testimonial.role}</p>
+                  <h4 className="font-bold text-brand-textDark">{testimonial.name}</h4>
+                  <p className="text-xs text-brand-textMuted">{testimonial.role}</p>
                 </div>
               </div>
             </motion.div>

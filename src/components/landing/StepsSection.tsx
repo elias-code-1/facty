@@ -31,20 +31,20 @@ export default function StepsSection({ content }: { content: Record<string, any>
   };
 
   return (
-    <section className="py-24 bg-white overflow-hidden">
+    <section className="py-24 bg-brand-lightGray border-t border-brand-border/50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-geist font-extrabold text-brand-textDark mb-4 tracking-tight">
             {content.steps_title || 'Comment ça marche ?'}
           </h2>
-          <p className="text-slate-500 max-w-2xl mx-auto text-lg">
+          <p className="text-brand-textMuted max-w-2xl mx-auto text-lg">
             {content.steps_subtitle || 'Facty est conçu pour être simple et intuitif. Commencez en 3 étapes.'}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
           {/* Connector Line (Desktop) */}
-          <div className="hidden md:block absolute top-1/4 left-0 right-0 h-0.5 bg-slate-100 -z-10" />
+          <div className="hidden md:block absolute top-1/4 left-0 right-0 h-0.5 bg-brand-border -z-10" />
 
           {steps.map((step: any, index: number) => (
             <motion.div
@@ -55,14 +55,14 @@ export default function StepsSection({ content }: { content: Record<string, any>
               transition={{ delay: index * 0.2 }}
               className="flex flex-col items-center text-center"
             >
-              <div className="w-16 h-16 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 mb-6 relative">
-                <span className="absolute -top-2 -right-2 w-6 h-6 bg-slate-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+              <div className="w-16 h-16 bg-brand-bluePrimary text-white rounded-2xl flex items-center justify-center shadow-lg shadow-brand-bluePrimary/20 mb-6 relative">
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-brand-textDark text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-brand-white">
                   {index + 1}
                 </span>
                 {getIcon(step.icon)}
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-3">{step.title}</h3>
-              <p className="text-slate-500 leading-relaxed">
+              <h3 className="text-xl font-geist font-bold text-brand-textDark mb-3">{step.title}</h3>
+              <p className="text-brand-textMuted leading-relaxed">
                 {step.description}
               </p>
             </motion.div>

@@ -16,7 +16,7 @@ export default function FaqSection({ content }: { content: Record<string, any> }
   const faqs = content.faq_items || defaultFaq;
 
   return (
-    <section id="faq" className="bg-slate-50 py-24">
+    <section id="faq" className="bg-brand-white py-24 border-t border-brand-border/50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           ref={ref}
@@ -25,7 +25,7 @@ export default function FaqSection({ content }: { content: Record<string, any> }
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-geist font-extrabold text-brand-textDark mb-4 tracking-tight">
             {content.faq_title || 'Questions fréquentes'}
           </h2>
         </motion.div>
@@ -37,14 +37,14 @@ export default function FaqSection({ content }: { content: Record<string, any> }
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-white border border-slate-200 rounded-2xl overflow-hidden"
+              className="bg-brand-white border border-brand-border rounded-2xl overflow-hidden hover:border-brand-bluePrimary/30 transition-colors"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
               >
-                <span className="font-semibold text-slate-800">{item.question}</span>
-                <span className="text-indigo-600 ml-4 shrink-0">
+                <span className="font-geist font-bold text-brand-textDark">{item.question}</span>
+                <span className="text-brand-bluePrimary ml-4 shrink-0">
                   {openIndex === index ? <Minus size={20} /> : <Plus size={20} />}
                 </span>
               </button>
@@ -56,7 +56,7 @@ export default function FaqSection({ content }: { content: Record<string, any> }
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="px-6 pb-6 text-slate-500">
+                    <div className="px-6 pb-6 text-brand-textMuted leading-relaxed">
                       {item.answer}
                     </div>
                   </motion.div>

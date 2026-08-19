@@ -31,14 +31,14 @@ export default function SecuritySection({ content }: { content: Record<string, a
   };
 
   return (
-    <section className="py-24 bg-slate-50">
+    <section className="py-24 bg-brand-lightGray border-t border-brand-border/50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center gap-16">
           <div className="lg:w-1/2">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            <h2 className="text-3xl md:text-4xl font-geist font-extrabold text-brand-textDark mb-6 tracking-tight">
               {content.security_title || 'Votre sécurité est notre priorité absolue'}
             </h2>
-            <p className="text-slate-500 text-lg mb-8 leading-relaxed">
+            <p className="text-brand-textMuted text-lg mb-8 leading-relaxed">
               {content.security_description || 'Nous comprenons l\'importance de vos données financières. C\'est pourquoi nous utilisons des technologies de pointe pour assurer une protection maximale.'}
             </p>
             
@@ -50,14 +50,14 @@ export default function SecuritySection({ content }: { content: Record<string, a
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100"
+                  className="flex gap-4 p-4 bg-brand-white rounded-2xl shadow-sm border border-brand-border/50"
                 >
-                  <div className="flex-shrink-0 w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-lightGray rounded-xl flex items-center justify-center">
                     {getIcon(item.icon)}
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-800 mb-1">{item.title}</h3>
-                    <p className="text-sm text-slate-500 leading-relaxed">{item.description}</p>
+                    <h3 className="font-bold text-brand-textDark mb-1">{item.title}</h3>
+                    <p className="text-sm text-brand-textMuted leading-relaxed">{item.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -74,23 +74,23 @@ export default function SecuritySection({ content }: { content: Record<string, a
               <img 
                 src="/securite.avif" 
                 alt="Security" 
-                className="rounded-3xl shadow-2xl border-8 border-white"
+                className="rounded-3xl shadow-2xl shadow-brand-bluePrimary/10 border-8 border-brand-white"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+              <div className="absolute -bottom-6 -right-6 bg-brand-white p-6 rounded-2xl shadow-xl border border-brand-border/50 flex items-center gap-4">
+                <div className="w-12 h-12 bg-brand-greenSuccess/10 text-brand-greenSuccess rounded-full flex items-center justify-center">
                   <ShieldCheck size={24} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Certifié</p>
-                  <p className="text-sm font-bold text-slate-800">100% Sécurisé</p>
+                  <p className="text-xs font-bold text-brand-textMuted uppercase tracking-wider">Certifié</p>
+                  <p className="text-sm font-bold text-brand-textDark">100% Sécurisé</p>
                 </div>
               </div>
             </motion.div>
             
             {/* Decorative Elements */}
-            <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-100 rounded-full blur-3xl opacity-50 -z-10" />
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-emerald-100 rounded-full blur-3xl opacity-50 -z-10" />
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-brand-bluePrimary/10 rounded-full blur-3xl opacity-50 -z-10" />
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-greenSuccess/10 rounded-full blur-3xl opacity-50 -z-10" />
           </div>
         </div>
       </div>

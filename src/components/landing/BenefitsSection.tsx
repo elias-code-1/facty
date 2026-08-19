@@ -18,7 +18,7 @@ export default function BenefitsSection({ content }: { content: Record<string, a
   const benefits = content.benefits_items || defaultBenefits;
 
   return (
-    <section className="bg-white py-24">
+    <section className="bg-brand-white py-24 border-t border-brand-border/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           ref={ref}
@@ -27,7 +27,7 @@ export default function BenefitsSection({ content }: { content: Record<string, a
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="text-center max-w-3xl mx-auto mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-geist font-extrabold text-brand-textDark mb-4 tracking-tight">
             {content.benefits_title || 'Pourquoi choisir Facty ?'}
           </h2>
         </motion.div>
@@ -41,11 +41,11 @@ export default function BenefitsSection({ content }: { content: Record<string, a
               transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
               className="flex flex-col items-center text-center"
             >
-              <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-bluePrimary/10 text-brand-bluePrimary rounded-full flex items-center justify-center mb-4">
                 <DynamicIcon name={item.icon} size={24} />
               </div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-2">{item.title}</h3>
-              <p className="text-slate-500 text-sm">{item.description}</p>
+              <h3 className="text-lg font-geist font-bold text-brand-textDark mb-2">{item.title}</h3>
+              <p className="text-brand-textMuted text-sm">{item.description}</p>
             </motion.div>
           ))}
         </div>
