@@ -339,7 +339,7 @@ async function startServer() {
         { data: notifications },
         { data: payments }
       ] = await Promise.all([
-        admin.adminSupabase.from('profiles').select('id, created_at, is_suspended, role, full_name, email, is_premium').neq('role', 'admin').is('team_role', null),
+        admin.adminSupabase.from('profiles').select('id, created_at, is_suspended, role, full_name, email, is_premium, premium_expires_at').neq('role', 'admin').is('team_role', null),
         admin.adminSupabase.from('team_members').select('*'),
         admin.adminSupabase.from('invoices').select('id, total, status, created_at, user_id'),
         admin.adminSupabase.from('audit_logs').select('*, profiles(full_name, email)').order('created_at', { ascending: false }).limit(10),

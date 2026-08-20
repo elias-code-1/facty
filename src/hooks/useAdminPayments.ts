@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
 
+import { isPremiumActive } from '../utils/premium';
+
 export interface PaymentTransaction {
   id: string;
   user_id: string;
@@ -44,7 +46,7 @@ export function useAdminPayments() {
   const [loading, setLoading] = useState(true);
   const [rawData, setRawData] = useState<{
     transactions: PaymentTransaction[];
-    profiles: Pick<Profile, 'id' | 'role' | 'is_premium'>[];
+    profiles: Pick<Profile, 'id' | 'role' | 'is_premium' | 'premium_expires_at'>[];
   }>({
     transactions: [],
     profiles: [],
@@ -97,7 +99,7 @@ export function useAdminPayments() {
       // 5. Fetch all standard profiles for conversion rate calculation
       const profilesRes = await supabase
         .from('profiles')
-        .select('id, role, is_premium')
+        .select('id, role, is_premium, premium_expires_at')
         .neq('role', 'admin')
         .is('team_role', null);
 
@@ -161,7 +163,7 @@ export function useAdminPayments() {
     });
 
     const conversionProfiles = profiles;
-    const premiumCount = conversionProfiles.filter(p => p.is_premium).length;
+    const premiumCount = conversionProfiles.filter(p => isPremiumActive(p)).length;
     const tauxConversion = conversionProfiles.length > 0 ? (premiumCount / conversionProfiles.length) * 100 : 0;
 
     // Revenu par mois (12 derniers mois)

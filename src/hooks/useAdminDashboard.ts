@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { AuditLog, AdminNotification, Profile, Invoice } from '../types/database';
+import { isPremiumActive } from '../utils/premium';
 
 export interface AdminDashboardData {
   totalUsers: number;
@@ -58,7 +59,7 @@ export interface AdminDashboardData {
 export function useAdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [rawData, setRawData] = useState<{
-    profiles: Pick<Profile, 'id' | 'created_at' | 'is_suspended' | 'role' | 'full_name' | 'email' | 'is_premium'>[];
+    profiles: Pick<Profile, 'id' | 'created_at' | 'is_suspended' | 'role' | 'full_name' | 'email' | 'is_premium' | 'premium_expires_at'>[];
     teamMembers: any[];
     invoices: Pick<Invoice, 'id' | 'total' | 'status' | 'created_at' | 'user_id'>[];
     logs: (AuditLog & { profiles: { full_name: string; email: string } | null })[];
@@ -163,7 +164,7 @@ export function useAdminDashboard() {
     const newUsersThisMonth = rawData.profiles.filter(p => new Date(p.created_at) >= firstDayOfMonth).length;
     const totalTeamMembers = rawData.teamMembers.length;
     
-    const premiumUsers = rawData.profiles.filter(p => p.is_premium).length;
+    const premiumUsers = rawData.profiles.filter(p => isPremiumActive(p)).length;
     const platformRevenue = rawData.payments.reduce((sum, p) => sum + p.amount, 0);
 
     const totalInvoices = rawData.invoices.length;

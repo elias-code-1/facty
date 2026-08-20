@@ -12,6 +12,7 @@ import InvoiceForm from '../components/invoice/InvoiceForm';
 import InvoicePreview from '../components/invoice/InvoicePreview';
 import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
+import { isPremiumActive } from '../utils/premium';
 
 /** Page de création d'une nouvelle facture */
 export default function InvoiceNew() {
@@ -129,7 +130,7 @@ export default function InvoiceNew() {
     }
   };
 
-  const isClientLimitReached = !profile?.is_premium && profile?.role !== 'admin' && clients.length >= 10;
+  const isClientLimitReached = !isPremiumActive(profile) && profile?.role !== 'admin' && clients.length >= 10;
 
   const handleCreateClient = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,7 +168,7 @@ export default function InvoiceNew() {
   if (!profile) return null;
 
   // Calcul des limites pour l'utilisateur
-  const isPremium = profile.is_premium || profile.role === 'admin';
+  const isPremium = isPremiumActive(profile) || profile.role === 'admin';
   const currentMonthInvoices = invoices.filter(inv => {
     const dateStr = inv.created_at || inv.issue_date;
     if (!dateStr) return false;

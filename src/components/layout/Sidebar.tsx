@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { useProfile } from '../../hooks/useProfile';
 import { useFeatureFlags } from '../../hooks/useFeatureFlags';
+import { isPremiumActive } from '../../utils/premium';
 import PWAInstallButton from '../ui/PWAInstallButton';
 
 const DashboardIcon = () => (
@@ -118,7 +119,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
       {/* Footer Sidebar */}
       <div className={`p-2 lg:p-4 border-t border-slate-800 space-y-4`} id="tour-user-profile">
-        {!profile?.is_premium && profile?.role !== 'admin' && (
+        {!isPremiumActive(profile) && profile?.role !== 'admin' && (
           <div className={`${isMobileOverlay ? 'block' : 'hidden lg:block'} px-2`}>
             <div className="bg-gradient-to-br from-brand-bluePrimary to-indigo-600 rounded-xl p-4 text-center">
               <h4 className="text-white font-bold mb-1">Passer Premium</h4>
@@ -140,7 +141,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           <div className={`${isMobileOverlay ? 'flex' : 'hidden lg:flex'} flex-1 flex-col min-w-0`}>
             <p className="text-sm font-semibold truncate flex items-center gap-1">
               {profile?.full_name || 'Utilisateur'}
-              {profile?.is_premium && (
+              {isPremiumActive(profile) && (
                 <span title="Utilisateur Premium" className="text-brand-goldCertified">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 </span>

@@ -8,6 +8,7 @@ import { useKKiaPay } from 'kkiapay-react';
 import { supabase } from '../lib/supabase';
 import FullPageSpinner from '../components/ui/FullPageSpinner';
 import { motion } from 'framer-motion';
+import { isPremiumActive } from '../utils/premium';
 
 export default function Upgrade() {
   const { user } = useAuth();
@@ -28,7 +29,7 @@ export default function Upgrade() {
 
   useEffect(() => {
     // Si l'utilisateur est déjà premium, on le redirige
-    if (profile?.is_premium) {
+    if (isPremiumActive(profile)) {
       navigate('/dashboard');
     }
   }, [profile, navigate]);

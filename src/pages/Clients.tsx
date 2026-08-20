@@ -23,6 +23,7 @@ import { useToast } from '../hooks/useToast';
 import Modal from '../components/ui/Modal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import Spinner from '../components/ui/Spinner';
+import { isPremiumActive } from '../utils/premium';
 
 const containerVariants = {
   animate: {
@@ -58,7 +59,7 @@ export default function Clients() {
     address: ''
   });
 
-  const isPremium = profile?.is_premium || profile?.role === 'admin';
+  const isPremium = isPremiumActive(profile) || profile?.role === 'admin';
   const isClientLimitReached = !isPremium && clients.length >= 10;
 
   // Filtrage des clients
