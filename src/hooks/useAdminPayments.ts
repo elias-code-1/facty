@@ -54,23 +54,59 @@ export function useAdminPayments() {
     try {
       setLoading(true);
 
-      const [transactionsRes, profilesRes] = await Promise.all([
-        supabase
-          .from('payments')
-          .select(`
-            id, user_id, amount, currency, transaction_id, status, payment_method, country, fees, failure_reason, created_at,
-            profiles ( full_name, email )
-          `)
-          .order('created_at', { ascending: false }),
-        supabase
+      // 1. Fetch payments without the inner join
+      const transactionsRes = await supabase
+        .from('payments')
+        .select('id, user_id, amount, currency, transaction_id, status, payment_method, country, fees, failure_reason, created_at')
+        .order('created_at', { ascending: false });
+
+      if (transactionsRes.error) {
+        console.error('Erreur Supabase lors de la récupération des paiements:', transactionsRes.error);
+      }
+
+      const rawPayments = transactionsRes.data || [];
+
+      // 2. Extract unique user_ids
+      const userIds = [...new Set(rawPayments.map(p => p.user_id).filter(Boolean))];
+      
+      let profilesMap = new Map();
+
+      // 3. Fetch specific profiles for the payments
+      if (userIds.length > 0) {
+        const paymentProfilesRes = await supabase
           .from('profiles')
-          .select('id, role, is_premium')
-          .neq('role', 'admin')
-          .is('team_role', null)
-      ]);
+          .select('id, full_name, email')
+          .in('id', userIds);
+          
+        if (paymentProfilesRes.error) {
+          console.error('Erreur Supabase lors de la récupération des profils liés aux paiements:', paymentProfilesRes.error);
+        }
+        
+        const paymentProfiles = paymentProfilesRes.data || [];
+        paymentProfiles.forEach(p => {
+          profilesMap.set(p.id, { full_name: p.full_name, email: p.email });
+        });
+      }
+
+      // 4. Merge payment data with profile data
+      const transactions = rawPayments.map(p => ({
+        ...p,
+        profiles: profilesMap.get(p.user_id) || null
+      })) as unknown as PaymentTransaction[];
+
+      // 5. Fetch all standard profiles for conversion rate calculation
+      const profilesRes = await supabase
+        .from('profiles')
+        .select('id, role, is_premium')
+        .neq('role', 'admin')
+        .is('team_role', null);
+
+      if (profilesRes.error) {
+        console.error('Erreur Supabase lors de la récupération des profils globaux:', profilesRes.error);
+      }
 
       setRawData({
-        transactions: (transactionsRes.data || []) as unknown as PaymentTransaction[],
+        transactions,
         profiles: profilesRes.data || [],
       });
     } catch (err) {
