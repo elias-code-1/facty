@@ -62,7 +62,6 @@ export default function Auth() {
   // Champs du formulaire
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // Traduction des erreurs Supabase
@@ -495,19 +494,6 @@ export default function Auth() {
             transition={{ duration: 0.2 }}
             onSubmit={handleSubmit}
           >
-            {mode === 'register' && (
-              <InputField 
-                label="Nom complet" 
-                type="text" 
-                name="name"
-                value={fullName} 
-                onChange={setFullName} 
-                required 
-                placeholder="Jean Dupont" 
-                autoComplete="name"
-              />
-            )}
-            
             {mode === 'reset-password' && (
               <>
                 <InputField 
