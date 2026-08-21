@@ -113,6 +113,31 @@ export default function Auth() {
           if (type === 'recovery' || type === 'invite') {
             setMode('reset-password');
           } else if (type === 'signup') {
+            if (data.session?.user?.email && data.session?.user?.id) {
+              const email = data.session.user.email;
+              const userId = data.session.user.id;
+              
+              const { data: teamMember } = await supabase
+                .from('team_members')
+                .select('role, invited_by')
+                .eq('email', email)
+                .single();
+
+              if (teamMember) {
+                await supabase
+                  .from('profiles')
+                  .update({
+                    team_role: teamMember.role,
+                    invited_by: teamMember.invited_by
+                  })
+                  .eq('id', userId);
+
+                await supabase
+                  .from('team_members')
+                  .update({ status: 'active' })
+                  .eq('email', email);
+              }
+            }
             setMode('email-verified');
           } else if (data.session) {
             // Check if user is admin or team member to redirect correctly
@@ -247,8 +272,14 @@ export default function Auth() {
         const { data: regData, error: regErr } = await supabase.auth.signUp({ email, password });
         if (regErr) throw regErr;
         
-        if (regData.user) {
-          // Vérifier si email est dans team_members
+        if (regData.user && !regData.session) {
+          // Email confirmation required
+          setMode('email-sent-register');
+          return;
+        }
+
+        if (regData.user && regData.session) {
+          // Vérifier si email est dans team_members (fallback si la confirmation par email est désactivée)
           const { data: teamMember } = await supabase
             .from('team_members')
             .select('role, invited_by')
@@ -271,12 +302,6 @@ export default function Auth() {
               .update({ status: 'active' })
               .eq('email', email);
           }
-        }
-
-        if (regData.user && !regData.session) {
-          // Email confirmation required
-          setMode('email-sent-register');
-          return;
         }
 
       } else if (mode === 'reset-password') {

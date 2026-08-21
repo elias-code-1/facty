@@ -160,6 +160,10 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
     return <SuspendedPage />;
   }
 
+  if (profile?.role === 'admin' || profile?.team_role) {
+    return <Navigate to="/admin/facty" replace />;
+  }
+
   // Maintenance : visible pour tous sauf admin
   if (maintenanceMode && profile?.role !== 'admin') {
     return (
